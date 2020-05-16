@@ -38,7 +38,8 @@ export default class Globe{
 	}
 	
 	 addBaseSphere(){
-	    const geometry = new THREE.SphereGeometry(this.radius-1*this.totalSize, 40, 30)
+		 
+	    const geometry = new THREE.SphereGeometry(this.radius-4*this.totalSize, 40, 30)
 	    const material = new THREE.MeshBasicMaterial({ color: this.water     })
 	    const sphere = new THREE.Mesh(geometry, material)
 	    

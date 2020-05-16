@@ -12,6 +12,8 @@ export default class CameraHandler{
 		this.camera.position.z = this.distance;
 		
 	  this.mouse = { x: 0, y: 0 };
+	  this.touch = { x: 0, y: 0 };
+	  
 	  this.mouseOnDown = { x: 0, y: 0 };
 	  this.rotation = { x: 0, y: 0 };
 	  this.target = { x: Math.PI*3/2, y: Math.PI / 6.0 };
@@ -28,6 +30,15 @@ export default class CameraHandler{
 	
 	handlePanResponderGrant = (event) => { 
 		this.mousedown = true;
+		
+
+
+		this.touch.x = ( event.pageX / window.innerWidth ) * 2 - 1;
+		this.touch.y = - ( event.pageY / window.innerHeight ) * 2 + 1;
+		
+		console.log(this.mouse.x+","+this.mouse.y)
+		
+		
 	    this.mouseOnDown.x = - event.pageX;
 	    this.mouseOnDown.y = event.pageY;
 
@@ -41,10 +52,10 @@ export default class CameraHandler{
 	    this.mouse.x = - event.pageX;
 	    this.mouse.y = event.pageY;
 	
-	    var zoomDamp = this.distance/1000;
+	    var zoomDamp = (this.distance*this.distance)/100000;
 	
-	    this.target.x = this.targetOnDown.x + (this.mouse.x - this.mouseOnDown.x) * 0.005 * zoomDamp;
-	    this.target.y = this.targetOnDown.y + (this.mouse.y - this.mouseOnDown.y) * 0.005 * zoomDamp;
+	    this.target.x = this.targetOnDown.x + (this.mouse.x - this.mouseOnDown.x) * 0.003 * zoomDamp;
+	    this.target.y = this.targetOnDown.y + (this.mouse.y - this.mouseOnDown.y) * 0.003 * zoomDamp;
 	
 	    this.target.y = this.target.y > this.PI_HALF ? this.PI_HALF : this.target.y;
 	    this.target.y = this.target.y < - this.PI_HALF ? - this.PI_HALF : this.target.y;
@@ -125,36 +136,27 @@ export default class CameraHandler{
     //}
     return false;
   }
-  
-   onTouchMove = ( event ) =>{
 
-		var x, y;
-
-		if ( event.changedTouches ) {
-
-			x = event.changedTouches[ 0 ].pageX;
-			y = event.changedTouches[ 0 ].pageY;
-
-		} else {
-
-			x = event.clientX;
-			y = event.clientY;
-
-		}
+   
+   onSingleTap = (event) =>{
+		const x = event.pageX;
+		const y = event.pageY;
+		
 
 		this.mouse.x = ( x / window.innerWidth ) * 2 - 1;
 		this.mouse.y = - ( y / window.innerHeight ) * 2 + 1;
-
-	    
-
-	//	checkIntersection();
-
-	}
+   }
   
-  
+  onDoubleTap = ()=> {
+	  if(this.distanceTarget>150){ 
+		 // console.log(this.distanceTarget);
+		  this.distanceTarget = 120;
+	        
+		 }else if(this.distanceTarget<=150) this.distanceTarget = 300;
+  }
   
   zoom =(delta) =>{
-  	const zoomMin = 120
+  	const zoomMin = 110
   	const zoomMax = 300
 
     this.distanceTarget -= delta;

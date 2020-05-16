@@ -17,6 +17,7 @@ export default class VariableObjects{
 		this.mesh = mesh;
 		this.globe = globe;
 		this.container = container;
+		//this.setTextLabels = setTextLabels;
 		
 		this.objects =[];
 		this.objectMap = {};
@@ -54,9 +55,6 @@ export default class VariableObjects{
  
 	  
 	  var self = this;
-	  this.textlabels.forEach(function(text){
-		  if(text.added) self.container.removeChild(text.element); 
-	  });
 	  
 	  this.textlabels = [];
 	  
@@ -94,6 +92,8 @@ export default class VariableObjects{
     });
 
       this._baseGeometry = subgeo;
+      
+     // this.setTextLabels(this.textlabels)
 
   }
   
@@ -268,12 +268,13 @@ export default class VariableObjects{
 		var self = this;
 			// console.log(mouse.x);
 
-	 		 var ret = self.getSelected(mouse,camera,function(clicked,selected){
-	 			self.detail(selected,camera);
-	 		});
-	 		if(ret === false){
-	 			self.detail();
-	 		}
+ 		var ret = self.getSelected(mouse,camera,function(clicked,selected){
+ 			self.detail(selected,camera);
+ 		});
+ 		
+ 		if(ret === false){
+ 			self.detail();
+ 		}
 	 }
 	 
 	  getSelected(mouse,camera,callback){
@@ -307,78 +308,62 @@ export default class VariableObjects{
 	   detail(city,camera){
 		 	
 		  if(this.detailHtml === undefined){
-			  this.detailHtml = this.createTextLabel();
-			  
-		      this.container.appendChild(this.detailHtml.element);
+			  this.detailHtml = this.createTextLabel();			  
 		  }	 
 		  
 		  if(city === undefined){
-			  this.detailHtml.element.className = "text-hide";
+//			  this.detailHtml.element.className = "text-hide";
+			  this.detailHtml.added = false;
 			  return;
 		  }
 		  
-		  this.detailHtml.element.className ="text-detail";
+//		  this.detailHtml.element.className ="text-detail";
+		  this.detailHtml.name = city.name;
+		  this.detailHtml.added = true;
+		  this.detailHtml.factionName=city.factionData.name;
 		  
-		  var html = "<div><h5>"+city.name+"</h5>";
-	
+		  this.detailHtml.population = city.population;
+		  
 		  if(city.faction > 0){
-			  html +="<strong>"+city.factionData.name+"</strong><br/>";
-	
-			  this.detailHtml.element.style.backgroundColor = city.factionData.color;
+			  this.detailHtml.color = city.factionData.color;
 		  }else{
-			  this.detailHtml.element.style.backgroundColor = "#000";
-			  
+			  this.detailHtml.color = 'black'
 		  }
-		  if(city.population > 0){
-			  html +="<span class='glyphicon glyphicon-user'> </span> "+(city.population);
-		  }
-		  
-		  html 	+="</div>";
-	
 		  
 		 
 			  
-		  this.detailHtml.setHTML(html);
+//		  this.detailHtml.setHTML(html);
 		  this.detailHtml.setParent(city.object);
 		  this.detailHtml.updatePosition(true,camera);
-	
+		  
 	  }
 	  
 	  
-  	createTextLabel() {
+  	createTextLabel(name,placement) {
   	
   		var self =this;
-  	
-	    var div = document.createElement('div');
-	    div.className = 'text-label';
-	    div.style.position = 'absolute';
-	    div.style.width = 100;
-	    div.style.height = 100;
-	    div.innerHTML = "hi there!";
-	    div.style.top = -1000;
-	    div.style.left = -1000;
-	    
 	    
 	    return {
-	      element: div,
-	      parent: false,
-	      position: new THREE.Vector3(0,0,0),
-	      added:false,
-	      setHTML: function(html) {
-	        this.element.innerHTML = html;
-	      },
-	      setParent: function(threejsobj) {
-	        this.parent = threejsobj;
-	      },
-	      updatePosition: function(show,camera) {
+	    	top:-1000,
+	    	left:-1000,
+	    	name:name,
+	    	placement:placement,
+	    	parent: false,
+	    	position: new THREE.Vector3(0,0,0),
+	    	added:false,
+	    	setParent: function(threejsobj) {
+	          this.parent = threejsobj;
+	        },
+	        updatePosition: function(show,camera) {
 	        if(this.parent) {
 	          this.position.copy(this.parent.position);
 	        }
 	        
 	        var coords2d = this.get2DCoords(this.position, camera);
-	        this.element.style.left = coords2d.x + 'px';
-	        this.element.style.top = coords2d.y + 'px';
-	
+	        this.left = coords2d.x ;
+	        this.top = coords2d.y;
+	        
+	        
 	       
 	        if(show!==true){
 	        	var distance = this.parent.position.distanceTo(camera.position);
@@ -386,19 +371,13 @@ export default class VariableObjects{
 	        	var a = this.parent.scale.x / 0.3;
 	        	
 	        	if(distance < Math.pow(a,2) * 100){
-		        	this.element.classList.remove("text-hide");
-		        	if(!this.added) self.container.appendChild(this.element);
 	             	this.added  = true;
 	        	}else{
-	        		this.element.classList.add("text-hide");
-	        		if(this.added) self.container.removeChild(this.element); 
 	             	this.added  = false;
 	        		
 	        	}
 	        	
 		        if(distance> 400){
-	        		this.element.classList.add("text-hide");
-	        		if(this.added) self.container.removeChild(this.element); 
 	             	this.added  = false;
 		        }
 		        
@@ -417,15 +396,11 @@ export default class VariableObjects{
 	  } 
 	    
 	    
-	  addDom(point,name,labelPosition){
-			var text = this.createTextLabel();
-			text.setHTML(name);
+	  addDom(point,name,placement){
+			var text = this.createTextLabel(name,placement);
 			text.setParent(point);
 			this.textlabels.push(text);
-			if(labelPosition ==='top'){
-				text.element.classList.add("label-top")
-			}
-		//	container.appendChild(text.element);
+		
 	  }
 	 
 	 render(mouse,camera){
@@ -434,8 +409,8 @@ export default class VariableObjects{
 		 for(var i=0; i<this.textlabels.length; i++) {
   	      	this.textlabels[i].updatePosition(false,camera);
     	 }
-		 
-		 
+		// this.setTextLabels(this.textlabels)
+		 return {textlabels:this.textlabels,detail:this.detailHtml}
 		 
 	 }
 	 

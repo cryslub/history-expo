@@ -3,21 +3,58 @@ import React, { Component } from 'react';
 import ExpoTHREE, { THREE } from 'expo-three'; // 2.2.2-alpha.1
 import ExpoGraphics from 'expo-graphics'; // 0.0.3
 
-import {  View,Animated,PanResponder,TouchableHighlight  } from 'react-native';
-import { PinchGestureHandler, RotationGestureHandler,State } from 'react-native-gesture-handler';
+
+import {  View,Animated,PanResponder,TouchableOpacity,Text,StyleSheet  } from 'react-native';
+import { PinchGestureHandler, RotationGestureHandler,State,PanGestureHandler,TapGestureHandler } from 'react-native-gesture-handler';
+import { Subheading,Paragraph,Button,Caption  } from 'react-native-paper';
 
 
 import Globe from './Globe.js';
 import CameraHandler from './CameraHandler.js';
 import VariableObjects from './VariableObjects.js';
 
+import DataService from './DataService.js';
 
+import Util from './Util.js';
+
+
+const styles = StyleSheet.create({
+	textLabel:{
+		position:'absolute',
+		color: "white",
+		marginLeft:-50,
+		 textShadowColor: 'rgba(0, 0, 0, 1)',
+		  textShadowOffset: {width: -1, height: 1},
+		  textShadowRadius: 1,
+		
+		width:100,		
+		textAlign:'center',
+		lineHeight:13
+	},
+	detail:{
+		position:'absolute',
+		zIndex:10,
+		marginTop:-50,
+		marginLeft:15,	
+		padding:10,
+		borderWidth:1,
+		borderColor:'#111111',
+		opacity: 1
+	}
+});
 
 export default class ThreeScene extends Component{
 
-	
-  
-	componentWillMount() {
+	constructor(){
+		super();
+		this.doubleTap = React.createRef();
+		
+		this.state={
+			textlabels :[],
+			detail:{}
+		}
+		
+		
 		this.panResponder = PanResponder.create({
 			onStartShouldSetPanResponder: this.handleStartShouldSetPanResponder,
 		    onPanResponderGrant: this.handlePanResponderGrant,
@@ -25,7 +62,10 @@ export default class ThreeScene extends Component{
 		    onPanResponderRelease: this.handlePanResponderEnd,
 		    onPanResponderTerminate: this.handlePanResponderEnd,
 		});
+		
 	}
+  
+	
 	// Should we become active when the user presses down on the square?
 	  handleStartShouldSetPanResponder = () => {
 	    return true;
@@ -102,7 +142,7 @@ export default class ThreeScene extends Component{
 		//this.zoom(this.curZoomSpeed);
 		this.cameraHandler.render();
 	    
-	    this.objects.render(this.cameraHandler.mouse,this.camera);
+	    this.objects.render(this.cameraHandler.touch,this.camera);
 	    
 	    this.renderer.render(this.scene, this.camera);
 	    	   
@@ -129,6 +169,10 @@ export default class ThreeScene extends Component{
 	
 		this.cameraHandler = new CameraHandler(this.container,this.camera,this.mesh);
 		this.objects = new VariableObjects(this.scene,this.mesh,this.globe,this.container);
+		
+	//	console.log(this.objects)
+//		this.setState({textlabels:this.objects.textlabels})
+		this.data = new DataService(this.objects);
 	
 	};
 
@@ -142,53 +186,91 @@ export default class ThreeScene extends Component{
   	onRender = delta => {
 	  this.cameraHandler.render();
 	    
-	  //  this.objects.render(this.cameraHandler.mouse,this.camera);	    
+	    const ret = this.objects.render(this.cameraHandler.touch,this.camera);	    
+	    
+	  //  console.log(this.state.textlabels)
+	    this.setState({textlabels:ret.textlabels,detail:ret.detail})
 	    this.renderer.render(this.scene, this.camera);
   	};
   
   	onGestureEvent =event => {
-	  console.log(event.nativeEvent)
+//	  console.log(event.nativeEvent)
 	};
   
 	onHandlerStateChange = event => {
-		console.log(event)
+	//	console.log(event)
 	    if (event.nativeEvent.oldState === State.ACTIVE) {
 	    	
 	    }
 	 };
-	  
+	 
+	 onSingleTap = (e) =>{
+		 if(e.nativeEvent.state === State.ACTIVE){
+			// this.cameraHandler.onSingleTap(e.nativeEvent);
+		 }
+			
+	 }
+	 
+	 onDoubleTap = (e) =>{
+		 if(e.nativeEvent.state === State.ACTIVE)
+			 this.cameraHandler.onDoubleTap();
+	 }
+	 
+	 setTextLabels = (textlabels)=>{
+		 this.setState({textlabels:textlabels})
+	 }
+	 
 	render(){
+		const self = this;
+		const detail = this.state.detail;
+		
 	    return(
-	    	
-	    		<PinchGestureHandler
-	    	      onGestureEvent={this.onZoomEvent}
-		    		>
-	    		<TouchableHighlight   style={{ flex: 1 }}
-		    	onPress={() => {
-		            this.backCount++
-		            if (this.backCount == 2) {
-		                clearTimeout(this.backTimer)
-		                console.warn("Clicked twice")
-		            } else {
-		                this.backTimer = setTimeout(() => {
-		                	this.backCount = 0
-		                }, 3000)
-		            }
-	
-		        }}>
-			    	<View {...this.panResponder.panHandlers} style={{ flex: 1 }}>
-				    	<ExpoGraphics.View
-				              style={{ flex: 1 }}
-				              onContextCreate={this.onContextCreate}
-				              onRender={this.onRender}
-				              onResize={this.onResize}
-				              arEnabled={false}
-				    			ref={(container) => { this.container = container }}
-						    	
-				            />
-				    </View>
-				   </TouchableHighlight>
-				   </PinchGestureHandler>
+	    	<TapGestureHandler
+	    		onHandlerStateChange={this.onSingleTap}
+	    		waitFor={this.doubleTap}>
+	    		<TapGestureHandler
+	    			ref={this.doubleTap}
+	    		    onHandlerStateChange={this.onDoubleTap}
+	    		    numberOfTaps={2}>
+		    		<PinchGestureHandler
+		    	      onGestureEvent={this.onZoomEvent}>
+				    	<View {...this.panResponder.panHandlers} style={{ flex: 1 ,overflow:'hidden'}}>
+					    	<ExpoGraphics.View
+					        	style={{ flex: 1 }}
+					            onContextCreate={this.onContextCreate}
+					            onRender={this.onRender}
+					            onResize={this.onResize}
+					            arEnabled={false}
+					    		ref={(container) => { this.container = container }}	>					    		
+					    	</ExpoGraphics.View>
+					    	{
+					    		this.state.textlabels.map((label,i)=>{
+					    			if(!label.added) return null;
+					    			return 	<Text style={[styles.textLabel, 
+					    						{top:label.top,left:label.left,marginTop:label.placement==='top'?-25:10}]} key={i}>{label.name}</Text>
+					    		})
+					    	}
+					    	{detail.added?
+					    	<View style={[styles.detail,{top:detail.top,left:detail.left,backgroundColor:detail.color}]}>
+					    		<Subheading style={{color:'white'}}>{detail.name}</Subheading>
+					    		{detail.population>0?
+					    		<>
+					    			<Paragraph style={{color:'white',fontWeight: "bold"}}>{detail.factionName}</Paragraph>
+					    		
+						    		<View style={{flexDirection:'row'}}>
+						    			<Button icon="account-multiple" color="white" style={{marginTop:2,minWidth:16,width:16,height:16}} contentStyle={{marginLeft:0,marginRight:-15}}/>
+						    			<Caption  style={{color:'white',marginLeft:5}}>{Util.number(detail.population)}</Caption>
+						    		</View>
+					    		</>
+					    		:null
+					    		}
+					    	</View>
+					    	:null
+					    	}
+				    	</View>
+					  </PinchGestureHandler>
+				 </TapGestureHandler>
+			</TapGestureHandler>
 	    )
 	  }
 }

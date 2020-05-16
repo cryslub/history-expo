@@ -1,14 +1,14 @@
 import City from './City.js';
 
 export default class DataService{
-	constructor(scene){
+	constructor(objetcs){
 	
 		var self = this;
 	
 		self.host = "http://cryslub.cafe24app.com/history/";
 		//self.host = "";
 
-		self.scene = scene;
+		self.globe = objetcs;
 		
 		self.cities ={};
 		self.showUnuse = false;
@@ -243,7 +243,7 @@ export default class DataService{
 			var self = this;
 			
 
-			self.globe = self.scene.current.objects;
+//			self.globe = self.objects;
 
 			var data = [];
 

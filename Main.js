@@ -18,7 +18,7 @@ export default class Main extends Component{
 	}
 	
 	componentDidMount(){
-		//const data = new DataService(this.scene);
+		
 		
 	}
 	
