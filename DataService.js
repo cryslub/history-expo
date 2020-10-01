@@ -1,4 +1,6 @@
 import City from './City.js';
+import DataBase from './DataBase.js';
+
 
 export default class DataService{
 	constructor(objetcs){
@@ -31,48 +33,88 @@ export default class DataService{
 	 
 		self.data = [];
 		
-		self.getFaction(function(){
-			self.getScenario(function(){
+		self.database = new DataBase();
+		
+	}
+	
+	load =  ()=>{
+		
+		const self = this;
+		
+		this.checkUpdate(()=>{
+
+			
+			self.getFaction();
+			
+			self.getScenario(()=>{
 				self.selectScenario(self.scenarios[0]);			
+				
 			});
+			
 		});
+		
+	
+		
+	}
+	
+	checkUpdate =  (callback)=>{
+		const self = this;
+		
+		this.database.getVersion((rows)=>{
+			console.log(rows)
+			if(rows.length == 0){
+				self.download(callback);
+			}
+		});
+	}
+	
+	download = async (callback) =>{
+		await this.downloadScenario();
+		
+		
+		callback();
+	}
+	
+	downloadScenario = async () =>{
+		
+		
+		const data = await fetch(this.host+"data/scenario")
+    	const scenarios = await data.json();
+		this.database.insertScenarios(scenarios)
 		
 	}
 	
 	 getScenario(callback){
 		  var self = this;
-		  
-
-//			self.startLoading();
-			
-			fetch(self.host+"data/scenario")
-			.then(response => response.json())
-		    .then(data => {
-		    	
-		    	self.scenarios = data;
-		    	
-		    	
-		    	self.scenarios.forEach(function(scenario){
-		    		if(scenario.yn){
-			    		var era = "";
-			    		if(scenario.year <=-500){
-			    			era ="ancient";
-			    		}else if(scenario.year > -500 && scenario.year <= 500){
-			    			era ="classical";		    			
-			    		}else if(scenario.year > 500 && scenario.year <= 1400){
-			    			era ="medieval";		    			
-			    		}else if(scenario.year > 1400){
-			    			era ="renaissance";		    			
+		  console.log("getScenario")
+	    	this.database.getScenarios((rows)=>{
+	    			    		 
+	    		self.scenarios = rows._array;
+	    		rows._array.forEach(function(scenario){
+	    			//console.log(scenario)
+			    		if(scenario.yn){
+				    		var era = "";
+				    		if(scenario.year <=-500){
+				    			era ="ancient";
+				    		}else if(scenario.year > -500 && scenario.year <= 500){
+				    			era ="classical";		    			
+				    		}else if(scenario.year > 500 && scenario.year <= 1400){
+				    			era ="medieval";		    			
+				    		}else if(scenario.year > 1400){
+				    			era ="renaissance";		    			
+				    		}
+				    		
+			    			self.era[era].push(scenario);
+			    		//	console.log(scenario.name)
 			    		}
-			    		
-		    			self.era[era].push(scenario);
-		    		}
+		
+			    	})
+			    	callback();
+	    	});
+	    	
 
-		    	})
 		    	
-		    	callback();
-		    	
-		    });
+		   
 			
 		}
 		
@@ -129,26 +171,20 @@ export default class DataService{
 		
 		
 		
-	getFaction(fn){
+	async getFaction(){
 		var self = this;
 		
-		fetch(self.host+"data/faction")
-			.then(response => response.json())
-		    .then(data => {
-	    	var list = data;
-	    	Object.entries(list).forEach(([key, faction]) => {
-				
-				faction.cities = [];
-				faction.forces = [];
-				faction.targeted = [];
-				
-				self.factions[faction.id] = faction;
-		 	});
+		const data  = await fetch(self.host+"data/faction")
+    	var list = await data.json();
+    	Object.entries(list).forEach(([key, faction]) => {
 			
-			fn();
+			faction.cities = [];
+			faction.forces = [];
+			faction.targeted = [];
 			
-	    	
-	    });
+			self.factions[faction.id] = faction;
+	 	});
+		
 		
 	}
 	
@@ -190,7 +226,7 @@ export default class DataService{
 			 		self.snapshotMap[city.snapshot] = c;
 			 		
 
-			 		if(self.activeFactions[city.faction] === undefined && city.yn && city.faction !==0){
+			 		if(self.activeFactions[city.faction] === undefined && city.yn && city.faction !==0 &&self.factions[city.faction]!=undefined){
 				 		self.activeFactions[city.faction] = self.factions[city.faction];	
 				 		self.activeFactions[city.faction].cities = [];
 					}

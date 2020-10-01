@@ -13,6 +13,9 @@ import riversPolygon from "./json/earth-rivers-simplify.json"
 import terrain from "./json/wwf_terr_ecos.json"
 
 import Earcut from "./Earcut.js"
+import Colors from "./Colors.js"
+
+
 
 
 export default class Globe{
@@ -26,8 +29,8 @@ export default class Globe{
 		//this.host = "";
 		this.totalSize = 0.5;
 	    this.radius = 200*this.totalSize;    
-	    this.water =0x4B76C0;  
-		
+		this.theme = 'natural';
+		this.materials = [];
 	}
 
 	init(){
@@ -37,10 +40,27 @@ export default class Globe{
 	    this.addExtraGeoData();
 	}
 	
+	changeTheme = (theme) => {
+		this.theme = 'simple';
+		
+		
+		this.materials.forEach((item)=>{
+			item.material.color.setHex(Colors[theme][item.color])
+		})
+	}
+	
+	addMaterial(color,material){
+	    this.materials.push({color:color,material:material});
+		
+	}
+	
 	 addBaseSphere(){
 		 
 	    const geometry = new THREE.SphereGeometry(this.radius-4*this.totalSize, 40, 30)
-	    const material = new THREE.MeshBasicMaterial({ color: this.water     })
+	    const material = new THREE.MeshBasicMaterial({ color: Colors[this.theme].water     })
+	    
+	    this.addMaterial('water',material)
+	    
 	    const sphere = new THREE.Mesh(geometry, material)
 	    
 	    sphere.rotation.y = Math.PI;
@@ -57,12 +77,12 @@ export default class Globe{
  	 var self = this;
 	  var arr = [{
 	    	file:rivers,
-	    	color:this.water,
+	    	color:'water',
 	    	radius:this.radius+0.1*this.totalSize
 	    },
 	    {
 	    	file:reefs,
-	    	color:0x63ABC1,
+	    	color:'reef',
 	    	radius:this.radius+0.1*this.totalSize
 	    }];
 	    
@@ -84,8 +104,10 @@ export default class Globe{
 	        		  }	
 	        	});
 	        	
-	        	  
-      		self.scene.add( new THREE.LineSegments(geo, new THREE.LineBasicMaterial({color: item.color})));
+	        	  	  
+	        const material = new THREE.LineBasicMaterial({color: Colors[self.theme][item.color]});
+	        self.addMaterial(item.color,material);
+      		self.scene.add( new THREE.LineSegments(geo, material));
 
         	
 	    });
@@ -99,18 +121,18 @@ export default class Globe{
 	
 	var self = this;
 	var materials = [
-		this.makeMaterial(0x9F907A),
-		this.makeMaterial(0x0F5C0F),		      
-		this.makeMaterial(0xFFE99E),
-		this.makeMaterial(0x9F907A),
-		this.makeMaterial(0x297229),
-		this.makeMaterial(0x9E8C5B),
-		this.makeMaterial(0x665147),
-		this.makeMaterial(0xFFE6B3),
-		this.makeMaterial(0x74896C), ////dry grassland
-		this.makeMaterial(0xffffff),
-		this.makeMaterial(0x0D490D),// thick forest
-		this.makeMaterial(this.water)
+		this.makeMaterial('hill'),
+		this.makeMaterial('forest'),		      
+		this.makeMaterial('desert'),
+		this.makeMaterial('rock'),
+		this.makeMaterial('grass'),
+		this.makeMaterial('dry'),
+		this.makeMaterial('mexican'),
+		this.makeMaterial('hot'),
+		this.makeMaterial('dryGrass'), ////dry grassland
+		this.makeMaterial('void'),
+		this.makeMaterial('jungle'),// thick forest
+		this.makeMaterial('water')
 
 	]
 
@@ -142,23 +164,23 @@ export default class Globe{
   	var self = this;
 	 var jsons = [{
 	    	file:lakes,
-	    	color:this.water,
+	    	color:'water',
 	    	radius:this.radius+0.05
 	    },{
 	    	file:glaciated,
-	    	color:0xEFF4FF,
+	    	color:'glacier',
 	    	radius:this.radius+0.5
 	    },{
 	    	file:playas,
-	    	color:0xffffff,
+	    	color:'playa',
 	    	radius:this.radius+0.1
 	    },{
 	    	file:riversPolygon,
-	    	color:this.water,
+	    	color:'water',
 	    	radius:this.radius+0.05
 	    },{
 	    	file:bathymetry,
-	    	color:0x1A448B,
+	    	color:'sea',
 	    	radius:this.radius+0.05
 	    }];
 	    
@@ -172,32 +194,20 @@ export default class Globe{
 	    });
   }
   
-	  drawGeometry(geometry,geo,color){
-	  	
-	  	var self = this;
-  	      if(geometry.type === 'LineString'){
-			  self.drawLines(geo,geometry.coordinates);
-		  }
-		  
-		  if(geometry.type === 'MultiLineString'){
-			geometry.coordinates.forEach(function(coordinates){
-				self.drawLines(geo,coordinates);  				
-			});
-		  }
+	
 	  
-  		  
-	  	self.scene.add( new THREE.LineSegments(geo, new THREE.LineBasicMaterial({color: color})));
-	  
-	  }
-	  
-	  makeMaterial(color){
+	makeMaterial(color){
+		
+		
 		
 		var ret = new THREE.MeshBasicMaterial({
-		        color: color,
+		        color: Colors[this.theme][color],
 		        morphTargets: false,
 		        side: THREE.DoubleSide
 		      });
 		      
+	    this.addMaterial(color,ret)
+
 		return ret;
 	}
 	  
@@ -206,11 +216,13 @@ export default class Globe{
 		var self = this;
 	  var geo = new THREE.Geometry();
 		var material =  new THREE.MeshBasicMaterial({
-	        color: color,
+	        color: Colors[self.theme][color],
 	        morphTargets: false,
 	        side: THREE.DoubleSide
 	      });
 
+		
+ 		 self.addMaterial(color,material);
 		
 		if(data.type==="GeometryCollection"){
 		
@@ -263,7 +275,7 @@ export default class Globe{
 				var color = 1;
 				if(feature.properties !== undefined){
 					
-					if(feature.properties.BIOME>=biomeColorMap.length) console.log(feature.properties.BIOME);
+				//	if(feature.properties.BIOME>=biomeColorMap.length) console.log(feature.properties.BIOME);
 					color = biomeColorMap[feature.properties.BIOME];
 					
 					

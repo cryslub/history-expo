@@ -1,16 +1,12 @@
 import * as THREE from 'three';
 
+import Colors from "./Colors.js"
+
 export default class VariableObjects{
 
 	constructor(scene,mesh,globe,container){
   
-	  this.roadColors = {
-		  "normal":new THREE.Color( 0xAB9B5D),
-		  "water":new THREE.Color( 0xA2C5FF),
-		  "high":new THREE.Color( 0x6E6957),
-		  "mountain":new THREE.Color( 0x82A876),
-		  "desert":new THREE.Color( 0xECB480) 
-	  }
+		this.changeTheme('natural')
   
   
 		this.scene = scene;
@@ -26,9 +22,19 @@ export default class VariableObjects{
 	    this.radius =  globe.radius;    
 	    
 		this.textlabels = [];
-		
+		this.detail();
 	}
 	
+	changeTheme = (theme) => {
+		this.theme = theme;
+		this.roadColors = {
+			  "normal":new THREE.Color( Colors[this.theme].road.normal),
+			  "water":new THREE.Color( Colors[this.theme].road.water),
+			  "high":new THREE.Color( Colors[this.theme].road.high),
+			  "mountain":new THREE.Color( Colors[this.theme].road.mountain),
+			  "desert":new THREE.Color( Colors[this.theme].road.desert) 
+		  }
+	}
 	
 	vertex(point,radius) {
 		if(point === undefined){
@@ -83,7 +89,10 @@ export default class VariableObjects{
         
         }
         
-        city.object = self.addPoint(city, city.population, color,subgeo);
+        city.object = self.makePoint(city, city.population, color);
+        
+        subgeo.merge(city.object.geometry, city.object.matrix);
+        self.scene.add(city.object);
         
         self.objects.push(city.object);
         self.objectMap[city.object.id] = city;	
@@ -98,6 +107,154 @@ export default class VariableObjects{
   }
   
 
+  makePoint(city, size, color){
+	  	var sphereSize = this.radius-0.1*this.totalSize;
+		var geometry;
+		
+		if(size === 0){
+			sphereSize = this.radius+0.1*this.totalSize
+			geometry = new THREE.CylinderGeometry( 0.1*this.totalSize, 0.1*this.totalSize, 0.5*this.totalSize,16  );
+			
+		    
+		}else{
+			
+			
+			geometry = new THREE.BoxGeometry(1*this.totalSize, 1*this.totalSize, 0.3*this.totalSize);
+			geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,0,-0.5));
+		}
+		
+		
+	
+		
+		
+	    var material = new THREE.MeshBasicMaterial( {color: color} );
+	
+		var point = new THREE.Mesh(geometry,material);
+	
+	
+		if(size === 0){
+		
+			point.geometry.rotateX((-90 * Math.PI) / 180);
+		// point.geometry.translate(0,0,-3);
+	
+			
+		}else{
+		    var scale = Math.cbrt(size*this.totalSize)/100;
+		    scale = Math.max( scale, 0.5*this.totalSize );
+		// scale = Math.sqrt(scale);
+		    point.scale.x = scale;
+		    point.scale.y = scale;
+		    point.scale.z = Math.max( scale, 0.8*this.totalSize ); // avoid
+																// non-invertible
+																// matrix
+		
+		    
+		
+		    for (var i = 0; i < point.geometry.faces.length; i++) {
+		      point.geometry.faces[i].color = color;
+		    }
+		    
+		    
+		    this.addDom(point,city);
+	
+		}
+	
+		
+	    var phi = (90 - city.latitude) * Math.PI / 180;
+	    var theta = (180 - city.longitude) * Math.PI / 180;
+	
+	    point.position.x = sphereSize * Math.sin(phi) * Math.cos(theta);
+	    point.position.y = sphereSize * Math.cos(phi);
+	    point.position.z = sphereSize * Math.sin(phi) * Math.sin(theta);
+	
+	    point.lookAt(this.mesh.position);
+	    
+	    
+	    if(point.matrixAutoUpdate){
+	      point.updateMatrix();
+	    }
+	    
+	    
+	    var geo = new THREE.EdgesGeometry( point.geometry );
+	    var mat = new THREE.LineBasicMaterial( { color: 0x111111, linewidth: 1 } );
+	    var wireframe = new THREE.LineSegments( geo, mat );
+	    wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+	    point.add( wireframe );
+	    
+	    return point;
+  }
+  
+
+  makeSelectPoint(city, size, color){
+	  	var sphereSize = this.radius-0.1*this.totalSize;
+		var geometry;
+		
+		if(size === 0){
+			sphereSize = this.radius+0.1*this.totalSize
+			geometry = new THREE.CylinderGeometry( 0.1*this.totalSize, 0.1*this.totalSize, 0.5*this.totalSize,16  );
+			
+		    
+		}else{
+			
+			
+			geometry = new THREE.BoxGeometry(1*this.totalSize, 1*this.totalSize, 0.3*this.totalSize);
+			geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,0,-0.5));
+		}
+		
+		
+	
+		
+		
+	    var material = new THREE.MeshBasicMaterial( {color: color} );
+	
+		var point = new THREE.Mesh(geometry,material);
+	
+	
+		if(size === 0){
+		
+			point.geometry.rotateX((-90 * Math.PI) / 180);
+		// point.geometry.translate(0,0,-3);
+	
+			
+		}else{
+		    var scale = Math.cbrt(size*this.totalSize)/100;
+		    scale = Math.max( scale, 0.5*this.totalSize );
+		// scale = Math.sqrt(scale);
+		    point.scale.x = scale;
+		    point.scale.y = scale;
+		    point.scale.z = Math.max( scale, 0.8*this.totalSize ); // avoid
+																// non-invertible
+																// matrix
+		
+		    
+		
+		    for (var i = 0; i < point.geometry.faces.length; i++) {
+		      point.geometry.faces[i].color = color;
+		    }
+		    
+		    
+		    this.addDom(point,city);
+	
+		}
+	
+		
+	    var phi = (90 - city.latitude) * Math.PI / 180;
+	    var theta = (180 - city.longitude) * Math.PI / 180;
+	
+	    point.position.x = sphereSize * Math.sin(phi) * Math.cos(theta);
+	    point.position.y = sphereSize * Math.cos(phi);
+	    point.position.z = sphereSize * Math.sin(phi) * Math.sin(theta);
+	
+	    point.lookAt(this.mesh.position);
+	    
+	    
+	    if(point.matrixAutoUpdate){
+	      point.updateMatrix();
+	    }
+	    
+	    	    
+	    return point;
+  }
   
    addPoint(city, size, color, subgeo) {
 
@@ -149,7 +306,7 @@ export default class VariableObjects{
 		    }
 		    
 		    
-		    this.addDom(point,city.name,city.labelPosition);
+		    this.addDom(point,city);
 	
 		}
 	
@@ -183,6 +340,10 @@ export default class VariableObjects{
   addLines(lines) {
 	  
 	  var self = this;
+	  
+	  self.lines = lines;
+	  
+	  if(this.roads !=undefined) this.remove(this.roads)
 	  
 	  var geo = new THREE.BufferGeometry();
 
@@ -224,9 +385,11 @@ export default class VariableObjects{
 		geo.setAttribute( 'position', new THREE.BufferAttribute( fvertices, 3 ) );
 		geo.setAttribute( 'color', new THREE.BufferAttribute( fcolors, 3 ) );
 		
-		  var mesh  = new THREE.LineSegments(geo, material);
-			self.scene.add( mesh);
+		var mesh  = new THREE.LineSegments(geo, material);
+		self.scene.add( mesh);
 			
+		this.roads = mesh;
+		
 		return mesh;
 
   }
@@ -305,7 +468,7 @@ export default class VariableObjects{
 	 }
 	 
 	 
-	   detail(city,camera){
+	   detail(city){
 		 	
 		  if(this.detailHtml === undefined){
 			  this.detailHtml = this.createTextLabel();			  
@@ -334,20 +497,23 @@ export default class VariableObjects{
 			  
 //		  this.detailHtml.setHTML(html);
 		  this.detailHtml.setParent(city.object);
-		  this.detailHtml.updatePosition(true,camera);
+		 
 		  
 	  }
 	  
 	  
-  	createTextLabel(name,placement) {
+  	createTextLabel(city) {
   	
   		var self =this;
+  		
+  		if(city===undefined) city = {};
 	    
 	    return {
 	    	top:-1000,
 	    	left:-1000,
-	    	name:name,
-	    	placement:placement,
+	    	name:city.name,
+	    	placement:city.labelPosition,
+	    	city:city,
 	    	parent: false,
 	    	position: new THREE.Vector3(0,0,0),
 	    	added:false,
@@ -396,20 +562,21 @@ export default class VariableObjects{
 	  } 
 	    
 	    
-	  addDom(point,name,placement){
-			var text = this.createTextLabel(name,placement);
+	  addDom(point,city){
+			var text = this.createTextLabel(city);
 			text.setParent(point);
 			this.textlabels.push(text);
 		
 	  }
 	 
 	 render(mouse,camera){
-		 this.onMouseover(mouse,camera);
 		 
 		 for(var i=0; i<this.textlabels.length; i++) {
   	      	this.textlabels[i].updatePosition(false,camera);
     	 }
 		// this.setTextLabels(this.textlabels)
+		 if(this.detailHtml!=undefined)
+			 this.detailHtml.updatePosition(true,camera);
 		 return {textlabels:this.textlabels,detail:this.detailHtml}
 		 
 	 }

@@ -19,7 +19,8 @@ export default class CameraHandler{
 	  this.target = { x: Math.PI*3/2, y: Math.PI / 6.0 };
 	  this.targetOnDown = { x: 0, y: 0 };
 	  
-	  
+	  this.zoomMin = 110
+	  this.zoomMax = 300
 
 	  //  this.container.addEventListener('mousedown', this.onMouseDown, false);
 	  //  this.container.addEventListener('mousewheel', this.onMouseWheel, false);
@@ -156,14 +157,30 @@ export default class CameraHandler{
   }
   
   zoom =(delta) =>{
-  	const zoomMin = 110
-  	const zoomMax = 300
 
     this.distanceTarget -= delta;
-    this.distanceTarget = this.distanceTarget > zoomMax ? zoomMax : this.distanceTarget;
-    this.distanceTarget = this.distanceTarget < zoomMin  ? zoomMin : this.distanceTarget;
+    this.checkZoom();
   }
   
+  checkZoom = ()=>{
+	    this.distanceTarget = this.distanceTarget > this.zoomMax ? this.zoomMax : this.distanceTarget;
+	    this.distanceTarget = this.distanceTarget < this.zoomMin  ? this.zoomMin : this.distanceTarget;
+	  
+  }
+  
+  zoomIn = ()=>{	  
+	  this.zoom(Math.log(100)*2);
+  }
+
+  zoomOut = ()=>{	  
+	  this.zoom(Math.log(0.01)*2);
+  }
+
+  
+  setDistanceTarget = (distanceTarget)=>{
+	  	this.distanceTarget = distanceTarget;
+	    this.checkZoom();
+}
   
   render(){
   

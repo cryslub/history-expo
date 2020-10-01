@@ -13,23 +13,26 @@ import Globe from './Globe.js';
 import CameraHandler from './CameraHandler.js';
 import VariableObjects from './VariableObjects.js';
 
-import DataService from './DataService.js';
+
 
 import Util from './Util.js';
 
 
 const styles = StyleSheet.create({
-	textLabel:{
-		position:'absolute',
+	text:{
 		color: "white",
-		marginLeft:-50,
 		 textShadowColor: 'rgba(0, 0, 0, 1)',
 		  textShadowOffset: {width: -1, height: 1},
 		  textShadowRadius: 1,
+
+			lineHeight:13,
+			textAlign:'center',
+	},
+	textLabel:{
+		position:'absolute',
+		marginLeft:-50,
 		
 		width:100,		
-		textAlign:'center',
-		lineHeight:13
 	},
 	detail:{
 		position:'absolute',
@@ -65,6 +68,9 @@ export default class ThreeScene extends Component{
 		
 	}
   
+	detail = (label)=>{
+		this.objects.detail(label.city)
+	}
 	
 	// Should we become active when the user presses down on the square?
 	  handleStartShouldSetPanResponder = () => {
@@ -76,6 +82,8 @@ export default class ThreeScene extends Component{
 		  const event = this._transformEvent({ ...e, gestureState });
 //		  console.log(event)
 		  this.cameraHandler.handlePanResponderGrant(event.nativeEvent)
+		  this.objects.onMouseover(this.cameraHandler.touch,this.camera);
+		  
 	  };
 
 	  // Every time the touch/mouse moves
@@ -101,53 +109,13 @@ export default class ThreeScene extends Component{
 		    return event;
 		  };
 		  
-		  
-	  onZoomEvent = (e) =>{
-		  const event = this._transformEvent({ ...e });
-		  		 
-		  this.cameraHandler.onZoomEvent(event.nativeEvent);
-		//  console.log(event);
-	  }
 
-	onWindowResize = ( event ) => {
-	  this.camera.aspect = window.innerWidth / window.innerHeight;
-	    this.camera.updateProjectionMatrix();
-
-	    this.renderer.setSize( window.innerWidth, window.innerHeight );
-	}
-  	
-	componentWillUnmount(){
-	//    this.stop()
-	 //   this.container.removeChild(this.renderer.domElement)
+	  changeTheme = (theme) => {
+		 this.globe.changeTheme(theme)
+		 this.objects.changeTheme(theme);
+		 this.objects.addLines(this.objects.lines)
 	  }
 	  
-	start = () => {
-	    if (!this.frameId) {
-	      this.frameId = requestAnimationFrame(this.animate)
-	    }
-	  }
-	  
-	stop = () => {
-	    cancelAnimationFrame(this.frameId)
-	  }
-	  
-	animate = () => {
-	  // this.cube.rotation.x += 0.01
-	   //this.cube.rotation.y += 0.01
-	   this.renderScene()
-	   this.frameId = window.requestAnimationFrame(this.animate)
-	 }
-	 
-	renderScene = () => {
-		//this.zoom(this.curZoomSpeed);
-		this.cameraHandler.render();
-	    
-	    this.objects.render(this.cameraHandler.touch,this.camera);
-	    
-	    this.renderer.render(this.scene, this.camera);
-	    	   
-	}
-
 	onContextCreate = async ({ gl, arSession, width, height, scale }) => {
 		
 		this.renderer = new ExpoTHREE.Renderer({ gl });
@@ -172,7 +140,8 @@ export default class ThreeScene extends Component{
 		
 	//	console.log(this.objects)
 //		this.setState({textlabels:this.objects.textlabels})
-		this.data = new DataService(this.objects);
+		
+		this.props.onLoad(this.objects);
 	
 	};
 
@@ -193,84 +162,58 @@ export default class ThreeScene extends Component{
 	    this.renderer.render(this.scene, this.camera);
   	};
   
-  	onGestureEvent =event => {
-//	  console.log(event.nativeEvent)
-	};
-  
-	onHandlerStateChange = event => {
-	//	console.log(event)
-	    if (event.nativeEvent.oldState === State.ACTIVE) {
-	    	
-	    }
-	 };
 	 
-	 onSingleTap = (e) =>{
-		 if(e.nativeEvent.state === State.ACTIVE){
-			// this.cameraHandler.onSingleTap(e.nativeEvent);
-		 }
-			
+	 zoom = (delta) =>{		 
+		 this.cameraHandler.zoom(delta);
 	 }
 	 
-	 onDoubleTap = (e) =>{
-		 if(e.nativeEvent.state === State.ACTIVE)
-			 this.cameraHandler.onDoubleTap();
-	 }
-	 
-	 setTextLabels = (textlabels)=>{
-		 this.setState({textlabels:textlabels})
-	 }
 	 
 	render(){
 		const self = this;
 		const detail = this.state.detail;
 		
 	    return(
-	    	<TapGestureHandler
-	    		onHandlerStateChange={this.onSingleTap}
-	    		waitFor={this.doubleTap}>
-	    		<TapGestureHandler
-	    			ref={this.doubleTap}
-	    		    onHandlerStateChange={this.onDoubleTap}
-	    		    numberOfTaps={2}>
-		    		<PinchGestureHandler
-		    	      onGestureEvent={this.onZoomEvent}>
-				    	<View {...this.panResponder.panHandlers} style={{ flex: 1 ,overflow:'hidden'}}>
-					    	<ExpoGraphics.View
-					        	style={{ flex: 1 }}
-					            onContextCreate={this.onContextCreate}
-					            onRender={this.onRender}
-					            onResize={this.onResize}
-					            arEnabled={false}
-					    		ref={(container) => { this.container = container }}	>					    		
-					    	</ExpoGraphics.View>
-					    	{
-					    		this.state.textlabels.map((label,i)=>{
-					    			if(!label.added) return null;
-					    			return 	<Text style={[styles.textLabel, 
-					    						{top:label.top,left:label.left,marginTop:label.placement==='top'?-25:10}]} key={i}>{label.name}</Text>
-					    		})
-					    	}
-					    	{detail.added?
-					    	<View style={[styles.detail,{top:detail.top,left:detail.left,backgroundColor:detail.color}]}>
-					    		<Subheading style={{color:'white'}}>{detail.name}</Subheading>
-					    		{detail.population>0?
-					    		<>
-					    			<Paragraph style={{color:'white',fontWeight: "bold"}}>{detail.factionName}</Paragraph>
-					    		
-						    		<View style={{flexDirection:'row'}}>
-						    			<Button icon="account-multiple" color="white" style={{marginTop:2,minWidth:16,width:16,height:16}} contentStyle={{marginLeft:0,marginRight:-15}}/>
-						    			<Caption  style={{color:'white',marginLeft:5}}>{Util.number(detail.population)}</Caption>
-						    		</View>
-					    		</>
-					    		:null
-					    		}
-					    	</View>
-					    	:null
-					    	}
-				    	</View>
-					  </PinchGestureHandler>
-				 </TapGestureHandler>
-			</TapGestureHandler>
+	    	<View {...this.panResponder.panHandlers} style={{ flex: 1 ,overflow:'hidden'}}>
+		    	<ExpoGraphics.View
+		        	style={{ flex: 1 }}
+		            onContextCreate={this.onContextCreate}
+		            onRender={this.onRender}
+		            onResize={this.onResize}
+		            arEnabled={false}
+		    		ref={(container) => { this.container = container }}	>					    		
+		    	</ExpoGraphics.View>
+		    	{
+		    		this.state.textlabels.map((label,i)=>{
+		    			if(!label.added) return null;
+		    			return 	<TouchableOpacity key={i} 
+		    				style={[styles.textLabel, 
+    							{top:label.top,left:label.left,marginTop:label.placement==='top'?-25:10}]
+		    				}
+		    				onPress={()=>this.detail(label)}>
+		    					<Text  style={styles.text}>{label.name}</Text>
+		    			</TouchableOpacity >
+		    		})
+		    	}
+		    	{detail.added?
+		    	<View style={[styles.detail,{top:detail.top,left:detail.left,backgroundColor:detail.color}]}>
+		    		<Subheading style={{color:'white'}}>{detail.name}</Subheading>
+		    		{detail.population>0?
+		    		<>
+		    			<View style={{flexDirection:'row'}}>
+		    				<Button icon="bookmark" color="white" style={{marginTop:2,minWidth:21,width:21,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>
+		    				<Caption style={{color:'white',fontWeight: "bold"}}>{detail.factionName}</Caption>
+		    			</View>
+			    		<View style={{flexDirection:'row'}}>
+			    			<Button icon="account-multiple" color="white" style={{marginTop:2,minWidth:16,width:16,height:16}} contentStyle={{marginLeft:0,marginRight:-15}}/>
+			    			<Caption  style={{color:'white',marginLeft:5}}>{Util.number(detail.population)}</Caption>
+			    		</View>
+		    		</>
+		    		:null
+		    		}
+		    	</View>
+		    	:null
+		    	}
+	    	</View>
 	    )
 	  }
 }

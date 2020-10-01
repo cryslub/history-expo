@@ -1,0 +1,55 @@
+ const Colors = {
+		 natural:{
+				water:0x4B76C0,
+				reef:0x63ABC1,
+				hill:0x9F907A,
+				forest:0x0F5C0F,
+				desert:0xFFE99E,
+				rock:0x9F907A,
+				grass:0x297229,
+				dry:0x9E8C5B,
+				mexican:0x665147,
+				hot:0xFFE6B3,
+				dryGrass:0x74896C,
+				void:0xffffff,
+				jungle:0x0D490D,
+				glacier:0xEFF4FF,
+				playa:0xffffff,
+				sea:0x1A448B,
+				road:{
+					normal:0xAB9B5D,
+					water:0xA2C5FF,
+					high:0x6E6957,
+					mountain:0x82A876,
+					desert:0xECB480
+				}
+			},
+			simple:{
+				water:0x6F98DE,
+				reef:0x98B6EA,
+				hill:0xA4A4A3,
+				forest:0x8F8F8F,
+				desert:0xE3E3E3,
+				rock:0xA7A7A7,
+				grass:0xA6A6A6,
+				dry:0xA7A7A7,
+				mexican:0x7E7E7E,
+				hot:0xE7E7E7,
+				dryGrass:0x909090,
+				void:0xffffff,
+				jungle:0x7A7A7A,
+				glacier:0xFCFCFC,
+				playa:0xffffff,
+				sea:0x5F88CD,
+				road:{
+					normal:0xffffff,
+					water:0xA2C5FF,
+					high:0x8B8B8B,
+					mountain:0xC1C1C1,
+					desert:0xfcfcfc
+				}
+			}
+ }
+ 
+ 
+ export default Colors
