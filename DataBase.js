@@ -6,9 +6,9 @@ export default class DataBase{
 
 	constructor(){
 		db.transaction(tx => {
-	      tx.executeSql(
-	        "create table if not exists scenario (id integer primary key not null, name text, year int,month text,description text,yn integer,age text);"
-	      );
+//	      tx.executeSql(
+//	        "create table if not exists scenario (id integer primary key not null, name text, year int,month text,description text,yn integer,age text);"
+//	      );
 	      
 	      tx.executeSql(
 	  	        "create table  if not exists version (id integer primary key not null, version integer);"

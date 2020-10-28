@@ -19,7 +19,7 @@ export default class CameraHandler{
 	  this.target = { x: Math.PI*3/2, y: Math.PI / 6.0 };
 	  this.targetOnDown = { x: 0, y: 0 };
 	  
-	  this.zoomMin = 110
+	  this.zoomMin = 105
 	  this.zoomMax = 300
 
 	  //  this.container.addEventListener('mousedown', this.onMouseDown, false);
@@ -37,7 +37,7 @@ export default class CameraHandler{
 		this.touch.x = ( event.pageX / window.innerWidth ) * 2 - 1;
 		this.touch.y = - ( event.pageY / window.innerHeight ) * 2 + 1;
 		
-		console.log(this.mouse.x+","+this.mouse.y)
+	//	console.log(this.mouse.x+","+this.mouse.y)
 		
 		
 	    this.mouseOnDown.x = - event.pageX;

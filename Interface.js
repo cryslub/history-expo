@@ -95,20 +95,20 @@ export default class Interface extends Component {
 		 </View>	
 		
 		<View style={styles.right}>
-			<Button mode="outlined"  onPress={()=>this.zoom(100)} 
+			<Button mode="outlined"  onPress={()=>this.zoom(80)} 
 				compact={true} color="white" style={{borderColor:'white',marginBottom:3}} labelStyle={{fontSize:9}}> 
 		 		++
 		 	</Button>
 
-	 		<Button mode="outlined"  onPress={()=>this.zoom(20)} 
+	 		<Button mode="outlined"  onPress={()=>this.zoom(8)} 
 				compact={true} color="white" style={{borderColor:'white',marginBottom:3}} labelStyle={{fontSize:9}}> 
 		 		+
 		 	</Button>
-			<Button mode="outlined"  onPress={()=>this.zoom(-20)} 
+			<Button mode="outlined"  onPress={()=>this.zoom(-8)} 
 				compact={true} color="white" style={{borderColor:'white',marginBottom:3}} labelStyle={{fontSize:9}}> 
 		 		-
 		 	</Button>
-		 	<Button mode="outlined"  onPress={()=>this.zoom(-100)} 
+		 	<Button mode="outlined"  onPress={()=>this.zoom(-80)} 
 				compact={true} color="white" style={{borderColor:'white'}} labelStyle={{fontSize:9}}> 
 		 		--
 		 	</Button>

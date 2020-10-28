@@ -113,7 +113,7 @@ export default class VariableObjects{
 		
 		if(size === 0){
 			sphereSize = this.radius+0.1*this.totalSize
-			geometry = new THREE.CylinderGeometry( 0.1*this.totalSize, 0.1*this.totalSize, 0.5*this.totalSize,16  );
+			geometry = new THREE.CylinderGeometry( 0.06*this.totalSize, 0.06*this.totalSize, 0.5*this.totalSize,16  );
 			
 		    
 		}else{
@@ -140,7 +140,7 @@ export default class VariableObjects{
 			
 		}else{
 		    var scale = Math.cbrt(size*this.totalSize)/100;
-		    scale = Math.max( scale, 0.5*this.totalSize );
+		    scale = Math.max( scale, 0.2*this.totalSize );
 		// scale = Math.sqrt(scale);
 		    point.scale.x = scale;
 		    point.scale.y = scale;

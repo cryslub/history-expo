@@ -1,5 +1,13 @@
 import City from './City.js';
-import DataBase from './DataBase.js';
+//import DataBase from './DataBase.js';
+
+import scenarios from "./json/scenario.json"
+import factions from "./json/faction.json"
+import roads from "./json/road.json"
+import scenarioRoads from "./json/scenarioRoad.json"
+import scenarioCities from "./json/scenarioCity.json"
+import cities from "./json/city.json"
+import snapshots from "./json/snapshot.json"
 
 
 export default class DataService{
@@ -33,7 +41,7 @@ export default class DataService{
 	 
 		self.data = [];
 		
-		self.database = new DataBase();
+	//	self.database = new DataBase();
 		
 	}
 	
@@ -41,95 +49,55 @@ export default class DataService{
 		
 		const self = this;
 		
-		this.checkUpdate(()=>{
+	
+		self.getFaction();
+		
+		self.selectScenario(scenarios[0]);			
+		self.makeEra();
+		
+	
+		
+	}
+	
+	
+	 makeEra(callback){
+		 var self = this;
+		 	 
+		scenarios.forEach(function(scenario){
+			//console.log(scenario)
+	    		if(scenario.yn){
+		    		var era = "";
+		    		if(scenario.year <=-500){
+		    			era ="ancient";
+		    		}else if(scenario.year > -500 && scenario.year <= 500){
+		    			era ="classical";		    			
+		    		}else if(scenario.year > 500 && scenario.year <= 1400){
+		    			era ="medieval";		    			
+		    		}else if(scenario.year > 1400){
+		    			era ="renaissance";		    			
+		    		}
+		    		
+	    			self.era[era].push(scenario);
+	    		//	console.log(scenario.name)
+	    		}
 
-			
-			self.getFaction();
-			
-			self.getScenario(()=>{
-				self.selectScenario(self.scenarios[0]);			
-				
-			});
-			
-		});
+	    	})
 		
-	
-		
-	}
-	
-	checkUpdate =  (callback)=>{
-		const self = this;
-		
-		this.database.getVersion((rows)=>{
-			console.log(rows)
-			if(rows.length == 0){
-				self.download(callback);
-			}
-		});
-	}
-	
-	download = async (callback) =>{
-		await this.downloadScenario();
-		
-		
-		callback();
-	}
-	
-	downloadScenario = async () =>{
-		
-		
-		const data = await fetch(this.host+"data/scenario")
-    	const scenarios = await data.json();
-		this.database.insertScenarios(scenarios)
-		
-	}
-	
-	 getScenario(callback){
-		  var self = this;
-		  console.log("getScenario")
-	    	this.database.getScenarios((rows)=>{
-	    			    		 
-	    		self.scenarios = rows._array;
-	    		rows._array.forEach(function(scenario){
-	    			//console.log(scenario)
-			    		if(scenario.yn){
-				    		var era = "";
-				    		if(scenario.year <=-500){
-				    			era ="ancient";
-				    		}else if(scenario.year > -500 && scenario.year <= 500){
-				    			era ="classical";		    			
-				    		}else if(scenario.year > 500 && scenario.year <= 1400){
-				    			era ="medieval";		    			
-				    		}else if(scenario.year > 1400){
-				    			era ="renaissance";		    			
-				    		}
-				    		
-			    			self.era[era].push(scenario);
-			    		//	console.log(scenario.name)
-			    		}
-		
-			    	})
-			    	callback();
-	    	});
-	    	
-
-		    	
 		   
 			
 		}
 		
 		getRoad (scenario){
 			var self = this;
-			fetch(self.host+"data/road/scenario/"+scenario)
-			.then(response => response.json())
-		    .then(data => {		    
-		    	
+			
+			
+				
+		
 		    	self.roadMap = {};
 		    	
-		    	var lines = data;
-		    	Object.entries(lines).forEach(([key, line]) => {
-					
-					self.roadMap[line.road] = line;
+		    	scenarioRoads[scenario].forEach(id=>{ 
+		    		if(roads[id] != undefined)
+		    			self.roadMap[id] = roads[id];
 			 	});
 				
 				
@@ -161,8 +129,6 @@ export default class DataService{
 						 clearInterval(interval);
 					}
 				}, 1000);
-		    	
-		    });
 			
 		}
 		
@@ -174,9 +140,7 @@ export default class DataService{
 	async getFaction(){
 		var self = this;
 		
-		const data  = await fetch(self.host+"data/faction")
-    	var list = await data.json();
-    	Object.entries(list).forEach(([key, faction]) => {
+    	factions.forEach(faction => {
 			
 			faction.cities = [];
 			faction.forces = [];
@@ -204,17 +168,35 @@ export default class DataService{
 			
 //			self.startLoading();
 			
-			fetch(self.host+"data/scenarioCities/"+scenario.id)
-			.then(response => response.json())
-		    .then(data => {
 		    	
-		    	var list = data;
 		    	self.data = [];
 		    	self.activeFactions = {};
 		    	self.region = {};
 
-		    	Object.entries(list).forEach(([key, city]) => {
-			 		
+		    	
+		    	
+		    	scenarioCities[scenario.id].forEach(id=>{
+		    		var city = {};
+		    		 Object.assign(city, cities[id]);
+		    		
+		    		var lastSnapshot = undefined;
+		    		for(const snapshot of snapshots[id]){
+
+		    			lastSnapshot = snapshot;
+
+		    			if(scenario.year>=snapshot.year){
+		    				if(lastSnapshot == undefined) lastSnapshot = snapshot;
+		    				city.population = lastSnapshot.population;
+		    				if(lastSnapshot.name != null) city.name = lastSnapshot.name;
+		    				city.snapshot = lastSnapshot.id;
+		    				city.faction = lastSnapshot.faction;
+		    				city.color = self.factions[city.faction].color;
+		    			}
+		    		}
+		    		
+		    		if(city.population==0 && city.type!='waypoint') return false;
+		    		
+		    		
 			 		var c = new City(city,self);
 			 		
 			 		self.cities[city.id] = c;
@@ -268,8 +250,6 @@ export default class DataService{
 //		       		$('#faction li:first-child a').tab('show');
 		       	},100);
 			  	
-			  	 
-		    });
 			
 		}
 		
