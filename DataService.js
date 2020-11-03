@@ -107,7 +107,6 @@ export default class DataService{
 					
 					if(self.cities[line.start] !== undefined && self.cities[line.end] !== undefined){
 
-						if(self.cities[line.start].yn && self.cities[line.end].yn){
 // line.type ='road';
 							line.destinies = [{road:line,city:self.cities[line.start]},{road:line,city:self.cities[line.end]}];
 							line.forces = [];
@@ -116,8 +115,6 @@ export default class DataService{
 							self.cities[line.end].destinies.push({road:line,city:self.cities[line.start]});
 
 							self.lineCoord.push({start:self.cities[line.start],end:self.cities[line.end],waypoint:line.waypoint,type:line.type});
-							
-						}
 					}
 			 	});
 				
@@ -182,14 +179,14 @@ export default class DataService{
 		    		var lastSnapshot = undefined;
 		    		for(const snapshot of snapshots[id]){
 
-		    			lastSnapshot = snapshot;
-
 		    			if(scenario.year>=snapshot.year){
-		    				if(lastSnapshot == undefined) lastSnapshot = snapshot;
-		    				city.population = lastSnapshot.population;
-		    				if(lastSnapshot.name != null) city.name = lastSnapshot.name;
-		    				city.snapshot = lastSnapshot.id;
-		    				city.faction = lastSnapshot.faction;
+		    				if(id==44){
+		    					console.log(snapshot)
+		    				}
+		    				city.population = snapshot.population;
+		    				if(snapshot.name != null) city.name = snapshot.name;
+		    				city.snapshot = snapshot.id;
+		    				city.faction = snapshot.faction;
 		    				city.color = self.factions[city.faction].color;
 		    			}
 		    		}
@@ -208,11 +205,11 @@ export default class DataService{
 			 		self.snapshotMap[city.snapshot] = c;
 			 		
 
-			 		if(self.activeFactions[city.faction] === undefined && city.yn && city.faction !==0 &&self.factions[city.faction]!=undefined){
+			 		if(self.activeFactions[city.faction] === undefined  && city.faction !==0 &&self.factions[city.faction]!=undefined){
 				 		self.activeFactions[city.faction] = self.factions[city.faction];	
 				 		self.activeFactions[city.faction].cities = [];
 					}
-			 		if(self.activeFactions[city.faction] !== undefined && city.yn ){
+			 		if(self.activeFactions[city.faction] !== undefined  ){
 			 			self.activeFactions[city.faction].cities.push(c);
 			 		}
 			 	});
@@ -274,9 +271,7 @@ export default class DataService{
 			
 			window.data.forEach(function(city){
 				
-				if(self.showUnuse || city.yn){
 					data.push(city);
-				}	
 			});
 			
 			self.globe.addData(data);
