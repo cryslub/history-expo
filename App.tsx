@@ -18,8 +18,8 @@ export default class App extends React.Component {
 	
 	
   render() {
-    return ( 
-    	<Main  ref={this.scene}/>       
+    return (
+        	<Main  ref={this.scene}/>
     );
   }
 

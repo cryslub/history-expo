@@ -1,0 +1,66 @@
+{
+  "8533":{
+    "heroes": [1,3,4,5,798,799,800,801],
+    "governor": 1
+  },
+  "860":{
+    "heroes": [804,802,805,6,806],
+    "governor": 804
+  },
+  "73":{
+    "heroes": [807,796],
+    "governor": 807
+  },
+  "57":{
+    "heroes": [797],
+    "governor": 797
+  },
+  "102":{
+    "heroes": [2],
+    "governor": 2
+  },
+  "8535":{
+    "heroes": [794],
+    "governor": 794
+  },
+  "8534":{
+    "heroes": [795],
+    "governor": 795
+  },
+  "859":{
+    "heroes": [7],
+    "governor": 7
+  },
+  "296":{
+    "heroes": [8],
+    "governor": 8
+  },
+  "861":{
+    "heroes": [9,16,345,346,349,18],
+    "governor": 9
+  },
+  "149":{
+      "heroes": [15,350],
+    "governor": 15
+  },
+  "153":{
+    "heroes": [14],
+    "governor": 14
+  },
+  "716":{
+    "heroes": [17],
+    "governor": 17
+  },
+  "702":{
+    "heroes": [12],
+    "governor": 12
+  },
+  "862":{
+    "heroes": [10,11,348,344,347],
+    "governor": 10
+  },
+  "863":{
+    "heroes": [13,351],
+    "governor": 13
+  }
+}

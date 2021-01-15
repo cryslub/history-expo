@@ -12,8 +12,11 @@ import { Subheading,Paragraph,Button,Caption  } from 'react-native-paper';
 import Globe from './Globe.js';
 import CameraHandler from './CameraHandler.js';
 import VariableObjects from './VariableObjects.js';
+import Detail from './Detail.js';
+import Icon from './Icon.js';
 
 
+import mainStore from './MainContext.js'
 
 import Util from './Util.js';
 
@@ -21,19 +24,29 @@ import Util from './Util.js';
 const styles = StyleSheet.create({
 	text:{
 		color: "white",
-		 textShadowColor: 'rgba(0, 0, 0, 1)',
-		  textShadowOffset: {width: -1, height: 1},
-		  textShadowRadius: 1,
+		 textShadowColor: 'rgba(0, 0, 0, 0.7)',
+          textShadowOffset: {width: -1, height: 1},
+          textShadowRadius: 1,
 
-			lineHeight:13,
-			textAlign:'center',
+        lineHeight:13,
+        textAlign:'center',
+        padding:5,
+        borderRadius:5
 	},
 	textLabel:{
-		position:'absolute',
-		marginLeft:-50,
-		
-		width:100,		
+		position:'absolute'
 	},
+	battle:{
+        color: "white",
+         textShadowColor: 'rgba(0, 0, 0, 0.7)',
+          textShadowOffset: {width: -1, height: 1},
+          textShadowRadius: 1,
+
+        lineHeight:13,
+        textAlign:'center',
+        padding:5,
+        borderRadius:5
+    },
 	detail:{
 		position:'absolute',
 		zIndex:10,
@@ -71,7 +84,13 @@ export default class ThreeScene extends Component{
 	detail = (label)=>{
 		this.objects.detail(label.city)
 	}
-	
+
+	detailOff = ()=>{
+	    const detail = this.state.detail;
+	    detail.added = false;
+	    this.setState({detail:detail})
+	}
+
 	// Should we become active when the user presses down on the square?
 	  handleStartShouldSetPanResponder = () => {
 	    return true;
@@ -115,9 +134,13 @@ export default class ThreeScene extends Component{
 		 this.objects.changeTheme(theme);
 		 this.objects.addLines(this.objects.lines)
 	  }
-	  
+
+	 addUnit = (lat,lon,color,unit) =>{
+	    this.objects.addUnit(lat,lon,color,unit)
+	 }
+
 	onContextCreate = async ({ gl, arSession, width, height, scale }) => {
-		
+
 		this.renderer = new ExpoTHREE.Renderer({ gl });
 	    this.renderer.setPixelRatio(scale);
 	    this.renderer.setSize(width, height);
@@ -137,12 +160,13 @@ export default class ThreeScene extends Component{
 	
 		this.cameraHandler = new CameraHandler(this.container,this.camera,this.mesh);
 		this.objects = new VariableObjects(this.scene,this.mesh,this.globe,this.container);
-		
+		mainStore.objects = this.objects;
 	//	console.log(this.objects)
 //		this.setState({textlabels:this.objects.textlabels})
 		
 		this.props.onLoad(this.objects);
-	
+
+	      this.cameraHandler.moveCameraTo(30,39,200);
 	};
 
 	onResize = ({ width, height, scale }) => {
@@ -167,7 +191,20 @@ export default class ThreeScene extends Component{
 		 this.cameraHandler.zoom(delta);
 	 }
 	 
-	 
+	 moveCameraTo = (lat,long,distance)=>{
+     		this.cameraHandler.moveCameraTo(lat,long,distance);
+      }
+
+    remove = (unit)=>{
+        const array = this.state.textlabels;
+        for (var i = array.length - 1; i > -1; i--) {
+            if(array[i].city == unit){
+                 array.splice(i, 1);
+            }
+        }
+        this.objects.remove(unit.object)
+    }
+
 	render(){
 		const self = this;
 		const detail = this.state.detail;
@@ -185,32 +222,55 @@ export default class ThreeScene extends Component{
 		    	{
 		    		this.state.textlabels.map((label,i)=>{
 		    			if(!label.added) return null;
+
+		    			const style = {top:label.top,left:label.left,marginTop:label.placement==='top'?-25:10};
+		    			if(label.type=='unit'){
+		    			    style.marginTop=5;
+		    			    if(label.city.currentLocation.labelPosition!='top'){
+		    			        style.marginTop=-28;
+		    			    }
+
+		    			    //style.marginLeft='-10%';
+		    			}
+
+                        const icons = [];
+                        if(label.city.state=='fighting'){
+                            icons.push("sword-cross")
+                        }
+                        if(label.city.moral<=0){
+                            icons.push("heart")
+                        }
+                        if(label.city.resources.food==undefined||label.city.resources.food<=0){
+                            icons.push("barley")
+                        }
+
+
 		    			return 	<TouchableOpacity key={i} 
-		    				style={[styles.textLabel, 
-    							{top:label.top,left:label.left,marginTop:label.placement==='top'?-25:10}]
-		    				}
+		    				style={[styles.textLabel,style]}
 		    				onPress={()=>this.detail(label)}>
-		    					<Text  style={styles.text}>{label.name}</Text>
+		    				    {label.type=='unit'?<>
+		    				        <View  style={{flexDirection:'row'}}>
+		    				        {
+		    				            icons.map((icon,index)=>{
+                                            return  <View style={[styles.text,{padding:0}]}>
+                                               <Button icon={icon} color="#fc8b8b" style={[styles.text,{paddingRight:0,marginTop:2,marginLeft:-22-(index*14),minWidth:24,width:24,height:22}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
+                                            </View>
+		    				            })
+		    				        }
+                                     <View style={[styles.text,{backgroundColor:label.textColor,padding:0}]}>
+                                         <Button icon={label.city.data.icon} color="white" style={[styles.text,{marginTop:2,minWidth:28,width:28,height:28}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
+                                      </View>
+                                     </View>
+		    				     </>
+		    				    : <View style={[styles.text,{backgroundColor:label.textColor,padding:0}]}><Text  style={styles.text}>{label.name}</Text>
+		    				     </View>
+		    					}
+
 		    			</TouchableOpacity >
 		    		})
 		    	}
 		    	{detail.added?
-		    	<View style={[styles.detail,{top:detail.top,left:detail.left,backgroundColor:detail.color}]}>
-		    		<Subheading style={{color:'white'}}>{detail.name}</Subheading>
-		    		{detail.population>0?
-		    		<>
-		    			<View style={{flexDirection:'row'}}>
-		    				<Button icon="bookmark" color="white" style={{marginTop:2,minWidth:21,width:21,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>
-		    				<Caption style={{color:'white',fontWeight: "bold"}}>{detail.factionName}</Caption>
-		    			</View>
-			    		<View style={{flexDirection:'row'}}>
-			    			<Button icon="account-multiple" color="white" style={{marginTop:2,minWidth:16,width:16,height:16}} contentStyle={{marginLeft:0,marginRight:-15}}/>
-			    			<Caption  style={{color:'white',marginLeft:5}}>{Util.number(detail.population)}</Caption>
-			    		</View>
-		    		</>
-		    		:null
-		    		}
-		    	</View>
+		    	<Detail detail={detail}  scene={this} interface={this.props.interface}/>
 		    	:null
 		    	}
 	    	</View>

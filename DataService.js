@@ -1,4 +1,8 @@
 import City from './City.js';
+import Faction from './Faction.js';
+
+import Util from './Util.js';
+
 //import DataBase from './DataBase.js';
 
 import scenarios from "./json/scenario.json"
@@ -8,6 +12,8 @@ import scenarioRoads from "./json/scenarioRoad.json"
 import scenarioCities from "./json/scenarioCity.json"
 import cities from "./json/city.json"
 import snapshots from "./json/snapshot.json"
+import snapshotSubs from "./json/snapshotSub.json"
+import heroes from "./json/hero.json"
 
 
 export default class DataService{
@@ -23,6 +29,8 @@ export default class DataService{
 		self.cities ={};
 		self.showUnuse = false;
 		self.factions = {0:{name:'None',id:0}};
+		self.heroes = {};
+
 		self.activeFactions = {};
 		self.region = {};
 	
@@ -51,6 +59,7 @@ export default class DataService{
 		
 	
 		self.getFaction();
+		self.getHero();
 		
 		self.selectScenario(scenarios[0]);			
 		self.makeEra();
@@ -86,7 +95,52 @@ export default class DataService{
 		   
 			
 		}
-		
+
+
+
+		getRoadLength(line){
+            var self = this;
+            let ret = 0;
+
+            if(line.waypoint !== "" && line.waypoint !== null){
+                var waypoint = JSON.parse(line.waypoint);
+               for(var i = 0;i<waypoint.length;i++){
+                  if(i === 0){
+                        ret += Util.getDistance(
+                         self.cities[line.start].latitude,
+                         self.cities[line.start].longitude,
+                         waypoint[0][1],
+                         waypoint[0][0],
+                     )
+                  }else{
+                        ret += Util.getDistance(
+                           waypoint[i-1][1],
+                           waypoint[i-1][0],
+                           waypoint[i][1],
+                           waypoint[i][0],
+                       )
+                  }
+              }
+              ret += Util.getDistance(
+                 waypoint[waypoint.length-1][1],
+                 waypoint[waypoint.length-1][0],
+                  self.cities[line.end].latitude,
+                  self.cities[line.end].longitude,
+                )
+
+            }else{
+                ret = Util.getDistance(
+                      self.cities[line.start].latitude,
+                      self.cities[line.start].longitude,
+                      self.cities[line.end].latitude,
+                      self.cities[line.end].longitude,
+                  )
+            }
+
+            return  ret;
+
+		}
+
 		getRoad (scenario){
 			var self = this;
 			
@@ -109,10 +163,13 @@ export default class DataService{
 
 // line.type ='road';
 							line.destinies = [{road:line,city:self.cities[line.start]},{road:line,city:self.cities[line.end]}];
-							line.forces = [];
-							
-							self.cities[line.start].destinies.push({road:line,city:self.cities[line.end]});
-							self.cities[line.end].destinies.push({road:line,city:self.cities[line.start]});
+							line.units = [];
+
+							const length =self.getRoadLength(line);
+							let cost = length;
+							if(line.type=='mountain'){cost = length*(3/2)}
+							self.cities[line.start].destinies.push({road:line,city:self.cities[line.end],length:length,cost:cost});
+							self.cities[line.end].destinies.push({road:line,city:self.cities[line.start],length:length,cost:cost});
 
 							self.lineCoord.push({start:self.cities[line.start],end:self.cities[line.end],waypoint:line.waypoint,type:line.type});
 					}
@@ -138,155 +195,168 @@ export default class DataService{
 		var self = this;
 		
     	factions.forEach(faction => {
-			
-			faction.cities = [];
-			faction.forces = [];
-			faction.targeted = [];
-			
-			self.factions[faction.id] = faction;
+			self.factions[faction.id] = new Faction(faction);
 	 	});
 		
 		
 	}
-	
-		selectScenario (scenario){
-			var self = this;
-			
-			self.selectedScenario=scenario;
-			
-			self.cities = {};
-			
-			self.cityMap = {};
-			self.snapshotMap = {};
-			self.cities = {};
-			self.selectedFaction = 0;
-			
-			
-			
+
+	async getHero(){
+		var self = this;
+
+    	heroes.forEach(hero => {
+			self.heroes[hero.id] = hero;
+	 	});
+
+
+	}
+
+
+    selectScenario (scenario){
+        var self = this;
+
+        self.selectedScenario=scenario;
+        console.log(self.selectedScenario)
+
+        self.cities = {};
+
+        self.cityMap = {};
+        self.snapshotMap = {};
+        self.cities = {};
+        self.selectedFaction = 0;
+
+
+
 //			self.startLoading();
-			
-		    	
-		    	self.data = [];
-		    	self.activeFactions = {};
-		    	self.region = {};
 
-		    	
-		    	
-		    	scenarioCities[scenario.id].forEach(id=>{
-		    		var city = {};
-		    		 Object.assign(city, cities[id]);
-		    		
-		    		var lastSnapshot = undefined;
-		    		for(const snapshot of snapshots[id]){
 
-		    			if(scenario.year>=snapshot.year){
-		    				if(id==44){
-		    					console.log(snapshot)
-		    				}
-		    				city.population = snapshot.population;
-		    				if(snapshot.name != null) city.name = snapshot.name;
-		    				city.snapshot = snapshot.id;
-		    				city.faction = snapshot.faction;
-		    				city.color = self.factions[city.faction].color;
-		    			}
-		    		}
-		    		
-		    		if(city.population==0 && city.type!='waypoint') return false;
-		    		
-		    		
-			 		var c = new City(city,self);
-			 		
-			 		self.cities[city.id] = c;
-			 		
-			 		
-			 		self.data.push(c)
-			 		
-			 		self.cityMap[city.id] = c;
-			 		self.snapshotMap[city.snapshot] = c;
-			 		
+        self.data = [];
+        self.activeFactions = {};
+        self.region = {};
 
-			 		if(self.activeFactions[city.faction] === undefined  && city.faction !==0 &&self.factions[city.faction]!=undefined){
-				 		self.activeFactions[city.faction] = self.factions[city.faction];	
-				 		self.activeFactions[city.faction].cities = [];
-					}
-			 		if(self.activeFactions[city.faction] !== undefined  ){
-			 			self.activeFactions[city.faction].cities.push(c);
-			 		}
-			 	});
-			 	
-			 	
-		    	Object.entries(self.activeFactions).forEach(([key, faction]) => {
 
-			 		if(faction.region !== null){
-			 			if(self.region[faction.region] === undefined){
-			 				self.region[faction.region] = {};
-			 			}
-			 			if(self.region[faction.region][faction.area] === undefined){
-			 				self.region[faction.region][faction.area] = [];
-			 			}
-			 			self.region[faction.region][faction.area].push(faction);
-			 		}
-			 	});
-			 	
-		       window.data = self.data;
-		       
-		       
-		       
-		       
-		       self.addData(scenario);
-		       
-		       
 
-		       self.citiesArray = Object.values(self.cities);
+        scenarioCities[scenario.id].forEach(id=>{
+            var city = {};
+             Object.assign(city, cities[id]);
+            if(id==266){
+                console.log("here")
+            }
+            var lastSnapshot = undefined;
+            for(const snapshot of snapshots[id]){
 
-			  	
-		       
-			  	
-			  	
-		       	setTimeout(function(){
+                if(scenario.year>=snapshot.year){
+
+                    city.population = snapshot.population;
+                    if(snapshot.name != null) city.name = snapshot.name;
+                    city.snapshot = snapshot.id;
+                    city.faction = snapshot.faction;
+                    city.color = self.factions[city.faction].color;
+                    city.traits = snapshot.traits==null?'':snapshot.traits;
+                    city.snapshotSub = snapshotSubs[snapshot.id];
+                }
+            }
+
+            if(city.population==0 && city.type!='waypoint') return false;
+
+
+            var c = new City(city,self);
+
+            self.cities[city.id] = c;
+
+
+            self.data.push(c)
+
+            self.cityMap[city.id] = c;
+            self.snapshotMap[city.snapshot] = c;
+
+
+            if(self.activeFactions[city.faction] === undefined  && city.faction !==0 &&self.factions[city.faction]!=undefined){
+                self.activeFactions[city.faction] = self.factions[city.faction];
+                self.activeFactions[city.faction].cities = [];
+            }
+            if(self.activeFactions[city.faction] !== undefined  ){
+                self.activeFactions[city.faction].cities.push(c);
+                if(city.traits.includes('capital')){
+                    self.activeFactions[city.faction].capital = c;
+                }
+            }
+        });
+
+
+        Object.entries(self.activeFactions).forEach(([key, faction]) => {
+
+            if(faction.region !== null){
+                if(self.region[faction.region] === undefined){
+                    self.region[faction.region] = {};
+                }
+                if(self.region[faction.region][faction.area] === undefined){
+                    self.region[faction.region][faction.area] = [];
+                }
+                self.region[faction.region][faction.area].push(faction);
+            }
+        });
+
+       window.data = self.data;
+
+
+
+
+       self.addData(scenario);
+
+
+
+       self.citiesArray = Object.values(self.cities);
+
+
+
+
+
+        setTimeout(function(){
 //		       		$('#faction li:first-child a').tab('show');
-		       	},100);
-			  	
-			
-		}
-		
-		
-		addData(scenario){
-		
-			var self = this;
-			
+        },100);
 
-//			self.globe = self.objects;
 
-			var data = [];
-
-			if(self.roads !== undefined){
-				self.globe.remove(self.roads);						
-			}
-			
-			Object.entries(self.objectMap).forEach(([key, city]) => {
-			
-				self.globe.remove(city.object);			
-			});
-			
-			window.data.forEach(function(city){
-				
-					data.push(city);
-			});
-			
-			self.globe.addData(data);
-			
-			self.objects = [];
-	       data.forEach(function(city){
-	    	   if(city.object !== undefined){
-	    		   self.objectMap[city.object.id] = city;	    		   
-		    	   self.objects.push(city.object);
-	    	   }
-	       });
-	       self.getRoad(scenario.id);
-	       
-			
-		}
+    }
 		
+		
+    addData(scenario){
+
+        var self = this;
+
+        var data = [];
+
+        if(self.roads !== undefined){
+            self.globe.remove(self.roads);
+        }
+
+        Object.entries(self.objectMap).forEach(([key, city]) => {
+            self.globe.remove(city.object);
+        });
+
+        window.data.forEach(function(city){
+            data.push(city);
+        });
+
+        self.globe.addData(data);
+
+       self.objects = [];
+       data.forEach(function(city){
+           if(city.object !== undefined){
+               self.objectMap[city.object.id] = city;
+               self.objects.push(city.object);
+           }
+       });
+       self.getRoad(scenario.id);
+
+
+    }
+
+
+    init(){
+        this.data.forEach(city=>{
+            city.init();
+        });
+    }
 	
 }

@@ -1,3 +1,6 @@
+import * as THREE from 'three';
+
+
 
  const Util = {
 	
@@ -5,8 +8,7 @@
 	 number :  (number) =>{
 		 
 		  if(number === undefined) return "";
-		   
-		  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");	    	
+		  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			
 	},
     sum : (arr,key) =>{
@@ -81,7 +83,151 @@
 	   	return history;
 	},
 	
+    initMap(obj,key,init){
+        if( obj[key]==undefined){
+            obj[key] = init;
+            return true;
+        }
 
+        return false;
+    },
+    arrayRemove(array,obj){
+        for (var i = array.length - 1; i > -1; i--) {
+            if(array[i] == obj){
+                 array.splice(i, 1);
+            }
+        }
+    },
+    intDivide(source,mod){
+
+        const n = source/mod;
+        let result = Math.floor(n);
+        if(n-result >0) result++;
+        return result;
+    },
+    getDistance(lat1,lon1,lat2,lon2){
+          const R = 6371e3; // metres
+          const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+          const φ2 = lat2 * Math.PI/180;
+          const Δφ = (lat2-lat1) * Math.PI/180;
+          const Δλ = (lon2-lon1) * Math.PI/180;
+
+          const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                    Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ/2) * Math.sin(Δλ/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+          const d = R * c; // in metres
+          return d;
+      },
+    vertex(point) {
+         const sphereSize =  200*0.5+0.2*0.5;
+
+		if(point === undefined){
+			console.log("point undefined");
+			return null;
+		}
+	    var phi = (90 - point[1]) * Math.PI / 180;
+	    var theta = (180 - point[0]) * Math.PI / 180;
+
+
+		  return new THREE.Vector3(
+				  sphereSize * Math.sin(phi) * Math.cos(theta),
+				  sphereSize * Math.cos(phi),
+				  sphereSize * Math.sin(phi) * Math.sin(theta)
+		  );
+
+	},
+
+    aStar (unit,end){
+
+
+
+        let start = unit.currentLocation;
+        if(unit.currentRoad !=undefined){
+            const line = unit.currentRoad;
+            const road = line.road;
+
+            start = {destinies:[
+                {city:road.destinies[0].city,cost:line.cost},
+                {city:road.destinies[1].city,cost:line.cost}
+            ],
+            id:0}
+        }
+
+         if(end.category=='unit'){
+            if(end.currentRoad == undefined){
+                end = end.currentLocation;
+            }else{
+                let s;
+                if(unit.currentRoad==undefined){
+                    s = unit.currentLocation.object.position;
+                }else{
+                    s = unit.object.position;
+                }
+                if(s.distanceTo(end.currentRoad.destinies[0].city.object.position) >s.distanceTo(end.currentRoad.destinies[1].city.object.position)){
+                    end = end.currentRoad.destinies[1].city
+                }else{
+                    end = end.currentRoad.destinies[0].city
+                }
+            }
+        }
+
+        const scores = {};
+        scores[start.id] = {selected :true};
+
+        let pivot = start;
+        let selectedLength = 0;
+        let selectedScore;
+        do{
+
+
+            pivot.destinies.forEach(destiny=>{
+                const city = destiny.city;
+                if(scores[city.id]==undefined){
+
+                    const distance = end.getDistance(city);
+                    const length = selectedLength+destiny.cost;
+                    const score = length  + distance;
+
+                    scores[city.id] = {length:length,score:score,city:city,selected:false,from:pivot}
+                }
+            })
+
+            let bestScore = undefined;
+            let bestKey = '';
+            Object.keys(scores).forEach(key=>{
+                const score = scores[key];
+                if(!score.selected){
+                    if(bestScore==undefined || score.score<bestScore){
+                        bestScore = score.score;
+                        bestKey = key;
+                    }
+                }
+            })
+
+            selectedScore = scores[bestKey]
+            pivot = selectedScore.city;
+            selectedLength = selectedScore.length;
+            selectedScore.selected = true;
+//            console.log(pivot.name)
+
+        } while(pivot.id != end.id)
+
+        const path = [end];
+        let p = selectedScore;
+        while(p.from.id != start.id){
+            path.push(p.from);
+            p = scores[p.from.id];
+        }
+        return {
+            length:selectedLength,
+            path : path.reverse()
+        }
+
+
+
+    }
 
 }
  

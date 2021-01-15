@@ -1,0 +1,259 @@
+{
+  "food": {
+    "name": "Food",
+    "icon": "barley",
+    "color": "#e3c378",
+    "storage": "granary",
+    "price": 1
+  },
+  "brick": {
+    "name": "Brick",
+    "icon": "wall",
+    "color": "#70543e",
+    "storage": "brick",
+    "price": 3
+  },
+  "citizen": {
+    "name": "Citizen",
+    "icon": "account-multiple",
+    "color": "#255e7e"
+  },
+  "happiness": {
+    "name": "Happiness",
+    "icon": "heart",
+    "color": "#ff6361"
+  },
+  "resource": {
+    "name": "Resource",
+    "icon": "cube"
+  },
+  "pottery": {
+    "name": "Pottery",
+    "icon": "gas-cylinder",
+    "color": "#d97557",
+    "storage": "warehouse",
+    "price": 3
+  },
+  "beer": {
+    "name": "Beer",
+    "icon": "glass-mug",
+    "color": "#F6C101",
+    "storage": "warehouse",
+    "price": 10
+  },
+  "clay": {
+    "name": "Clay",
+    "icon": "checkbox-blank",
+    "color": "#d97557",
+    "storage": "clay",
+    "price": 2
+  },
+  "mud": {
+    "name": "Mud",
+    "icon": "checkbox-blank",
+    "color": "#70543e",
+    "storage": "mud",
+    "price": 1
+  },
+  "defense": {
+    "name": "Defense",
+    "icon": "chess-rook"
+  },
+  "wood": {
+    "name": "Wood",
+    "icon": "tree",
+    "color": "#8D6142",
+    "storage": "warehouse",
+    "price": 10
+  },
+  "livestock": {
+    "name": "Livestock",
+    "icon": "cow",
+    "color": "#7c4945",
+    "storage": "livestock",
+    "price": 100
+  },
+  "copper": {
+    "name": "Copper",
+    "icon": "bandcamp",
+    "storage": "warehouse",
+    "color": "#b87333",
+    "price": 50
+  },
+  "tin": {
+    "name": "Tin",
+    "icon": "decagram",
+    "color": "#8f8b96",
+    "storage": "warehouse",
+    "price": 100
+  },
+  "river": {
+    "name": "River",
+    "icon": "waves",
+    "color": "#1ca3ec",
+    "storage": "river"
+  },
+  "bronze": {
+    "name": "Bronze",
+    "icon": "bootstrap",
+    "color": "#794909",
+    "storage": "warehouse",
+    "price": 200
+  },
+  "wool": {
+    "name": "Wool",
+    "icon": "volleyball",
+    "color": "#bab9b1",
+    "storage": "warehouse",
+    "price": 10
+  },
+  "cloth": {
+    "name": "Cloth",
+    "icon": "tshirt-crew",
+    "color": "#bab9b1",
+    "storage": "warehouse",
+    "price": 5
+  },
+  "cart": {
+    "name": "Cart",
+    "icon": "buddhism",
+    "color": "#8D6142",
+    "storage": "warehouse",
+    "price": 800
+  },
+  "copper tool": {
+    "name": "Copper Tool",
+    "icon": "hammer",
+    "color": "#b87333",
+    "storage": "warehouse",
+    "price": 50
+  },
+  "silver": {
+    "name": "Silver",
+    "icon": "coin",
+    "color": "silver",
+    "storage": "warehouse",
+    "price": 100
+  },
+  "leather": {
+    "name": "Leather",
+    "icon": "firebase",
+    "color": "#501b00",
+    "storage": "warehouse",
+    "price": 20
+  },
+  "copper axe": {
+    "name": "Copper Axe",
+    "icon": "axe",
+    "color": "#b87333",
+    "storage": "armoury",
+    "price": 300
+  },
+  "cloak": {
+    "name": "Leather Cloak",
+    "icon": "atlassian",
+    "color": "#501b00",
+    "storage": "armoury",
+    "price": 50
+  },
+  "helmet": {
+    "name": "Copper Helmet",
+    "icon": "racing-helmet",
+    "color": "#b87333",
+    "storage": "armoury",
+    "price": 100
+  },
+  "bow": {
+    "name": "Bow",
+    "icon": "forwardburger",
+    "color": "#8D6142",
+    "storage": "armoury",
+    "price": 50
+  },
+  "copper dagger": {
+    "name": "Copper Dagger",
+    "icon": "knife-military",
+    "color": "#b87333",
+    "storage": "armoury",
+    "price": 30
+  },
+  "quiver": {
+    "name": "Quiver",
+    "icon": "heart-half",
+    "color": "#501b00",
+    "storage": "armoury",
+    "price": 20
+  },
+  "copper arrow": {
+    "name": "Copper Arrow",
+    "icon": "arrow-bottom-right",
+    "color": "#b87333",
+    "storage": "armoury",
+    "price": 40
+  },
+  "copper javelin": {
+    "name": "Copper Javelin",
+    "icon": "format-horizontal-align-right",
+    "color": "#b87333",
+    "storage": "armoury",
+    "price": 100
+  },
+  "copper spear": {
+    "name": "Copper Spear",
+    "icon": "zodiac-sagittarius",
+    "color": "#b87333",
+    "storage": "armoury",
+    "price": 250
+  },
+  "shield": {
+    "name": "Tower Shield",
+    "icon": "shield",
+    "color": "#a3814b",
+    "storage": "armoury",
+    "price": 100
+  },
+  "sling": {
+    "name": "Sling",
+    "icon": "transit-connection-variant",
+    "storage": "armoury",
+    "color": "#bab9b1",
+    "price": 10
+  },
+  "mace": {
+    "name": "Mace",
+    "icon": "wrench",
+    "color": "#6D7876",
+    "storage": "armoury",
+    "price": 20
+  },
+  "stick": {
+    "name": "Throwing Stick",
+    "icon": "loading",
+    "color": "#8D6142",
+    "storage": "armoury",
+    "price": 5
+  },
+  "tablet": {
+    "name": "Clay tablet",
+    "icon": "file-document-box",
+    "color": "#d97557",
+    "storage": "warehouse",
+    "price": 5
+  },
+  "stone": {
+    "name": "Stone",
+    "icon": "alpha-s-box",
+    "color": "#6D7876",
+    "storage": "stone",
+    "price": 2
+  },
+  "polished stone": {
+    "name": "Polished Stone",
+    "icon": "alpha-s-circle",
+    "color": "#6D7876",
+    "storage": "warehouse",
+    "price": 10
+  }
+
+
+}

@@ -6,8 +6,8 @@ export default class CameraHandler{
 		this.mesh = mesh;
 		this.container = container;
 		
-		this.distance = 300;
-		this.distanceTarget = 300;
+		this.distance = 200;
+		this.distanceTarget = 200;
 		
 		this.camera.position.z = this.distance;
 		
@@ -181,6 +181,18 @@ export default class CameraHandler{
 	  	this.distanceTarget = distanceTarget;
 	    this.checkZoom();
 }
+
+
+  moveCameraTo = (lat,long,distance)=>{
+
+	  this.target.x = (270 + long) * Math.PI / 180;
+	  this.target.y = lat/180 * Math.PI  ;
+	  if(distance == undefined){
+		  this.distanceTarget = this.distanceTarget > 120 ? 120 : this.distanceTarget;
+	  }else  this.distanceTarget = distance;
+  }
+
+
   
   render(){
   

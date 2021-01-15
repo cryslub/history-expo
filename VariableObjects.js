@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import Colors from "./Colors.js"
+import mainStore from './MainContext.js'
 
 export default class VariableObjects{
 
@@ -108,7 +109,7 @@ export default class VariableObjects{
   
 
   makePoint(city, size, color){
-	  	var sphereSize = this.radius-0.1*this.totalSize;
+	  	var sphereSize = this.radius+0.2*this.totalSize;
 		var geometry;
 		
 		if(size === 0){
@@ -120,7 +121,7 @@ export default class VariableObjects{
 			
 			
 			geometry = new THREE.BoxGeometry(1*this.totalSize, 1*this.totalSize, 0.3*this.totalSize);
-			geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,0,-0.5));
+			//geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0,0,-0.5));
 		}
 		
 		
@@ -393,7 +394,62 @@ export default class VariableObjects{
 		return mesh;
 
   }
-  
+
+    addUnit(lat,lng,color,unit) {
+
+
+        const size = 1000;
+      var subgeo = new THREE.Geometry();
+
+      color = new THREE.Color(color);
+
+     var sphereSize = this.radius-0.1*this.totalSize;;
+	var geometry = new THREE.CylinderGeometry( 0.05*this.totalSize, 0.05*this.totalSize, 0.5*this.totalSize,16  );
+      var material = new THREE.MeshBasicMaterial( {color: color} );
+  //		geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,-0.5));
+
+  	var point = new THREE.Mesh(geometry,material);
+
+
+      var phi = (90 - lat) * Math.PI / 180;
+      var theta = (180 - lng) * Math.PI / 180;
+
+
+      point.position.x = sphereSize * Math.sin(phi) * Math.cos(theta);
+      point.position.y = sphereSize * Math.cos(phi);
+      point.position.z = sphereSize * Math.sin(phi) * Math.sin(theta);
+
+      point.geometry.rotateX((-90 * Math.PI) / 180);
+      point.geometry.translate(0,0,-0.3);
+      point.lookAt(this.mesh.position);
+
+
+      var scale =   0.7;
+  //		    scale = Math.sqrt(scale);
+      point.scale.x = scale;
+      point.scale.y = scale;
+      point.scale.z = scale; // avoid non-invertible matrix
+
+
+
+  //	     this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
+       this.scene.add(point);
+
+       var geo = new THREE.EdgesGeometry( point.geometry );
+       var mat = new THREE.LineBasicMaterial( { color: 0x333333, linewidth: 1 } );
+       var wireframe = new THREE.LineSegments( geo, mat );
+       wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+       point.add( wireframe );
+
+        unit.latitude = lat;
+        unit.longitude = lng;
+
+        this.addDom(point,unit,'unit');
+        unit.object = point;
+       return point;
+
+    }
+
    globePoint(lat, lng,sphereSize){
 	    var phi = (90 - lat) * Math.PI / 180;
 	    var theta = (180 - lng) * Math.PI / 180;
@@ -484,13 +540,19 @@ export default class VariableObjects{
 		  this.detailHtml.name = city.name;
 		  this.detailHtml.added = true;
 		  this.detailHtml.factionName=city.factionData.name;
-		  
+          this.detailHtml.faction = city.factionData;
+
 		  this.detailHtml.population = city.population;
+		  this.detailHtml.city = city;
 		  
-		  if(city.faction > 0){
+		  if(city.factionData.id > 0){
 			  this.detailHtml.color = city.factionData.color;
+	    	  this.detailHtml.isCapital=city.factionData.capital.id == city.id;
+
 		  }else{
 			  this.detailHtml.color = 'black'
+			  this.detailHtml.isCapital=false;
+
 		  }
 		  
 		 
@@ -502,11 +564,11 @@ export default class VariableObjects{
 	  }
 	  
 	  
-  	createTextLabel(city) {
+  	createTextLabel(city,type) {
   	
   		var self =this;
   		
-  		if(city===undefined) city = {};
+  		if(city===undefined) city = {factionData:{}};
 	    
 	    return {
 	    	top:-1000,
@@ -514,6 +576,7 @@ export default class VariableObjects{
 	    	name:city.name,
 	    	placement:city.labelPosition,
 	    	city:city,
+	    	type:type,
 	    	parent: false,
 	    	position: new THREE.Vector3(0,0,0),
 	    	added:false,
@@ -521,34 +584,39 @@ export default class VariableObjects{
 	          this.parent = threejsobj;
 	        },
 	        updatePosition: function(show,camera) {
-	        if(this.parent) {
-	          this.position.copy(this.parent.position);
-	        }
-	        
-	        var coords2d = this.get2DCoords(this.position, camera);
-	        this.left = coords2d.x ;
-	        this.top = coords2d.y;
-	        
-	        
-	       
-	        if(show!==true){
-	        	var distance = this.parent.position.distanceTo(camera.position);
-		        	
-	        	var a = this.parent.scale.x / 0.3;
-	        	
-	        	if(distance < Math.pow(a,2) * 100){
-	             	this.added  = true;
-	        	}else{
-	             	this.added  = false;
-	        		
-	        	}
-	        	
-		        if(distance> 400){
-	             	this.added  = false;
-		        }
-		        
-	        }
-	
+                if(this.parent) {
+                  this.position.copy(this.parent.position);
+                }
+
+                var coords2d = this.get2DCoords(this.position, camera);
+                this.left = coords2d.x ;
+                this.top = coords2d.y;
+                if(mainStore.selectedFaction){
+                    let color = 'rgba(0,100,255,0)'
+                    if(this.city.factionData.id == mainStore.selectedFaction.id){
+                        color = 'rgba(0,100,255,0.3)';
+                    }
+                    this.textColor = color;
+                }
+
+                if(show!==true){
+                    var distance = this.parent.position.distanceTo(camera.position);
+
+                    var a = this.parent.scale.x / 0.3;
+
+                    if(distance < Math.pow(a,2) * 100){
+                        this.added  = true;
+                    }else{
+                        this.added  = false;
+
+                    }
+
+                    if(distance> 400){
+                        this.added  = false;
+                    }
+
+                }
+
 		        	
 	
 	      },
@@ -562,8 +630,8 @@ export default class VariableObjects{
 	  } 
 	    
 	    
-	  addDom(point,city){
-			var text = this.createTextLabel(city);
+	  addDom(point,city,type){
+			var text = this.createTextLabel(city,type);
 			text.setParent(point);
 			this.textlabels.push(text);
 		
@@ -586,5 +654,36 @@ export default class VariableObjects{
   	}
 	 
 	 
-	
+
+    move(position,object,speed){
+
+
+          var dir = new THREE.Vector3();
+
+          dir.subVectors( position, object.position ).normalize();
+
+         if( object.position.distanceTo(position) >= speed){
+
+              object.position.add(dir.multiplyScalar(speed));
+                object.lookAt(this.mesh.position);
+              return true;
+         }else{
+              object.position.add(dir.multiplyScalar(object.position.distanceTo(position)));
+                object.lookAt(this.mesh.position);
+             return false;
+         }
+     }
+
+     vertexReverse(position) {
+
+         var sphereSize = this.radius-0.1*this.totalSize;;
+         const phi = Math.acos(position.y/sphereSize);
+         const theta = Math.acos(position.x/(sphereSize*Math.sin(phi)));
+
+
+         const lat = 90- phi / (Math.PI / 180)
+         const lon = 180-theta/  (Math.PI / 180)
+
+         return {lat:lat,lon:lon}
+    }
 }

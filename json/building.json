@@ -1,0 +1,866 @@
+{
+  "farm": {
+    "id": 31,
+    "name": "Farm",
+    "key": "farm",
+    "type": "production",
+    "delay": 15,
+    "description": "Farmers can produce foods from here",
+    "icon": "barley",
+    "color": "#e3c378",
+    "worker": "farmer",
+    "production": {
+      "delay": 365,
+      "result": "food",
+      "quantity": 3000
+    }
+  },
+  "clay": {
+    "id": 31,
+    "name": "Clay pit",
+    "key": "clay",
+    "type": "production",
+    "delay": 10,
+    "description": "Workers can quarry clay from here",
+    "icon": "checkbox-blank",
+    "color": "#d97557",
+    "worker": "worker",
+    "production": {
+      "delay": 7,
+      "result": "clay",
+      "quantity": 10
+    },
+    "storage": {
+      "type": "clay",
+      "quantity": 1000
+    }
+  },
+  "mud": {
+    "id": 31,
+    "name": "Mud pit",
+    "key": "mud",
+    "type": "production",
+    "delay": 10,
+    "description": "Workers can collect mud from here",
+    "icon": "checkbox-blank",
+    "color": "#70543e",
+    "worker": "worker",
+    "production": {
+      "delay": 7,
+      "result": "mud",
+      "quantity": 20
+    },
+    "storage": {
+      "type": "mud",
+      "quantity": 1000
+    }
+  },
+  "wood": {
+    "id": 31,
+    "name": "Lumber yard",
+    "key": "wood",
+    "type": "production",
+    "delay": 10,
+    "description": "Workers can collect woods from here",
+    "icon": "tree",
+    "color": "#8D6142",
+    "worker": "worker",
+    "production": {
+      "delay": 40,
+      "result": "wood",
+      "quantity": 10
+    }
+  },
+  "stone": {
+    "id": 31,
+    "name": "Quarry",
+    "key": "stone",
+    "type": "production",
+    "delay": 10,
+    "description": "Workers can quarry stone from here",
+    "icon": "alpha-s-box",
+    "color": "#6D7876",
+    "worker": "worker",
+    "production": {
+      "delay": 20,
+      "result": "stone",
+      "quantity": 5
+    },
+    "storage": {
+      "type": "stone",
+      "quantity": 200
+    }
+  },
+  "tin": {
+    "id": 31,
+    "name": "Tin mine",
+    "key": "tin",
+    "type": "production",
+    "delay": 10,
+    "description": "Workers can mine tin from here",
+    "icon": "decagram",
+    "color": "#8f8b96",
+    "worker": "worker",
+    "cost": {
+      "type": "brick",
+      "quantity": 30
+    },
+    "production": {
+      "delay": 60,
+      "result": "tin",
+      "quantity": 10
+    },
+    "require": "tin"
+  },
+  "copper": {
+    "id": 31,
+    "name": "Copper mine",
+    "key": "copper",
+    "type": "production",
+    "delay": 10,
+    "description": "Workers can mine copper from here",
+    "icon": "bandcamp",
+    "color": "#b87333",
+    "worker": "worker",
+    "cost": {
+      "type": "brick",
+      "quantity": 30
+    },
+    "production": {
+      "delay": 40,
+      "result": "copper",
+      "quantity": 10
+    },
+    "require": "copper"
+  },
+  "livestock": {
+    "id": 31,
+    "name": "Ranch",
+    "key": "livestock",
+    "type": "production",
+    "delay": 20,
+    "description": "Workers can breed livestock from here",
+    "icon": "cow",
+    "color": "#7c4945",
+    "worker": "worker",
+    "production": {
+      "delay": 300,
+      "result": "livestock",
+      "quantity": 20
+    },
+    "storage": {
+      "type": "livestock",
+      "quantity": 50
+    }
+  },
+  "wool": {
+    "id": 31,
+    "name": "Sheep farm",
+    "key": "wool",
+    "type": "production",
+    "delay": 20,
+    "description": "Workers can collect wool from sheep",
+    "icon": "sheep",
+    "color": "#bab9b1",
+    "worker": "worker",
+    "production": {
+      "delay": 30,
+      "result": "wool",
+      "quantity": 20,
+      "cost": [
+        {
+          "type": "livestock",
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  "brick": {
+    "id": 31,
+    "name": "Brickyard",
+    "key": "brick",
+    "type": "production",
+    "delay": 10,
+    "description": "Artisans can make bricks from here",
+    "icon": "wall",
+    "color": "#70543e",
+    "worker": "artisan",
+
+    "production": {
+      "delay": 14,
+      "result": "brick",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "mud",
+          "quantity": 10
+        },
+        {
+          "type": "food",
+          "quantity": 10
+        }
+      ]
+    },
+    "storage": {
+      "type": "brick",
+      "quantity": 500
+    }
+  },
+  "polished": {
+    "id": 31,
+    "name": "Stonemasonry",
+    "key": "polished",
+    "type": "production",
+    "delay": 10,
+    "description": "Artisans can polish stone from here",
+    "icon": "alpha-s-circle",
+    "color": "#6D7876",
+    "worker": "artisan",
+    "cost": {
+      "type": "brick",
+      "quantity": 50
+    },
+    "production": {
+      "delay": 60,
+      "result": "polished stone",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "stone",
+          "quantity": 10
+        }
+      ]
+    }
+  },
+    "residence": {
+      "id": 31,
+      "name": "Residential Area",
+      "key": "residence",
+      "type": "",
+      "delay": 30,
+      "description": "The place where people lives",
+      "icon": "home-group",
+      "color": "#70543e",
+      "cost": {
+        "type": "brick",
+        "quantity": 100
+      },
+      "storage": {
+        "type": "citizen",
+        "quantity": 1000
+      }
+    },
+  "granary": {
+    "id": 31,
+    "name": "Granary",
+    "key": "granary",
+    "type": "",
+    "delay": 30,
+    "description": "Foods can be stored here",
+    "icon": "silo",
+    "color": "#e3c378",
+    "cost": [{
+      "type": "brick",
+      "quantity": 40
+    },{
+      "type": "pottery",
+      "quantity": 40
+    }],
+    "storage": {
+      "type": "food",
+      "quantity": 5000
+    }
+  },
+  "pottery": {
+    "id": 31,
+    "name": "Pottery",
+    "key": "pottery",
+    "type": "production",
+    "delay": 10,
+    "description": "Artisans can make pottery from here",
+    "icon": "gas-cylinder",
+    "color": "#d97557",
+    "cost": {
+      "type": "brick",
+      "quantity": 20
+    },
+    "worker": "artisan",
+    "production": {
+      "delay": 14,
+      "result": "pottery",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "clay",
+          "quantity": 10
+        }
+      ]
+    }
+  },
+  "cloth": {
+    "id": 31,
+    "name": "Weaver",
+    "key": "cloth",
+    "type": "production",
+    "delay": 20,
+    "description": "Artisans can weave wool to make clothes from here",
+    "icon": "tshirt-crew",
+    "color": "#bab9b1",
+    "cost": {
+      "type": "brick",
+      "quantity": 30
+    },
+    "worker": "artisan",
+
+    "production": {
+      "delay": 30,
+      "result": "cloth",
+      "quantity": 50,
+      "cost": [
+        {
+          "type": "wool",
+          "quantity": 10
+        }
+      ]
+    }
+  },
+  "market": {
+    "id": 31,
+    "name": "Market",
+    "key": "market",
+    "type": "production",
+    "delay": 10,
+    "description": "Merchants can distribute basic goods from here. More variety of goods will give more happiness.",
+    "icon": "store",
+    "color": "#e3c378",
+    "cost": {
+      "type": "brick",
+      "quantity": 40
+    },
+    "worker": "merchant",
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [
+        {
+          "type": "pottery",
+          "quantity": 10,
+          "optional": true
+        },
+        {
+          "type": "cloth",
+          "quantity": 10,
+          "optional": true
+        }
+      ]
+    }
+  },
+  "warehouse": {
+    "id": 31,
+    "name": "Storage Pit",
+    "key": "warehouse",
+    "type": "",
+    "delay": 30,
+    "description": "Various resources can be stored here",
+    "icon": "cube",
+    "color": "#d97557",
+    "cost": {
+      "type": "brick",
+      "quantity": 50
+    },
+    "storage": {
+      "type": "resource",
+      "quantity": 200
+    }
+  },
+  "trade": {
+    "id": 31,
+    "name": "Trading Post",
+    "key": "trade",
+    "type": "trade",
+    "delay": 30,
+    "description": "Merchants can trade from here. You need 1 trading post per 1 resource to trade",
+    "icon": "cached",
+    "color": "#e3c378",
+    "worker": "merchant",
+    "trade": {
+    },
+    "cost": {
+      "type": "brick",
+      "quantity": 50
+    }
+  },
+  "beer": {
+    "id": 31,
+    "name": "Brewery",
+    "key": "beer",
+    "type": "production",
+    "delay": 10,
+    "description": "Priests can make beer from here",
+    "icon": "glass-mug",
+    "color": "#F6C101",
+    "cost": {
+      "type": "brick",
+      "quantity": 40
+    },
+    "worker": "priest",
+
+    "production": {
+      "delay": 60,
+      "result": "beer",
+      "quantity": 30,
+      "cost": [
+        {
+          "type": "food",
+          "quantity": 100
+        },
+        {
+          "type": "pottery",
+          "quantity": 30
+        }
+      ]
+    }
+  },
+    "tavern": {
+      "id": 31,
+      "name": "Tavern",
+      "key": "tavern",
+      "type": "production",
+      "delay": 10,
+      "description": "Priests can serve beer to the people from here",
+      "icon": "glass-mug",
+      "color": "#F6C101",
+      "cost": {
+        "type": "brick",
+        "quantity": 20
+      },
+      "worker": "priest",
+
+      "production": {
+        "delay": 7,
+        "result": "happiness",
+        "quantity": 0.2,
+        "cost": [
+          {
+            "type": "beer",
+            "quantity": 10
+          }
+        ]
+      }
+  },
+  "kiln": {
+    "id": 31,
+    "name": "Kiln",
+    "key": "kiln",
+    "type": "production",
+    "delay": 10,
+    "description": "Artisans can make clay tablet from here",
+    "icon": "file-document-box",
+    "color": "#d97557",
+    "cost": {
+      "type": "brick",
+      "quantity": 50
+    },
+    "worker": "artisan",
+
+    "production": {
+      "delay": 14,
+      "result": "tablet",
+      "quantity": 5,
+      "cost": [
+        {
+          "type": "clay",
+          "quantity": 5
+        }
+      ]
+    }
+  },
+  "library": {
+    "id": 31,
+    "name": "Library",
+    "key": "library",
+    "type": "trade",
+    "delay": 60,
+    "description": "Scribe can manage manpower from here. +3000 Max manpower until 1/3 of city population",
+    "icon": "book",
+    "color": "#d97557",
+    "cost": [{
+      "type": "brick",
+      "quantity": 100
+    },
+    {
+      "type": "tablet",
+      "quantity": 200
+    }],
+    "worker": "scribe",
+    "trade": {
+    }
+  },
+  "wall": {
+    "id": 31,
+    "name": "City wall",
+    "key": "wall",
+    "type": "defense",
+    "delay": 120,
+    "description": "Increase city defense",
+    "icon": "chess-rook",
+    "color": "#70543e",
+    "cost": {
+      "type": "brick",
+      "quantity":200
+    },
+    "defense": 1
+  },
+  "leather": {
+    "id": 31,
+    "name": "Tannery",
+    "key": "leather",
+    "type": "production",
+    "delay": 20,
+    "description": "Artisans can produce leather from here",
+    "icon": "firebase",
+    "color": "#501b00",
+    "cost": {
+      "type": "brick",
+      "quantity": 40
+    },
+    "worker": "artisan",
+    "production": {
+      "delay": 50,
+      "result": "leather",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "livestock",
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  "furnace": {
+    "id": 31,
+    "name": "Furnace",
+    "key": "furnace",
+    "type": "production",
+    "delay": 30,
+    "description": "Artisan can combine copper and tin to make bronze from here",
+    "icon": "weight",
+    "color": "#8f8b96",
+    "cost": {
+      "type": "brick",
+      "quantity": 40
+    },
+    "worker": "artisan",
+
+    "production": {
+      "delay": 60,
+      "result": "bronze",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "wood",
+          "quantity": 10
+        },
+        {
+          "type": "copper",
+          "quantity": 10
+        },
+        {
+          "type": "tin",
+          "quantity": 2
+        }
+      ]
+    }
+  },
+  "toolsmith": {
+    "id": 31,
+    "name": "Toolsmith",
+    "key": "toolsmith",
+    "type": "production",
+    "delay": 50,
+    "description": "Artisan can make tool from here",
+    "icon": "hammer",
+    "color": "#b87333",
+    "cost": {
+      "type": "brick",
+      "quantity": 40
+    },
+    "worker": "artisan",
+
+    "production": {
+      "delay": 60,
+      "result": "copper tool",
+      "quantity": 20,
+      "cost": [
+        {
+          "type": "wood",
+          "quantity": 10
+        },
+        {
+          "type": "copper",
+          "quantity": 2
+        }
+      ]
+    }
+  },
+  "melee": {
+    "id": 31,
+    "name": "Weaponsmith (Melee)",
+    "key": "melee",
+    "type": "production",
+    "delay": 50,
+    "description": "Artisan can make melee weapons from here",
+    "icon": "sword-cross",
+    "color": "#b87333",
+    "cost": {
+      "type": "brick",
+      "quantity": 60
+    },
+    "worker": "artisan",
+    "production": [
+      {
+        "delay": 30,
+        "result": "mace",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },{
+            "type": "polished stone",
+            "quantity": 10
+          }
+        ]
+      },
+      {
+      "delay": 30,
+      "result": "copper axe",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "wood",
+          "quantity": 10
+        },
+        {
+          "type": "copper",
+          "quantity": 4
+        }
+      ]
+    },
+
+      {
+        "delay": 30,
+        "result": "copper spear",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "copper",
+            "quantity": 2
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "copper dagger",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "copper",
+            "quantity": 10
+          }
+        ]
+      }]
+  },
+  "ranged": {
+    "id": 31,
+    "name": "Weaponsmith (Ranged)",
+    "key": "weaponsmith",
+    "type": "production",
+    "delay": 50,
+    "description": "Artisan can make ranged weapons from here",
+    "icon": "bullseye-arrow",
+      "color": "#8D6142",
+    "cost": {
+      "type": "brick",
+      "quantity": 60
+    },
+    "worker": "artisan",
+    "production": [
+      {
+        "delay": 10,
+        "result": "sling",
+        "quantity": 50,
+        "cost": [
+          {
+            "type": "wool",
+            "quantity": 10
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "copper javelin",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "copper",
+            "quantity": 2
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "stick",
+        "quantity": 30,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "bow",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 20
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "copper arrow",
+        "quantity": 60,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "copper",
+            "quantity": 2
+          }
+        ]
+      }]
+  },
+  "armoursmith": {
+    "id": 31,
+    "name": "Armoursmith",
+    "key": "armoursmith",
+    "type": "production",
+    "delay": 50,
+    "description": "Artisan can make armours from here",
+    "icon": "tshirt-v-outline",
+    "color": "#501b00",
+    "cost": {
+      "type": "brick",
+      "quantity": 60
+    },
+    "worker": "artisan",
+    "production": [{
+      "delay": 30,
+      "result": "cloak",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "leather",
+          "quantity": 20
+        }
+      ]
+    },
+      {
+        "delay": 30,
+        "result": "quiver",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "leather",
+            "quantity": 10
+          }
+        ]
+      },
+      {
+        "delay": 50,
+        "result": "helmet",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "copper",
+            "quantity": 10
+          }
+        ]
+      },
+      {
+        "delay": 50,
+        "result": "shield",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "leather",
+            "quantity": 30
+          },
+          {
+            "type": "food",
+            "quantity": 100
+          }
+        ]
+      }]
+  },
+  "armoury": {
+    "id": 31,
+    "name": "Armoury",
+    "key": "armoury",
+    "type": "",
+    "delay": 30,
+    "description": "Weapons and armours can be stored at here",
+    "icon": "axe",
+    "color": "#b87333",
+    "cost": {
+      "type": "brick",
+      "quantity": 100
+    },
+    "storage": {
+      "type": "resource",
+      "quantity": 200
+    }
+  },
+  "workshop": {
+    "id": 31,
+    "name": "Workshop",
+    "key": "workshop",
+    "type": "production",
+    "delay": 80,
+    "description": "Artisan can make cart from here",
+    "icon": "buddhism",
+    "color": "#8D6142",
+    "cost": {
+      "type": "brick",
+      "quantity": 80
+    },
+    "worker": "artisan",
+    "production": {
+      "delay": 90,
+      "result": "cart",
+      "quantity": 1,
+      "cost": [
+        {
+          "type": "wood",
+          "quantity": 20
+        }
+      ]
+    }
+  }
+}

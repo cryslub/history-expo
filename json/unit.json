@@ -1,0 +1,615 @@
+{
+  "group": {
+    "id": 1,
+    "name": "Group",
+    "type": "group",
+    "icon": "account-group",
+    "description": "You can make group of deployable units",
+    "delay": 0,
+    "action": {
+      "deploy": true,
+      "manage": true
+    }
+  },
+  "farmer": {
+    "id": 1,
+    "name": "Farmer",
+    "type": "farmer",
+    "icon": "barley",
+    "description": "Can build farm and produce foods",
+    "delay": 2,
+    "manpower": 100,
+    "action": {
+      "build": ["farm"],
+      "assign": true
+    }
+  },
+  "worker": {
+    "id": 2,
+    "name": "Worker",
+    "type": "worker",
+    "icon": "shovel",
+    "description": "Can build or be assigned to various manual labour places",
+    "delay": 2,
+    "manpower": 50,
+    "speed": 25,
+    "capacity": 50,
+    "action": {
+      "build": ["residence","mud","clay","stone","wood","tin","copper","livestock","wool","granary","warehouse","armoury","trade","market","wall"],
+      "assign": true,
+      "equip":[ {
+        "key": "donkey1",
+        "name": "Donkey",
+        "description": "+200 capacity",
+        "require": {
+          "livestock": 50,
+          "pottery": 100
+        },
+        "effect": {
+          "capacity":200
+        }
+      },
+        {
+          "key": "cart",
+          "name": "Cart",
+          "description": "+400 capacity",
+          "require": {
+            "cart": 50,
+            "pottery": 200
+          },
+          "effect": {
+            "capacity":400
+          }
+        }
+      ],
+      "deploy": true
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 3
+    }
+  },
+  "artisan": {
+    "id": 2,
+    "name": "Artisan",
+    "type": "artisan",
+    "icon": "hammer",
+    "description": "Can build or assigned to various crafting places",
+    "delay": 4,
+    "manpower": 10,
+    "action": {
+      "build": ["brick","pottery","cloth","furnace","brewery","tavern","kiln","library","toolsmith","leather","polished","workshop","melee","ranged","armoursmith"],
+      "assign": true
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 1
+    }
+  },
+  "priest": {
+    "id": 2,
+    "name": "Priest",
+    "type": "priest",
+    "icon": "podcast",
+    "description": "Can serve in a temple or beer places",
+    "delay": 10,
+    "manpower": 10,
+    "action": {
+      "assign": true
+    }
+  },
+  "scribe": {
+    "id": 2,
+    "name": "Scribe",
+    "type": "scribe",
+    "icon": "border-color",
+    "description": "Can work in a library or can send to other city which is not the capital to increase the manpower of the city.",
+    "delay": 20,
+    "speed": 20,
+    "capacity": 0,
+    "manpower": 5,
+    "action": {
+      "assign": true,
+      "deploy": true
+    }
+  },
+  "merchant": {
+    "id": 2,
+    "name": "Merchant",
+    "type": "merchant",
+    "icon": "cached",
+    "description": "Can sell resource from your trade post or buy it form foreign lands",
+    "delay": 6,
+    "manpower": 10,
+    "speed": 30,
+    "capacity": 10,
+    "action": {
+      "assign": true,
+      "deploy": true,
+      "equip":[ {
+          "key": "donkey1",
+          "name": "Donkey",
+          "description": "+40 capacity",
+          "require": {
+            "livestock": 10,
+            "pottery": 20
+          },
+          "effect": {
+            "capacity":40
+          }
+        },
+        {
+          "key": "donkey2",
+          "name": "Donkey",
+          "description": "+40 capacity",
+          "require": {
+            "livestock": 10,
+            "pottery": 20
+          },
+          "effect": {
+            "capacity":40
+          }
+        },
+         {
+           "key": "cart",
+           "name": "Cart",
+           "description": "+80 capacity",
+           "require": {
+             "cart": 10,
+             "pottery": 40
+           },
+           "effect": {
+             "capacity":80
+           }
+        }
+      ]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 1
+    }
+  },
+  "militia": {
+    "id": 2,
+    "name": "Militia",
+    "type": "militia",
+    "category": "army",
+    "icon": "shield-home",
+    "description": "Can defend their own hometown. Cannot be deployed to outside of city.",
+    "delay": 3,
+    "manpower": 100,
+    "action": {
+      "equip":[ {
+        "key": "sling",
+        "name": "Sling",
+        "description": "2 range, 10 blunt damage",
+        "require": {
+          "sling": 100
+        },
+        "effect": {
+          "bluntDamage":10,
+          "range": 2
+        }
+      }]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 5
+    }
+  },
+  "warrior": {
+    "id": 2,
+    "name": "Warrior",
+    "type": "warrior",
+    "category": "army",
+    "icon": "axe",
+    "description": "Basic fighters.",
+    "delay": 30,
+    "manpower": 100,
+    "speed": 25,
+    "capacity": 100,
+    "action": {
+      "deploy": true,
+      "assign": true,
+      "equip":[ {
+        "key": "copper axe",
+        "name": "Copper Axe",
+        "description": "15 slash damage, 30 weight",
+        "require": {
+          "copper axe": 100
+        },
+        "effect": {
+          "slashDamage":15,
+          "weight": 30
+        }
+      },
+        {
+          "key": "mace",
+          "name": "Mace",
+          "description": "10 blunt damage, 30 weight",
+          "require": {
+            "mace": 100
+          },
+          "effect": {
+            "bluntDamage":10,
+            "weight": 30
+          }
+        },
+        {
+          "key": "cloak",
+          "name": "Leather Cloak",
+          "description": "+1 moral, +2 slash defense, -1 piercing defense",
+          "require": {
+            "cloak": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":1
+          }
+        },
+        {
+          "key": "Helmet",
+          "name": "Copper Helmet",
+          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+          "require": {
+            "helmet": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":2,
+            "bluntDefense":1,
+            "weight": 20
+          }
+        }
+      ]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 10,
+      "equip": true
+    }
+  },
+  "spearman": {
+    "id": 2,
+    "name": "Spearman",
+    "type": "spearman",
+    "category": "army",
+    "icon": "zodiac-sagittarius",
+    "description": "Main tankers",
+    "delay": 35,
+    "manpower": 100,
+    "capacity": 100,
+    "speed": 25,
+    "action": {
+      "deploy": true,
+      "assign": true,
+      "equip":[ {
+        "key": "copper spear",
+        "name": "Copper Spear",
+        "description": "10 piercing damage, 30 weight",
+        "require": {
+          "copper spear": 100
+        },
+        "effect": {
+          "piercingDamage":10,
+          "weight": 30
+        }
+      },
+        {
+          "key": "cloak",
+          "name": "Leather Cloak",
+          "description": "+1 moral, +2 slash defense, +1 piercing defense",
+          "require": {
+            "cloak": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":1
+          }
+        },
+        {
+          "key": "Helmet",
+          "name": "Copper Helmet",
+          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+          "require": {
+            "helmet": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":2,
+            "bluntDefense":1,
+            "weight": 20
+          }
+        },
+        {
+          "key": "shield",
+          "name": "Tower Shield",
+          "description": "+1 moral, +4 slash defense, +5 piercing defense,  +2 blunt defense, -3 speed, 50 weight",
+          "require": {
+            "shield": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":4,
+            "piercingDefense":5,
+            "bluntDefense":2,
+            "speed": -3,
+            "weight": 50
+          }
+        }
+      ]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 10,
+      "equip": true
+    }
+  },
+  "bowman": {
+    "id": 2,
+    "name": "Bowman",
+    "type": "bowman",
+    "category": "army",
+    "icon": "bullseye-arrow",
+    "description": "Main range unit",
+    "delay": 30,
+    "manpower": 100,
+    "speed": 25,
+    "capacity": 100,
+    "action": {
+      "deploy": true,
+      "assign": true,
+      "equip":[ {
+        "key": "bow",
+        "name": "Bow",
+        "description": "8 piercing damage,3 range, 20 weight",
+        "require": {
+          "bow": 100
+        },
+        "effect": {
+          "piercingDamage":8,
+          "range": 3,
+          "weight": 20,
+          "consume": "arrow"
+        }
+      },{
+        "key": "copper dagger",
+        "name": "Copper Dagger",
+        "description": "5 slash damage, 20 weight",
+        "require": {
+          "copper dagger": 100
+        },
+        "effect": {
+          "slashDamage":5,
+          "weight": 20
+        }
+      },
+        {
+          "key": "quiver",
+          "name": "Quiver",
+          "description": "+40 capacity",
+          "require": {
+            "quiver": 100
+          },
+          "effect": {
+            "capacity":40
+          }
+        },
+        {
+          "key": "copper arrow",
+          "name": "Copper Arrow",
+          "description": "instant use,5 weight",
+          "require": {
+            "copper arrow": 10
+          },
+          "instant": true,
+          "effect": {
+            "weight": 5
+          }
+        },
+        {
+          "key": "cloak",
+          "name": "Leather Cloak",
+          "description": "+1 moral, +2 slash defense, +1 piercing defense",
+          "require": {
+            "cloak": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":1
+          }
+        },
+        {
+          "key": "Helmet",
+          "name": "Copper Helmet",
+          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+          "require": {
+            "helmet": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":2,
+            "bluntDefense":1,
+            "weight": 20
+          }
+        }
+      ]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 10,
+      "equip": true
+    }
+  },
+  "skirmisher": {
+    "id": 2,
+    "name": "Skirmisher",
+    "type": "skirmisher",
+    "category": "army",
+    "icon": "format-horizontal-align-right",
+    "description": "Light infantry unit",
+    "delay": 30,
+    "manpower": 100,
+    "speed": 25,
+    "capacity": 100,
+    "action": {
+      "deploy": true,
+      "assign": true,
+      "equip":[ {
+        "key": "copper javelin",
+        "name": "Copper Javelin",
+        "description": "20 piercing damage,2 range, instant use, 20 weight",
+        "require": {
+          "copper javelin": 100
+        }
+        ,
+        "instant": true,
+        "effect": {
+          "piercingDamage":20,
+          "range": 2,
+          "weight": 20
+        }
+      },
+        {
+        "key": "stick",
+        "name": "Throwing Stick",
+        "description": "8 blunt damage,2 range, instant use, 10 weight",
+        "require": {
+          "stick": 100
+        }
+      ,
+        "instant": true,
+        "effect": {
+          "bluntDamage":8,
+          "range": 2,
+          "weight": 10
+        }
+      }
+        ,
+        {
+          "key": "cloak",
+          "name": "Leather Cloak",
+          "description": "+1 moral, +2 slash defense, +1 piercing defense",
+          "require": {
+            "cloak": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":1
+          }
+        },
+        {
+          "key": "Helmet",
+          "name": "Copper Helmet",
+          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+          "require": {
+            "helmet": 100
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":2,
+            "bluntDefense":1,
+            "weight": 20
+          }
+        }
+      ]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 10,
+      "equip": true
+    }
+  },
+  "charioteer": {
+    "id": 2,
+    "name": "Charioteer",
+    "type": "charioteer",
+    "category": "army",
+    "icon": "buddhism",
+    "description": "Tank of ancient era",
+    "delay": 50,
+    "manpower": 50,
+    "speed": 25,
+    "capacity": 25,
+    "action": {
+      "deploy": true,
+      "assign": true,
+      "equip":[ {
+        "key": "copper javelin",
+        "name": "Copper Javelin",
+        "description": "20 piercing damage,2 range, instant use, 5 weight",
+        "instant": true,
+        "require": {
+          "copper javelin": 25
+        },
+        "effect": {
+          "piercingDamage":20,
+          "range": 2,
+          "instant": true,
+          "weight": 10
+        }
+      },
+        {
+          "key": "chariot",
+          "name": "Chariot",
+          "description": "+5 moral,+4 slash defense, +3 piercing defense,  +2 blunt defense, +5 piercing damage, +50 capacity",
+          "require": {
+            "cart":25,
+            "livestock": 50
+          },
+          "effect": {
+            "moral": 5,
+            "slashDefense":4,
+            "piercingDefense":3,
+            "bluntDefense":2,
+            "piercingDamageBonus": 5,
+            "capacity": 50
+          }
+        },
+
+        {
+          "key": "cloak",
+          "name": "Leather Cloak",
+          "description": "+1 moral, +2 slash defense, +1 piercing defense",
+          "require": {
+            "cloak": 50
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":1
+          }
+        },
+        {
+          "key": "Helmet",
+          "name": "Copper Helmet",
+          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 10 weight",
+          "require": {
+            "helmet": 50
+          },
+          "effect": {
+            "moral": 1,
+            "slashDefense":2,
+            "piercingDefense":2,
+            "bluntDefense":1,
+            "weight": 10
+          }
+        }
+      ]
+    },
+    "cost": {
+      "type": "happiness",
+      "quantity": 5,
+      "equip": true
+    }
+  }
+
+}
