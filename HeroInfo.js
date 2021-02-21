@@ -375,29 +375,48 @@ export  const  HeroInfo =  (observer((props) => {
 
     return <View contentContainerStyle={{ padding: 10,height:'100%' }} style={{height:'100%'}}>
          <View style={{flexDirection:'row',margin:5}}>
-            <View style={{marginRight:5}}>
+            <View style={{marginRight:5,width:73}}>
                 <View style={{margin:5,height:76,alignItems:'center'}}>
                     <Avatar.Text style={{backgroundColor:'#ff1f13',margin:2}} size={36} label={hero.valor} />
                     <Subheading >Valor</Subheading>
                 </View>
-                <View style={{margin:5,height:76,alignItems:'center'}}>
-                    <Avatar.Text style={{backgroundColor:'#2780E3',margin:2}} size={36} label={hero.wisdom} />
-                    <Subheading >Wisdom</Subheading>
-                </View>
-                <View style={{margin:5,alignItems:'center'}}>
-                    <Avatar.Text style={{backgroundColor:'#FF7518',color:'white',margin:2}} color="white" size={36} label={hero.authority} />
-                    <Subheading >Authority</Subheading>
-                </View>
+
             </View>
             <View style={{width:270}}>
                 <Paragraph >+{(hero.valor/2).toFixed(1)}% military unit extra damage when assigned to a group</Paragraph>
                 <Paragraph >-{(hero.valor/2).toFixed(1)}% happiness cost of employing military unit when assigned as a governor</Paragraph>
-                <Paragraph >-{(hero.wisdom/5).toFixed(1)}% traveling unit food consumption when assigned to a group</Paragraph>
-                <Paragraph >+{(hero.wisdom/2).toFixed(1)}% base population growth rate when assigned as a governor</Paragraph>
-                <Paragraph >+{(hero.authority/10).toFixed(1)} moral when assigned to a group</Paragraph>
-                <Paragraph >+{(hero.authority/100).toFixed(1)} happiness/month when assigned as a governor</Paragraph>
+
             </View>
          </View>
+          <View style={{flexDirection:'row',margin:5}}>
+             <View style={{marginRight:5,width:73}}>
+
+                 <View style={{margin:5,height:76,alignItems:'center'}}>
+                     <Avatar.Text style={{backgroundColor:'#2780E3',margin:2}} size={36} label={hero.wisdom} />
+                     <Subheading >Wisdom</Subheading>
+                 </View>
+
+             </View>
+             <View style={{width:270}}>
+                 <Paragraph >-{(hero.wisdom/5).toFixed(1)}% traveling unit food consumption when assigned to a group</Paragraph>
+                 <Paragraph >{(hero.wisdom/10).toFixed(1)}% less trading commission when assigned to a group</Paragraph>
+                 <Paragraph >-{(hero.wisdom/2).toFixed(1)}% happiness cost of employing non-military unit when assigned as a governor</Paragraph>
+                 <Paragraph >+{(hero.wisdom/2).toFixed(1)}% production result when assigned to a production building</Paragraph>
+             </View>
+          </View>
+           <View style={{flexDirection:'row',margin:5}}>
+              <View style={{marginRight:5,width:73}}>
+
+                  <View style={{margin:5,alignItems:'center'}}>
+                      <Avatar.Text style={{backgroundColor:'#FF7518',color:'white',margin:2}} color="white" size={36} label={hero.authority} />
+                      <Subheading >Authority</Subheading>
+                  </View>
+              </View>
+              <View style={{width:270}}>
+                  <Paragraph >+{(hero.authority/10).toFixed(1)} moral when assigned to a group</Paragraph>
+                  <Paragraph >+{(hero.authority/100).toFixed(2)} happiness/month when assigned as a governor</Paragraph>
+              </View>
+           </View>
      </View>
 
 }))

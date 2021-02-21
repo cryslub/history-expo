@@ -29,26 +29,30 @@
     "name": "Worker",
     "type": "worker",
     "icon": "shovel",
-    "description": "Can build or be assigned to various manual labour places",
+    "description": "Can build or be assigned to various manual labour places. +50% extra food consumption when traveling.",
     "delay": 2,
     "manpower": 50,
     "speed": 25,
     "capacity": 50,
+    "food consume": 1.5,
     "action": {
       "build": ["residence","mud","clay","stone","wood","tin","copper","livestock","wool","granary","warehouse","armoury","trade","market","wall"],
       "assign": true,
-      "equip":[ {
-        "key": "donkey1",
-        "name": "Donkey",
-        "description": "+200 capacity",
-        "require": {
-          "livestock": 50,
-          "pottery": 100
-        },
-        "effect": {
-          "capacity":200
-        }
-      },
+      "equip": {
+        "Livestock":[
+        {
+          "key": "donkey1",
+          "name": "Donkey",
+          "description": "+200 capacity",
+          "require": {
+            "livestock": 50,
+            "pottery": 100
+          },
+          "effect": {
+            "capacity": 200
+          }
+        }],
+        "Cart": [
         {
           "key": "cart",
           "name": "Cart",
@@ -58,10 +62,11 @@
             "pottery": 200
           },
           "effect": {
-            "capacity":400
+            "capacity": 400
           }
         }
-      ],
+        ]
+      },
       "deploy": true
     },
     "cost": {
@@ -78,7 +83,7 @@
     "delay": 4,
     "manpower": 10,
     "action": {
-      "build": ["brick","pottery","cloth","furnace","brewery","tavern","kiln","library","toolsmith","leather","polished","workshop","melee","ranged","armoursmith"],
+      "build": ["brick","pottery","cloth","furnace","beer","tavern","kiln","library","toolsmith","leather","polished","workshop","melee","ranged","armoursmith"],
       "assign": true
     },
     "cost": {
@@ -203,10 +208,11 @@
     "type": "warrior",
     "category": "army",
     "icon": "axe",
-    "description": "Basic fighters.",
+    "description": "Basic fighters.  +100% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
     "speed": 25,
+    "food consume": 2,
     "capacity": 100,
     "action": {
       "deploy": true,
@@ -277,11 +283,12 @@
     "type": "spearman",
     "category": "army",
     "icon": "zodiac-sagittarius",
-    "description": "Main tankers",
+    "description": "Main tankers. +100% extra food consumption when traveling",
     "delay": 35,
     "manpower": 100,
     "capacity": 100,
     "speed": 25,
+    "food consume": 2,
     "action": {
       "deploy": true,
       "assign": true,
@@ -355,10 +362,11 @@
     "type": "bowman",
     "category": "army",
     "icon": "bullseye-arrow",
-    "description": "Main range unit",
+    "description": "Main range unit. +50% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
     "speed": 25,
+    "food consume": 1.5,
     "capacity": 100,
     "action": {
       "deploy": true,
@@ -453,10 +461,11 @@
     "type": "skirmisher",
     "category": "army",
     "icon": "format-horizontal-align-right",
-    "description": "Light infantry unit",
+    "description": "Light infantry unit. +50% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
     "speed": 25,
+    "food consume": 1.5,
     "capacity": 100,
     "action": {
       "deploy": true,
@@ -534,10 +543,11 @@
     "type": "charioteer",
     "category": "army",
     "icon": "buddhism",
-    "description": "Tank of ancient era",
+    "description": "Tank of ancient era. +100% extra food consumption when traveling",
     "delay": 50,
     "manpower": 50,
     "speed": 25,
+    "food consume": 2,
     "capacity": 25,
     "action": {
       "deploy": true,

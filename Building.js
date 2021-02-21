@@ -10,6 +10,7 @@ import Icon from './Icon.js';
 import Resource from './Resource.js';
 
 import mainStore from './MainContext.js';
+import Hero from './Hero.js';
 
 import resources from './json/resource.json';
 
@@ -80,8 +81,20 @@ export  const  Building =  (observer((props) => {
 
     const delay = production?.delay;
 
+
+    const removeHero = ()=>{
+        city.addHero(building.hero);
+        building.setHero(undefined);
+    }
+
     return <ScrollView style={{padding:10,paddingBottom:30}}>
         <Caption>{building.data.description}</Caption>
+        {building.hero!=undefined?<>
+            <Caption>Leader</Caption>
+            <Hero data={building.hero}  {...props} type='group' remove={removeHero} removable={true}/>
+        </>:null
+        }
+
         {storage?<>
             {storage.type=='resource'?
              <Paragraph>Resource storage capacity {Util.number(storage.quantity*building.completedQuantity)} </Paragraph>
@@ -133,17 +146,37 @@ export  const  Building =  (observer((props) => {
             <View style={{flexDirection:'row'}}>
                 <Paragraph>Increase happiness </Paragraph>
                 <Resource icon={resources[production.result].icon}/>
-                <Paragraph>{((production.quantity*building.completedQuantity)/(city.population/1000)).toFixed(3)}/{production.delay} days</Paragraph>
+                <Paragraph>{(building.getResultQuantity(production.quantity)/(city.population/1000)).toFixed(3)}/{production.delay} days</Paragraph>
             </View>
-           :<View style={{flexDirection:'row'}}>
+           :<>
+           {
+               Array.isArray(production.result)?<>
+               <View style={{flexDirection:'row'}}>
+               {
+                production.result.map(result=>{
+                    return <>
+                         <Paragraph>{result.key} </Paragraph>
+                         <Resource icon={resources[result.key].icon}/>
+                         <Paragraph>{Util.number(building.getResultQuantity(result.quantity))} </Paragraph>
+                    </>
+                })
+               }
+               </View>
+               <View style={{flexDirection:'row'}}>
+                   <Paragraph>will be produced with max effort</Paragraph>
+               </View>
+               </>
+               :<View style={{flexDirection:'row'}}>
                  <Paragraph>{production.result} </Paragraph>
                  <Resource icon={resources[production.result].icon}/>
-                 <Paragraph>{Util.number(production.quantity*building.completedQuantity)}  will be produced with max effort</Paragraph>
-            </View>
+                 <Paragraph>{Util.number(building.getResultQuantity(production.quantity))}  will be produced with max effort</Paragraph>
+               </View>
+           }
+            </>
             }
          </>
         :null}
-        {building.state!='deploy'&&(building.type=='production'||building.type=='trade')?<>
+        {building.state!='deploy'&&(building.data.production!=undefined||building.type=='trade')?<>
             <Divider/>
           {building.units.length>0?<Caption>Assigned Units
             {building.units.length}/{building.quantity}

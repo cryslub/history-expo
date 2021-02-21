@@ -277,7 +277,7 @@ export default class DataService{
             }
             if(self.activeFactions[city.faction] !== undefined  ){
                 self.activeFactions[city.faction].cities.push(c);
-                if(city.traits.includes('capital')){
+                if(city.snapshotSub?.capital){
                     self.activeFactions[city.faction].capital = c;
                 }
             }

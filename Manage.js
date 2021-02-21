@@ -152,13 +152,23 @@ const ResourceScreen = (observer((props) => {
             return <Paragraph>This resource is already on trade</Paragraph>
         }
 
-        if(city.buildings.trade==undefined || city.buildings.trade.completedQuantity<=city.trade.length || city.buildings.trade.units.length<=city.trade.length){
+        let limitExceeded = false;
+        if(city.buildings.trade==undefined){
+            if(city.trade.length>=5){
+                limitExceeded = true;
+            }
+        }else{
+            if((city.buildings.trade.completedQuantity+1)*5<=city.trade.length || (city.buildings.trade.units.length+1)*5<=city.trade.length){
+                limitExceeded = true;
+            }
+        }
+
+        if(limitExceeded){
             return <>
                  {desc}
                 <Paragraph>You need extra trading post with merchant in your city</Paragraph>
             </>
         }
-
 
         return <>
             {desc}
@@ -213,7 +223,11 @@ const TradeScreen = (observer((props) => {
 
       return (
         <View style={{paddingTop:10}}>
-                 <Caption>Selling {city.buildings.trade?<>{city.trade.length}/{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)}</>:'0/0'}</Caption>
+                 <Caption>Selling
+                    {city.buildings.trade?
+                        <>{city.trade.length}/(1+{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)})*5</>
+                     :city.trade.length+'/5'}
+                 </Caption>
 
         <FlatGrid
            itemDimension={mainStore.unitSize}
@@ -289,15 +303,31 @@ const InfoScreen =  (observer((props) => {
 
     const city= mainStore.selectedCity;
 
+    const change = ()=>{
+        props.navigation.navigate('HeroList', {city:city});
+    }
+
+    const changeChancellor = ()=>{
+        props.navigation.navigate('SelectChancellor', {city:city});
+    }
+
    return (
      <View style={{padding:10}}>
 
-        {city.governor!=undefined?
+
         <View style={{flexDirection:'row'}}>
              <Icon icon="bank"  />
             <Paragraph  style={{position:'relative',top:-2}}>Governor </Paragraph>
-            <Caption>{city.governor.name}</Caption>
-        </View>:null}
+            <Caption>{city.governor==undefined?'None':city.governor.name}</Caption>
+                <Button icon="playlist-edit" onPress={()=>change()} />
+        </View>
+        <View style={{flexDirection:'row'}}>
+             <Icon icon="bank"  />
+            <Paragraph  style={{position:'relative',top:-2}}>Chancellor </Paragraph>
+            <Caption>{city.chancellor==undefined?'None':city.chancellor.name}</Caption>
+                <Button icon="playlist-edit" onPress={()=>changeChancellor()} />
+        </View>
+
         {city?.factionData?.capital?.id == city.id?
             <View style={{flexDirection:'row'}}>
                 <Icon icon="star"  />
@@ -327,7 +357,7 @@ const InfoScreen =  (observer((props) => {
         <View style={{flexDirection:'row'}}>
             <Icon icon="heart"  />
             <Paragraph style={{position:'relative',top:-2}}>Happiness </Paragraph>
-            <Caption>{city.happiness.toFixed(2)}/100</Caption>
+            <Caption>{city.happiness.toFixed(2)}/{city.maxHappiness}</Caption>
         </View>
         <View style={{flexDirection:'row'}}>
             <Icon icon="hospital-box"  />
@@ -340,6 +370,7 @@ const InfoScreen =  (observer((props) => {
             <Paragraph style={{position:'relative',top:-2}}>Population Growth rate </Paragraph>
             <Caption>{city.getGrowthRate()}%/year</Caption>
         </View>
+
         <Divider/>
         <View style={{flexDirection:'row'}}>
             <Icon icon="sword-cross"  />
@@ -357,14 +388,14 @@ const InfoScreen =  (observer((props) => {
             <Paragraph style={{position:'relative',top:-2}}>City defense </Paragraph>
             <Caption>{Math.floor(city.getDefense())}/{city.getDefenseMax()}</Caption>
         </View>
-        {Object.keys(city.rareResources).length>0?
+        {city.snapshotSub?.resource?
         <>
             <Divider/>
             <Paragraph>Natural resources</Paragraph>
             {
-                Object.keys(city.rareResources).map(key=>{
-                    const resource = city.rareResources[key]
-                    return <ResourceRow resource={key} suffix={resource.name}/>
+                Object.keys(city.snapshotSub.resource).map(key=>{
+                    const resource = city.snapshotSub.resource[key]
+                    return <ResourceRow resource={key} suffix={resources[key].name} lv={resource}/>
                 })
             }
         </>:null}

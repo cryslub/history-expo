@@ -82,7 +82,17 @@ const Production = (props)=>{
         {props.index>0?<Paragraph>or </Paragraph>:null}
        {production.result=='happiness'?
        <ResourceRow prefix="Increase happiness " resource={production.result} suffix={(production.quantity/(city.population/1000)).toFixed(3)+'/'+production.delay+' days'}/>
-       :<ResourceRow prefix={"Produce "+production.result} resource={production.result} suffix={Util.number(production.quantity)+'/'+production.delay+' days'}/>
+       :Array.isArray(production.result)?
+        <View>
+             <View style={{flexDirection:'row'}}><Paragraph>Produce</Paragraph></View>
+            {
+                production.result.map(result=>{
+                    return   <View style={{flexDirection:'row',paddingLeft:10}}><ResourceRow prefix={result.key} resource={result.key} suffix={Util.number(result.quantity)}/></View>
+                })
+            }
+            <Paragraph>/ {production.delay} days</Paragraph>
+        </View>
+        :<ResourceRow prefix={"Produce "+production.result} resource={production.result} suffix={Util.number(production.quantity)+'/'+production.delay+' days'}/>
 
        }
         </View>
@@ -188,7 +198,7 @@ export default class Build extends Component {
              :null}
             {disabled?null:<Button  onPress={()=>this.add(unit,1)}>Build</Button>}
              <View style={{width:'100%'}}>
-                <Caption style={{textAlign:'center'}}>Takes {unit.delay} days</Caption>
+                <Caption style={{textAlign:'center'}}>Takes {city.getConstructionDays(unit.delay)} days</Caption>
             </View>
         </>
     }
@@ -204,6 +214,22 @@ export default class Build extends Component {
             const req = building.require;
             if(req){
                 if(city.rareResources[req]==undefined) return false;
+            }
+
+            const rare = building.rare;
+            if(rare){
+                if(city.snapshotSub?.resource != undefined){
+                    if(city.snapshotSub?.resource[rare]==undefined && city.buildings[key]?.quantity>0) return false;
+                }else{
+                    if(city.buildings[key]?.quantity>0) return false;
+                }
+            }
+
+            if(req || rare){
+               if(city.buildings[key]?.quantity>0){
+                    if(city.snapshotSub?.resource == undefined) return false;
+                    if(city.buildings[key]?.quantity>=city.snapshotSub?.resource[key]) return false;
+                }
             }
 
             if(key=='wall'){

@@ -85,7 +85,7 @@ class MainStore{
 
      addUnit = (unit) => {
          const city = unit.currentLocation;
-         unit.moral = city.happiness;
+         unit.initMoral();
          city.population-=unit.manpower;
 
          this.scene.current.addUnit(city.latitude,city.longitude,city.factionData.color,unit)

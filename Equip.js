@@ -275,6 +275,11 @@ export default class Equip extends Component {
         this.props.navigation.navigate('Exchange', {unit:unit,target:target});
     }
 
+    change = (key)=>{
+         const { unit } = this.props.route.params;
+        this.props.navigation.navigate('ChangeEquip', {unit:unit,key:key});
+    }
+
 	render(){
 
 		const { unit } = this.props.route.params;
@@ -311,9 +316,14 @@ export default class Equip extends Component {
             </>:null}
             <Caption>Equipments</Caption>
             {
-                equip.map(e=>{
-                    return <Equipment data={e} unit={unit}/>
+                Object.keys(equip).map(key=>{
+                    return <View style={{flexDirection:'row'}}>
+                        <Paragraph>{key} </Paragraph>
+                        <Caption> {unit.equipments[key]==undefined?'None':null} </Caption>
+                        <Button icon="playlist-edit" onPress={()=>this.change(key)} />
+                    </View>
                 })
+
             }
             {unit.inGroup!=true?<Resources unit={unit} />:null}
 

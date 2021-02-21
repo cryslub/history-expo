@@ -61,7 +61,7 @@
     "key": "wood",
     "type": "production",
     "delay": 10,
-    "description": "Workers can collect woods from here",
+    "description": "Workers can collect woods from here. Only one lumber yard is allowed to build unless the city has wood resource.",
     "icon": "tree",
     "color": "#8D6142",
     "worker": "worker",
@@ -69,7 +69,8 @@
       "delay": 40,
       "result": "wood",
       "quantity": 10
-    }
+    },
+    "rare": "wood"
   },
   "stone": {
     "id": 31,
@@ -77,7 +78,7 @@
     "key": "stone",
     "type": "production",
     "delay": 10,
-    "description": "Workers can quarry stone from here",
+    "description": "Workers can quarry stone from here. Only one quarry is allowed to build unless the city has stone resource.",
     "icon": "alpha-s-box",
     "color": "#6D7876",
     "worker": "worker",
@@ -86,10 +87,7 @@
       "result": "stone",
       "quantity": 5
     },
-    "storage": {
-      "type": "stone",
-      "quantity": 200
-    }
+    "rare": "stone"
   },
   "tin": {
     "id": 31,
@@ -102,8 +100,8 @@
     "color": "#8f8b96",
     "worker": "worker",
     "cost": {
-      "type": "brick",
-      "quantity": 30
+      "type": "wood",
+      "quantity": 50
     },
     "production": {
       "delay": 60,
@@ -123,8 +121,8 @@
     "color": "#b87333",
     "worker": "worker",
     "cost": {
-      "type": "brick",
-      "quantity": 30
+      "type": "wood",
+      "quantity": 50
     },
     "production": {
       "delay": 40,
@@ -148,6 +146,10 @@
       "result": "livestock",
       "quantity": 20
     },
+    "cost": {
+      "type": "wood",
+      "quantity": 30
+    },
     "storage": {
       "type": "livestock",
       "quantity": 50
@@ -163,9 +165,22 @@
     "icon": "sheep",
     "color": "#bab9b1",
     "worker": "worker",
+    "cost": {
+      "type": "wood",
+      "quantity": 30
+    },
     "production": {
       "delay": 30,
-      "result": "wool",
+      "result": [
+        {
+          "key":"wool",
+          "quantity": 20
+        },
+        {
+          "key":"food",
+          "quantity": 100
+        }
+      ],
       "quantity": 20,
       "cost": [
         {
@@ -238,7 +253,7 @@
       "key": "residence",
       "type": "",
       "delay": 30,
-      "description": "The place where people lives",
+      "description": "The place where people lives. When a hero has been assigned, population growth rate increases depends on the wisdom of hero.",
       "icon": "home-group",
       "color": "#70543e",
       "cost": {
@@ -248,6 +263,10 @@
       "storage": {
         "type": "citizen",
         "quantity": 1000
+      },
+      "hero effect": {
+        "population growth" : 0.01,
+        "property" : "wisdom"
       }
     },
   "granary": {
@@ -381,7 +400,7 @@
     "key": "trade",
     "type": "trade",
     "delay": 30,
-    "description": "Merchants can trade from here. You need 1 trading post per 1 resource to trade",
+    "description": "You need 1 trading post per 5 resource to trade. ",
     "icon": "cached",
     "color": "#e3c378",
     "worker": "merchant",
@@ -391,6 +410,7 @@
       "type": "brick",
       "quantity": 50
     }
+
   },
   "beer": {
     "id": 31,
@@ -481,21 +501,26 @@
     "id": 31,
     "name": "Library",
     "key": "library",
-    "type": "trade",
+    "type": "production",
     "delay": 60,
-    "description": "Scribe can manage manpower from here. +3000 Max manpower until 1/3 of city population",
+    "description": "Scribe can manage manpower from here. From 3,000 population, city needs libraries to increase its manpower. +10 available manpower per month until 1/3 of city population",
     "icon": "book",
     "color": "#d97557",
     "cost": [{
       "type": "brick",
       "quantity": 100
-    },
-    {
-      "type": "tablet",
-      "quantity": 200
     }],
     "worker": "scribe",
-    "trade": {
+    "production": {
+      "delay": 30,
+      "result": "manpower",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "tablet",
+          "quantity": 1
+        }
+      ]
     }
   },
   "wall": {
@@ -504,14 +529,18 @@
     "key": "wall",
     "type": "defense",
     "delay": 120,
-    "description": "Increase city defense",
+    "description": "Increase city defense. When a hero has been assigned, wall defense increases depends on the valor of the hero.",
     "icon": "chess-rook",
     "color": "#70543e",
     "cost": {
       "type": "brick",
       "quantity":200
     },
-    "defense": 1
+    "defense": 1,
+    "hero effect": {
+      "defense" : 0.01,
+      "property" : "valor"
+    }
   },
   "leather": {
     "id": 31,
@@ -861,6 +890,858 @@
           "quantity": 20
         }
       ]
+    }
+  },
+  "anu ziggurat": {
+    "id": 31,
+    "name": "Anu ziggurat",
+    "originalName":"\uD808\uDC2D",
+    "key": "anu ziggurat",
+    "type": "effect",
+    "delay": 3000,
+    "description": "Ziggurat dedicated to sky god An. +3 max happiness, +2 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#b53300",
+    "worker": "",
+    "cost": {
+      "type": "brick",
+      "quantity": 800
+    },
+    "effect": {
+      "faction max happiness" : 2,
+      "max happiness" : 3
+    }
+  },
+  "eanna": {
+    "id": 31,
+    "name": "Eanna",
+    "originalName":"\uD808\uDC8D\uD808\uDC2D\uD808\uDE3E",
+    "key": "eanna",
+    "type": "effect",
+    "delay": 3000,
+    "description": "District dedicated to goddess Inanna. +5% base population growth rate, +0.05 happiness/month",
+    "icon": "bank",
+    "color": "#0085b5",
+    "worker": "",
+    "cost": {
+      "type": "brick",
+      "quantity": 800
+    },
+    "effect": {
+      "population growth" : 5,
+      "happiness" : 0.05
+    }
+  },
+  "nanna": {
+    "id": 31,
+    "name": "E-kish-nu-gal ",
+    "originalName":"\uD808\uDC2D\uD808\uDEC0\uD808\uDDA0",
+    "key": "nanna",
+    "type": "production",
+    "delay": 1000,
+    "description": "Temple dedicated to god of moon Nanna. +5% base population growth rate, Grants happiness growth bonus depends on the wisdom of the governor.",
+    "icon": "bank",
+    "color": "#00b545",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "population growth" :5,
+      "wisdom happiness" : 1
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "abzu": {
+    "id": 31,
+    "name": "E-abzu",
+    "originalName":"\uD808\uDC8D\uD808\uDF6A\uD808\uDC0A",
+    "key": "abzu",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god of water Enki. +5 hygiene",
+    "icon": "bank",
+    "color": "#00b573",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "hygiene" :5
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "babbar": {
+    "id": 31,
+    "name": "E-babbar",
+    "key": "babbar",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to sun god Utu. +0.05 happiness/month",
+    "icon": "bank",
+    "color": "gold",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "happiness" :0.05
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "shara": {
+    "id": 31,
+    "name": "E-mah",
+    "originalName":"\uD808\uDC2D\uD808\uDC48",
+    "key": "shara",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to minor god of war Shara. -5% happiness cost of employing military unit",
+    "icon": "bank",
+    "color": "grey",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "military happiness cost" :5
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "ninlil": {
+    "id": 31,
+    "name": "Temple of Ninlil",
+    "originalName":"\uD808\uDC2D\uD808\uDEA9\uD808\uDF06\uD808\uDDA4",
+    "key": "ninlil",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess Ninlil. +5% farm production",
+    "icon": "bank",
+    "color": "#26619C",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "farm production" :5
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "dumuzid": {
+    "id": 31,
+    "name": "E-dumi-zi-abzu",
+    "originalName":"\uD808\uDF09\uD808\uDF63\uD808\uDE7A\uD808\uDDFB",
+    "fontSize": 12,
+    "key": "dumuzid",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god of shepherds Dumuzid. +5% wool production",
+    "icon": "bank",
+    "color": "#0085b5",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "wool production" :5
+    },
+
+    "production": {
+      "delay": 30,
+      "result": "happiness",
+      "quantity": 1.2,
+      "cost": [{
+        "type": "livestock",
+        "quantity": 1
+      }]
+    }
+  },
+  "nisaba": {
+    "id": 31,
+    "name": "Temple of Nisaba",
+    "originalName":"\uD808\uDC2D\uD808\uDE40",
+    "key": "nisaba",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess Nisaba. +2% farm production",
+    "icon": "bank",
+    "color": "#b56700",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "farm production" :2
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.2,
+      "cost": [{
+        "type": "food",
+        "quantity": 10
+      }]
+    }
+  },
+  "urash": {
+    "id": 31,
+    "name": "E-ibe-Anu",
+    "originalName":"\uD808\uDC2D\uD808\uDD41",
+    "key": "urash",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess of earth Urash. +2% farm production, +2 max happiness",
+    "icon": "bank",
+    "color": "#ba8534",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "farm production" :2,
+      "max happiness" : 2
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "ekur": {
+    "id": 31,
+    "name": "Ekur",
+    "originalName":"\uD808\uDC8D\uD808\uDDB3",
+    "key": "ekur",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Garden of the gods.  +5 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#26619C",
+    "worker": "",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "faction max happiness" : 5
+    }
+  },
+  "ninhursag": {
+    "id": 31,
+    "name": "E-mah",
+    "originalName":"\uD808\uDC2D\uD808\uDEA9\uD808\uDF06\uD808\uDD2F\uD808\uDE95",
+    "key": "ninhursag",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess Ninhursag. +10% base population growth rate",
+    "icon": "omega",
+    "color": "#00b573",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "population growth" : 10
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "eshumesha": {
+    "id": 31,
+    "name": "Eshumesha",
+    "originalName":"\uD808\uDC2D\uD808\uDEA9\uD808\uDF06\uD808\uDD41",
+    "key": "eshumesha",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Ninurta. +5% farm production",
+    "icon": "bank",
+    "color": "#666666",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "farm production" :5
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "sikil": {
+    "id": 31,
+    "name": "E-sikil",
+    "key": "sikil",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Ninazu. +2 hygiene",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "hygiene" :2
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "pabilsag": {
+    "id": 31,
+    "name": "Temple of Pabilsag",
+    "key": "pabilsag",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god of trees Pabilsag. +10% wood production",
+    "icon": "bank",
+    "color": "#1d8503",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "wood production" :10
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "inshushinak": {
+    "id": 31,
+    "name": "Temple of Inshushinak",
+    "key": "inshushinak",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Inshushinak, protector deity of Susa. +10% militia damage",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "effect": {
+      "militia damage" :10
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+
+  "kura": {
+    "id": 31,
+    "name": "Red Temple",
+    "key": "kura",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Kura.",
+    "icon": "bank",
+    "color": "#c45404",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+
+  "great temple": {
+    "id": 31,
+    "name": "Great Temple",
+    "key": "great temple",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Site of ritual animal sacrifice.",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 30,
+      "result": "happiness",
+      "quantity": 1.2,
+      "cost": [{
+        "type": "livestock",
+        "quantity": 1
+      }]
+    }
+  },
+
+  "banebdjedet": {
+    "id": 31,
+    "name": "Temple of Banebdjedet",
+    "key": "banebdjedet",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to ram god Banebdjedet. +10% wool production",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 30,
+      "result": "happiness",
+      "quantity": 1.2,
+      "cost": [{
+        "type": "livestock",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "wool production" :10
+    }
+  },
+
+  "eye temple": {
+    "id": 31,
+    "name": "Eye Temple",
+    "key": "eye temple",
+    "type": "effect",
+    "delay": 1000,
+    "description": "",
+    "icon": "zodiac-aries",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+
+  "per aat": {
+    "id": 31,
+    "name": "Per Aat",
+    "originalName":"\uD80C\uDFCF\uD80C\uDF43\uD80C\uDC2D",
+    "key": "per aat",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Great House dedicated to sun god Atum. +5 max happiness",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "max happiness" :5
+    }
+  },
+
+  "neith": {
+    "id": 31,
+    "name": "Temple of Neith",
+    "originalName":"\uD80C\uDE16\uD80C\uDFCF\uD80C\uDECC\uD80C\uDC50",
+    "key": "neith",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess Neith. -3% happiness cost of employing military unit, Grants happiness growth bonus depends on the wisdom of the governor",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "military happiness cost" :3,
+      "wisdom happiness" : 1
+    }
+  },
+
+  "wadjet": {
+    "id": 31,
+    "name": "Temple of Wadjet",
+    "key": "wadjet",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess Wadjet. +10% militia damage",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "militia damage" : 10
+    }
+  },
+
+  "ptah": {
+    "id": 31,
+    "name": "Hout-ka-Ptah",
+    "originalName":"\uD80C\uDEAA\uD80C\uDFCF\uD80C\uDF9B\uD80C\uDE57\uD80C\uDFCF\uD80C\uDE50\uD80C\uDC93\uD80C\uDE96",
+    "fontSize": 12,
+    "key": "ptah",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Great Temple dedicated to creator god Ptah. +10% building construction speed",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "construction speed" :10
+    }
+  },
+
+  "heryshaf": {
+    "id": 31,
+    "name": "Temple of Heryshaf",
+    "key": "heryshaf",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Heryshaf. Grants happiness growth bonus depends on the valor of the governor",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "valor happiness" : 1
+    }
+  },
+
+  "inpu": {
+    "id": 31,
+    "name": "Temple of Inpu",
+    "originalName":"\uD80C\uDDCB\uD80C\uDE16\uD80C\uDEAA\uD80C\uDD71\uD80C\uDC62",
+    "key": "inpu",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Inpu. +3 hygiene, +10% moral decrease rate of the invaders",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "hygiene" : 3,
+      "invader moral decrease" : 10
+    }
+  },
+
+  "anhur": {
+    "id": 31,
+    "name": "Temple of Anhur",
+    "originalName":"\uD80C\uDFCE\uD80C\uDE10\uD80C\uDDEF\uD80C\uDD46",
+    "fontSize": 12,
+    "key": "anhur",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god of war Anhur. -10% happiness cost of employing military unit",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "hygiene" : 3,
+      "military happiness cost" : 10
+    }
+  },
+
+  "horus": {
+    "id": 31,
+    "name": "Temple of Horus",
+    "originalName":"\uD80C\uDD43",
+    "key": "horus",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to hawk god Horus. +5 max happiness",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "max happiness" : 5
+    }
+  },
+
+  "khnum": {
+    "id": 31,
+    "name": "Temple of Khnum",
+    "originalName":"\uD80C\uDFB8\uD80C\uDCDD",
+    "key": "khnum",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to god Khnum. +10% food production",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "food production" : 10
+    }
+  },
+
+  "hathor": {
+    "id": 31,
+    "name": "Temple of Hathor",
+    "originalName":"\uD80C\uDE61",
+    "key": "hathor",
+    "type": "effect",
+    "delay": 1000,
+    "description": "Temple dedicated to goddess Hathor. +5% base population growth, +2 max happiness",
+    "icon": "bank",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": {
+      "type": "brick",
+      "quantity": 400
+    },
+    "production": {
+      "delay": 30,
+      "result": "happiness",
+      "quantity": 1.2,
+      "cost": [{
+        "type": "livestock",
+        "quantity": 1
+      }]
+    },
+    "effect": {
+      "population growth" : 5,
+      "max happiness": 2
+    }
+  },
+
+  "djoser": {
+    "id": 31,
+    "name": "Pyramid of Djoser",
+    "originalName":"\uD80C\uDF4B\uD80C\uDD53\uD80C\uDC8B\uD80C\uDE74",
+    "key": "djoser",
+    "type": "effect",
+    "delay": 3000,
+    "description": "Step Pyramid built for the burial of pharaoh Djoser. +1 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": {
+      "type": "brick",
+      "quantity": 800
+    },
+    "effect": {
+      "faction max happiness" : 1
     }
   }
 }

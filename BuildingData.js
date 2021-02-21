@@ -43,30 +43,45 @@ export default class BuildingData extends UnitData{
                     const maxEffort = this.getMaxEffort();
 
                     let  quantity = ((production.quantity*this.completedQuantity)*(this.effort/maxEffort));
-                    if(production.result!='happiness'){
-                        quantity = city.addResource(production.result,quantity)
-                    }
+                    const bonus = Util.isEmpty(this.city.effect[this.data.key+' production'])/100
+                    quantity *= (1+bonus+this.bonusEffort);
 
-                    let consumedCount = 0;
-                    if(quantity>0){
-                        const cost = production.cost;
-                        if(cost){
-                            cost.forEach(c=>{
-                                const consume = (c.quantity*this.completedQuantity)*this.effort/maxEffort;
-                                if(this.resources[c.type] >= consume){
-                                    consumedCount++;
-                                    this.resources[c.type] -= (c.quantity*this.completedQuantity)*this.effort/maxEffort;
-                                }
+                    if(production.result!='happiness' && production.result!='manpower'){
+                        if(Array.isArray(production.result)){
+                            production.result.forEach(result=>{
+                                city.addResource(result.key,result.quantity)
                             })
+                        }else{
+                            quantity = city.addResource(production.result,quantity)
                         }
                     }
 
 
+
+
                     if(production.result=='happiness'){
+                        let consumedCount = 0;
+                        if(quantity>0){
+                            const cost = production.cost;
+                            if(cost){
+                                cost.forEach(c=>{
+                                    const consume = (c.quantity*this.completedQuantity)*this.effort/maxEffort;
+                                    if(this.resources[c.type] >= consume){
+                                        consumedCount++;
+                                        this.resources[c.type] -= (c.quantity*this.completedQuantity)*this.effort/maxEffort;
+                                    }
+                                })
+                            }
+                        }
                         city.addHappiness((quantity*consumedCount)/(city.population/1000));
                     }
 
+                    if(production.result=='manpower'){
+                        city.setManpower(city.manpower+quantity)
+                    }
+
                     this.effort = 0 ;
+                    this.bonusEffort = 0;
 
                 }
 
@@ -109,8 +124,13 @@ export default class BuildingData extends UnitData{
 
 
          if(diff>0 && this.state == 'produce'){
-            if(this.checkResource())
+            if(this.checkResource()){
                this.effort += Math.min(this.units.length,this.completedQuantity)*diff;
+               if(this.hero){
+                    this.bonusEffort += (this.hero.wisdom/(200*this.delay))*diff
+               }
+            }
+
         }
     }
 
@@ -170,4 +190,11 @@ export default class BuildingData extends UnitData{
         return ret;
     }
 
+    getResultQuantity(quantity){
+        let ret = quantity*this.completedQuantity
+        if(this.hero){
+            ret *= (1+this.hero.wisdom/200)
+        }
+        return ret
+    }
 }

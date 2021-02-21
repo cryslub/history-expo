@@ -9,7 +9,7 @@ import Util from './Util.js';
 import Icon from './Icon.js';
 import Resource from './Resource.js';
 import ResourceRow from './ResourceRow.js';
-
+import Hero from './Hero.js';
 
 
 import Unit from './Unit.js';
@@ -81,6 +81,13 @@ export const Group =  (observer((props) => {
 
      const { unit} = props.route.params;
 
+    const removeHero = ()=>{
+        const city = unit.currentLocation;
+        city.addHero(unit.hero);
+        unit.setHero(undefined);
+    }
+
+    const removable = unit.state=='' || (unit.currentRoad == undefined && unit.currentLocation.factionData.id==unit.city.factionData.id)
 
       return (
         <ScrollView style={{padding:10}}>
@@ -93,7 +100,11 @@ export const Group =  (observer((props) => {
                    <Caption>{unit.speed}km/day</Caption>
                 </View>
                 <Divider/>
-
+            {unit.hero!=undefined?<>
+                <Caption>Leader</Caption>
+                <Hero data={unit.hero}  {...props} type='group' remove={removeHero} removable={removable}/>
+            </>:null
+            }
              <UnitScreen unit={unit} type='group' {...props}/>
              <Divider/>
              <Resources unit={unit} />

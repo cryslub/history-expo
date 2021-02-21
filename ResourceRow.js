@@ -14,6 +14,7 @@ export default class ResourceRow extends Component {
             <Paragraph>{props.prefix} </Paragraph>
             <Resource icon={resource.icon} color={resource.color}/>
             <Paragraph>{props.suffix}</Paragraph>
+            {props.lv?<Caption> Lv.{props.lv}</Caption>:null}
         </View>
     }
 }

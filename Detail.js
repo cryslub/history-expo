@@ -97,9 +97,15 @@ export default class Detail extends Component{
                 </View>
                  <View style={{flexDirection:'row',marginBottom:7}}>
                 {
-                    Object.keys(city.rareResources).map(key=>{
-                        return <Button icon={resources[key].icon} color="white" style={{marginTop:2,minWidth:24,width:24,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>
-                    })
+                    city.snapshotSub?.resource?
+                    <>
+                    {
+                        Object.keys(city.snapshotSub?.resource).map(key=>{
+                            return <Button icon={resources[key].icon} color="white" style={{marginTop:2,minWidth:24,width:24,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>
+                        })
+                    }
+                    </>
+                    :null
                 }
                 </View>
                 {mainStore.stage=='start'&&detail.factionName!='None'?<Button mode="outlined"  onPress={()=>inf.chooseFaction(detail.faction)}

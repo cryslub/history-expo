@@ -8,8 +8,16 @@ import * as THREE from 'three';
 	 number :  (number) =>{
 		 
 		  if(number === undefined) return "";
-		  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+		  return Math.floor(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			
+	},
+	isEmpty : (value,def)=>{
+	    if(value == undefined){
+	        if(def == undefined) return 0
+    	    return def;
+	    }
+	    return value;
 	},
     sum : (arr,key) =>{
     	if(Array.isArray( arr))

@@ -14,11 +14,14 @@ import {Deployed} from './Deployed.js';
 import {Manage} from './Manage.js';
 import {Info} from './Info.js';
 import {HeroInfo} from './HeroInfo.js';
+import {HeroList} from './HeroList.js';
+import {SelectChancellor} from './SelectChancellor.js';
 
 import {Employ} from './Employ.js';
 import Build from './Build.js';
 import Assign from './Assign.js';
 import Equip from './Equip.js';
+import {ChangeEquip} from './ChangeEquip.js';
 import Exchange from './Exchange.js';
 
 import {Trade} from './Trade.js';
@@ -69,8 +72,8 @@ export default class Main extends Component{
                                 options={({ route }) => ({
                                     headerTitle: props =>
                                         <View style={{flexDirection:'row'}}>
-                                            <Text style={{fontSize:18}}> {route.params.city.name} </Text>
-                                            <Caption style={{position: 'relative',top: 2}}> {route.params.city.originalName}</Caption>
+                                            <Text style={{position:'relative',top:5,fontSize:18}}> {route.params.city.name} </Text>
+                                            <Title style={{fontSize:route.params.city.snapshotSub?.fontSize}}> {route.params.city.originalName}</Title>
                                         </View>}
                                 )}
                          />
@@ -83,7 +86,18 @@ export default class Main extends Component{
                                         </View>}
                                 )}
                         />
-                         <Stack.Screen name="HeroInfo" component={HeroInfo} options={({ route }) => ({ title: route.params.hero.name })}/>
+                         <Stack.Screen name="HeroInfo" component={HeroInfo}
+                                options={({ route }) => ({
+                                    headerTitle: props =>
+                                        <View style={{flexDirection:'row'}}>
+                                            <Text style={{position:'relative',top:5,fontSize:18}}> {route.params.hero.name} </Text>
+                                            <Title > {route.params.hero.originalName}</Title>
+                                        </View>}
+                                )}
+                         />
+                         <Stack.Screen name="HeroList" component={HeroList} options={({ route }) => ({ title: "Select Governor" })}/>
+                         <Stack.Screen name="SelectChancellor" component={SelectChancellor} options={({ route }) => ({ title: "Select Chancellor" })}/>
+
                         <Stack.Screen name="Employ" component={Employ} options={{ title:'Add Unit'}}/>
                         <Stack.Screen name="Build" component={Build} options={{ title:'Build'}}/>
                         <Stack.Screen name="Assign" component={Assign} options={{ title:'Assign'}}/>
@@ -100,8 +114,17 @@ export default class Main extends Component{
                                     />
                                   )})
                             }  />
+                        <Stack.Screen name="ChangeEquip" component={ChangeEquip} options={{ title:'Change Equipment'}}/>
                         <Stack.Screen name="Exchange" component={Exchange} options={{ title:'Exchange'}}/>
-                        <Stack.Screen name="BuildingDetail" component={Building} options={({ route }) => ({ title: route.params.building.name })}/>
+                        <Stack.Screen name="BuildingDetail" component={Building}
+                            options={({ route }) => ({
+                                headerTitle: props =>
+                                    <View style={{flexDirection:'row'}}>
+                                        <Text style={{position:'relative',top:5,fontSize:18}}> {route.params.building.name} </Text>
+                                        <Title style={{fontSize:route.params.building.fontSize}}> {route.params.building.originalName}</Title>
+                                    </View>}
+                            )}
+                        />
                         <Stack.Screen name="Trade" component={Trade}
                                 options={({ navigation, route }) => ({
                                      title:'Trade',

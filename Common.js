@@ -59,6 +59,11 @@ export const UnitScreen  = (observer((props) => {
         onAction();
     }
 
+    const assignHero = (hero)=>{
+        props.navigation.navigate('Assign', {unit:{type:'hero',data:hero}});
+
+    }
+
     const equip = (unit,onAction)=>{
         mainStore.pause();
         props.navigation.navigate('Equip', {unit:unit});
@@ -114,7 +119,7 @@ export const UnitScreen  = (observer((props) => {
     }
 
     const heroInfo = (hero)=>{
-        props.navigation.navigate('HeroInfo', {hero:hero});
+
     }
 
   return (
@@ -132,7 +137,7 @@ export const UnitScreen  = (observer((props) => {
             </>:<>
                  <View style={{flexDirection:'row'}}>
                     <Icon icon="account" />
-                    <Text>Available Manpower {Util.number(Math.floor(city?.manpower))}</Text>
+                    <Text>Available Manpower {Util.number(Math.floor(city?.manpower))} / {Util.number(city?.getMaxManpower())}</Text>
                 </View>
                  <View style={{flexDirection:'row'}}>
                     <Button  style={{marginRight:2}} onPress={()=>props.navigation.navigate('Employ', {city:city})} icon="account-plus" mode="contained"  contentStyle={{marginLeft:16}} />
@@ -140,33 +145,38 @@ export const UnitScreen  = (observer((props) => {
             </>
         }
         </View>
-            {props.type=='group'?<>
-                <Caption>Units {unit.units.length}/10</Caption>
-            </>:<Caption>Idle Units</Caption>
-            }
-             <FlatGrid
-                  itemDimension={mainStore.unitSize}
-                  data={units}
+            <View style={{padding:5}}>
+                {props.type=='group'?<>
+                    <Caption>Units {unit.units.length}/10</Caption>
+                </>:<Caption>Idle Units</Caption>
+                }
+                 <FlatGrid
+                      itemDimension={mainStore.unitSize}
+                      data={units}
 
-                  spacing={1}
-                  renderItem={({ item }) => (
-                    <Unit data={item}  action={(onAction)=>action(item,onAction)} />
-                  )}
-                />
+                      spacing={1}
+                      renderItem={({ item }) => (
+                        <Unit data={item}  action={(onAction)=>action(item,onAction)} />
+                      )}
+                    />
+             </View>
 
-            {heroes&&heroes.length>0?<>
-                <Caption>Heroes</Caption>
-            </>:null
-            }
-             <FlatGrid
-                  itemDimension={mainStore.unitSize}
-                  data={heroes}
+            <View style={{padding:5}}>
+                {heroes&&heroes.length>0?<>
+                    <Caption>Heroes</Caption>
+                </>:null
+                }
+                 <FlatGrid
+                      itemDimension={mainStore.unitSize}
+                      data={heroes}
 
-                  spacing={1}
-                  renderItem={({ item }) => (
-                    <Hero data={item} info={heroInfo}/>
-                  )}
-                />
+                      spacing={1}
+                      renderItem={({ item }) => (
+                        <Hero data={item} assign={assignHero} navigation={props.navigation}/>
+                      )}
+                    />
+
+             </View>
 
     </View>
   );

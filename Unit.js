@@ -165,7 +165,7 @@ export default class Unit extends Component {
 
                     {this.icon(data)}
                    <View style={{height:40,display:'flex',justifyContent:'center'}}>
-                       <Paragraph style={{fontSize:12,textAlign:'center',lineHeight:13,verticalAlign:'middle'}}>{data.name}</Paragraph>
+                       <Paragraph style={{fontSize:data.name.length>20?10:12,textAlign:'center',lineHeight:13,verticalAlign:'middle'}}>{data.name}</Paragraph>
                    </View>
                    {this.props.quantity?this.props.quantity():null}
                 </Surface>

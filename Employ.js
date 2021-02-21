@@ -104,7 +104,7 @@ export const Employ = ((props) => {
                 {unit.cost?<View style={{flexDirection:'row'}}>
                     <Paragraph>Cost {unit.cost.type} </Paragraph>
                     <Resource icon={resources[unit.cost.type].icon} />
-                    <Paragraph>{Util.number(unit.cost.quantity)} </Paragraph>
+                    <Paragraph>{city.getHiringCost(unit,unit.cost.quantity).toFixed(2)} </Paragraph>
                 </View>:null
                 }
             </View>

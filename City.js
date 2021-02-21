@@ -24,21 +24,26 @@ export default class City extends SubUnits{
     @observable foodConsumptionRate = 1;
     @observable rareResources = {};
     @observable trade = [];
+    @observable governor = undefined;
+    @observable chancellor = undefined;
+
+    @observable heroes = [];
+
+
 
     consumedManpower = 0;
     happinessAccu = 0;
     distance = {};
 
     resourceConsume = {};
-
+    effect = {};
 
 	constructor(city,$scope) {
 
         super();
 
 		this.scope = $scope;
-		this.governer = 0;
-		
+
 
 		this.id = city.id;
 		this.yn = city.yn;
@@ -98,13 +103,25 @@ export default class City extends SubUnits{
             }
         })
 
- 		this.heroes = []
 
         if(this.snapshotSub != undefined){
             this.snapshotSub.heroes?.forEach(id=>{
                 this.heroes.push($scope.heroes[id])
             })
             this.governor = this.snapshotSub.governor?$scope.heroes[this.snapshotSub.governor]:undefined;
+            this.chancellor = this.snapshotSub.chancellor?$scope.heroes[this.snapshotSub.chancellor]:undefined;
+
+            this.snapshotSub.buildings?.forEach(building=>{
+                const b = this.initBuilding(building,1);
+                const effect = buildings[building].effect;
+                if(effect){
+                    Object.keys(effect).forEach(key=>{
+                        Util.initMap(this.effect,key,0)
+                        this.effect[key]+= effect[key];
+                    })
+                }
+                b.setState('')
+            })
         }
 
 
@@ -122,6 +139,8 @@ export default class City extends SubUnits{
         this.initBuilding("warehouse",1);
         const walls = Util.intDivide(this.population,10000)
         this.initBuilding("wall",walls);
+
+        this.setManpower(Math.min(1000,this.getMaxManpower()))
 
         this.resources.mace=100;
     }
@@ -167,9 +186,9 @@ export default class City extends SubUnits{
             const building = this.initBuilding("granary",granaries);
             building.goods = annualFood;
 
-            this.setManpower(this.getMaxManpower())
             this.addManpower(-farms*unitProto.farmer.manpower);
 
+            /*
             if(this.manpower <0){
                 let libraries = Util.intDivide(-this.manpower,3000);
 
@@ -194,7 +213,7 @@ export default class City extends SubUnits{
                  }
 
 
-            }
+            }*/
     }
 
     setManpower(manpower){
@@ -202,7 +221,7 @@ export default class City extends SubUnits{
     }
 
     addManpower(manpower){
-        if(manpower<0) this.consumedManpower+=manpower;
+        if(manpower<0) this.consumedManpower-=manpower;
         this.setManpower(this.manpower+manpower)
     }
 
@@ -238,8 +257,46 @@ export default class City extends SubUnits{
 
         const cost = unit.cost;
         if(cost){
-            if(cost.type =='happiness') city.happiness-=cost.quantity;
+            if(cost.type =='happiness'){
+                let quantity = this.getHiringCost(unit);
+
+                city.happiness-=quantity;
+            }
         }
+    }
+
+    getHiringCost(unit){
+        let quantity = unit.cost.quantity
+        const governor = this.governor;
+        const chancellor = this.chancellor;
+
+        let bonus  = 0;
+        if(governor){
+            if(unit.category=='army'){
+                bonus  = governor.valor/200;
+            }else{
+                bonus = governor.wisdom/200;
+            }
+        }
+        if(chancellor){
+            if(unit.category=='army'){
+                bonus  += chancellor.valor/400;
+            }else{
+                bonus += chancellor.wisdom/400;
+            }
+        }
+
+        if(unit.category=='army'){
+            bonus += Util.isEmpty(this.effect['military happiness cost'])/100;
+        }
+
+        quantity *= (1-bonus);
+        return quantity;
+    }
+
+    getConstructionDays(days){
+        const bonus = Util.isEmpty(this.effect['construction speed'])/100
+        return Math.floor(days * (1-bonus));
     }
 
     build(unit,building,need){
@@ -291,6 +348,10 @@ export default class City extends SubUnits{
         quantity = Math.floor(quantity);
         if(this.resources[key] == undefined){
             this.resources[key] = 0;
+        }
+        if(resources[key] == undefined){
+            console.log(key);
+            return;
         }
         const storage = resources[key].storage;
         if(storage){
@@ -346,6 +407,30 @@ export default class City extends SubUnits{
     refreshResource(){
         this.resources = Object.assign({}, this.resources);
     }
+
+    @action
+    refreshHeroes(){
+        this.heroes = this.heroes.splice(0);
+    }
+
+    @action
+    setGovernor(hero){
+        this.governor = hero;
+    }
+
+    @action
+    setChancellor(hero){
+        this.chancellor = hero;
+    }
+
+    @computed get maxHappiness(){
+        let bonus = Util.isEmpty(this.effect['max happiness'],0);
+         if(this.factionData?.capital){
+            bonus += Util.isEmpty(this.factionData.capital.effect['faction max happiness'],0)
+         }
+        return 100 + bonus;
+    }
+
 	setUnits(units){
 	    this.units = units;
 	}
@@ -355,12 +440,35 @@ export default class City extends SubUnits{
         this.units.push(unit);
         this.refreshUnits();
 	}
+
     assign(unit,building){
-        unit.parent = building;
-        building.units.push(unit);
-        this.removeUnit(unit);
+        if(unit.type=='hero'){
+           building.setHero(unit.data);
+           this.removeHero(unit.data)
+        }else{
+            unit.parent = building;
+            building.units.push(unit);
+            this.removeUnit(unit);
+        }
     }
 
+    addHero(hero){
+        this.heroes.push(hero);
+        if(this.governor == undefined) this.setGovernor(hero)
+    }
+
+    removeHero(hero){
+        Util.arrayRemove(this.heroes,hero);
+        this.refreshHeroes();
+        if(this.governor?.id === hero.id){
+            if(this.heroes.length>0){
+                this.setGovernor(this.heroes[0]);
+            }else{
+                this.setGovernor(undefined);
+            }
+        }
+
+    }
 
 
     addBuilding(building){
@@ -411,13 +519,21 @@ export default class City extends SubUnits{
     }
 
     disband(unit){
+        if(unit.type=='group'){
+            this.units = this.units.concat(unit.units);
+            if(unit.hero!=undefined){
+                this.addHero(unit.hero)
+            }
+        }
         this.removeUnit(unit);
-        this.manpower+=unit.data.manpower;
-        this.consumedManpower -=unit.data.manpower
+        if(unit.data.manpower!=undefined){
+            this.manpower+=unit.data.manpower;
+            this.consumedManpower -=unit.data.manpower
+        }
     }
 
     getHygiene(){
-        return Math.floor(Math.pow(80000-this.population,2)/100000000);
+        return Math.floor(Math.pow(80000-this.population,2)/100000000)+Util.isEmpty(this.effect['hygiene']);
     }
 
     getHappinessGrowth(){
@@ -476,21 +592,6 @@ export default class City extends SubUnits{
 		// 		return Math.pow(Math.floor(Math.sqrt(city.population)/10),2) + 10;
 	}
 
-	getRecruitMax(){
-		var city = this;
-		
-		if(city !== undefined){
-			var max = city.population/100;
-			max = max*city.loyalty/100;
-			var governer = this.scope.heroes[this.governer];
-			if(governer!==undefined)
-				max *= 1+0.1*governer.authority;
-			max = Math.floor(max);
-			return max < (city.mans - city.soldiers)?max:(city.mans - city.soldiers);
-		}
-		
-		return 0;
-	}
 
 	
 	addMusterSilver(amount){
@@ -801,6 +902,21 @@ export default class City extends SubUnits{
             this.refreshResource();
         }
 
+        const governor = this.governor;
+        if(governor){
+            this.happinessAccu += governor.authority/100;
+            if(this.effect['wisdom happiness']){
+                this.happinessAccu += governor.wisdom/400;
+            }
+            if(this.effect['valor happiness']){
+                this.happinessAccu += governor.valor/400;
+            }
+        }
+        const chancellor = this.chancellor;
+        if(chancellor){
+            this.happinessAccu += chancellor.authority/200;
+        }
+
         if(mainStore.selectedFaction.id!=this.factionData.id){
             this.ai.dailyJob(diff)
         }
@@ -837,7 +953,7 @@ export default class City extends SubUnits{
 
 	addHappiness(happiness){
 	    this.happiness += happiness;
-	    this.happiness = Math.min(Math.max(this.happiness,-100),100)
+	    this.happiness = Math.min(Math.max(this.happiness,-100),this.maxHappiness)
 	}
 
 	monthlyJob(diff){
@@ -846,9 +962,13 @@ export default class City extends SubUnits{
             let growth = Math.floor((population*0.01*this.getGrowthRate())/12);
             if(growth <1) growth =1;
 
-            if(this.factionData.id==0 ||this.factionData.capital.id==this.id ){
-                 this.addManpower(growth/3)
-               }
+            if(this.factionData.capital!=undefined){
+//                if(this.factionData.id==0 ||this.factionData.capital.id==this.id ){
+                    if(this.population<3000){
+                     this.setManpower(this.manpower+growth/3)
+                    }
+//                }
+            }
 
             const residenceCoverage= this.buildings.residence.completedQuantity*1000;
             if(population+growth>residenceCoverage) growth = residenceCoverage - population;
@@ -859,7 +979,7 @@ export default class City extends SubUnits{
 
             this.population += growth;
 
-             this.addHappiness((this.happinessAccu/30));
+             this.addHappiness((this.happinessAccu/30)+Util.isEmpty(this.effect['happiness']));
              this.happinessAccu = 0;
 
 	    }
@@ -874,8 +994,16 @@ export default class City extends SubUnits{
 	        return ((this.happiness)/10).toFixed(2);
 	    }
 
+        let bonus = 0;
+        const hero = this.buildings.residence.hero;
+        if(hero){
+           bonus = hero.wisdom/10
+        }
+
+        bonus += Util.isEmpty(this.effect['population growth'])
+
 	    const hygiene = this.getHygiene();
-	    return ((this.happiness*(hygiene/60))/10).toFixed(2);
+	    return (((this.happiness+bonus)*(hygiene/60))/10).toFixed(2);
 	}
 
 	checkRecruit(){
@@ -1050,4 +1178,5 @@ export default class City extends SubUnits{
         mainStore.addUnit(group);
         group.startMove(result.path,target.object.position);
     }
+
 }

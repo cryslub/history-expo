@@ -109,15 +109,28 @@ export default class Hero extends Component {
     }
 
     info = (data)=>{
-        this.props.info(this.props.data)
+        this.props.navigation.navigate('HeroInfo', {hero:this.props.data});
+        this.onAction();
+    }
+
+    assign = (data)=>{
+        this.props.assign(this.props.data)
+        this.onAction();
+    }
+
+    remove = (data)=>{
+        this.props.remove(this.props.data)
         this.onAction();
     }
 
 	render(){
 
         const data = this.props.data;
-        if(data==undefined) return null;
         const type = this.props.type;
+        const removable = this.props.removable;
+
+
+        if(data==undefined) return null;
         const selected = data.selected;
 
         let width = data.remain*mainStore.unitSize/data.delay;
@@ -129,6 +142,10 @@ export default class Hero extends Component {
 		    <Dialog visible={this.state.visible} onDismiss={()=>this.setState({visible:false})}>
               <Dialog.Content>
                  <Menu.Item  onPress={() => this.info()} title="Info"/>
+                 {removable?<Menu.Item  onPress={() => this.remove()} title="Remove"/>
+                 :null
+                 }
+                 {type=='group'?null:<Menu.Item  onPress={() => this.assign()} title="Assign"/>}
               </Dialog.Content>
 
             </Dialog>

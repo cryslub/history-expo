@@ -17,16 +17,18 @@ export default class UnitData extends SubUnits{
     @observable quantity = 1;
     @observable completedQuantity = 0;
     @observable equipments= {};
+    @observable equipmentsByCategory= {};
     @observable resources = {};
     @observable  selectedProduction = 0;
     @observable  selected= false;
-
+    @observable hero = undefined;
 
     name = '';
     icon = '';
     data = {};
     subs = [];
     effort  =0;
+    bonusEffort = 0;
     city ={};
     category='';
     goods = 0;
@@ -42,12 +44,15 @@ export default class UnitData extends SubUnits{
        super();
 
         this.name = unit.name;
+        this.originalName = unit.originalName;
+        this.fontSize = unit.fontSize;
+
         this.icon = unit.icon;
         this.color = unit.color;
         this.description = unit.description;
         this.type = unit.type;
-        this.delay = unit.delay;
-        this.remain = unit.delay;
+        this.delay = city.getConstructionDays(unit.delay);
+        this.remain = this.delay;
         this.data = unit;
         this.city = city;
         this.category = unit.category;
@@ -63,7 +68,8 @@ export default class UnitData extends SubUnits{
             this.setProgress(production.delay);
          }
           this.effort = 0
-    }
+          this.bonusEffort = 0
+     }
 
     onDone = ()=>{
         if(this.state == 'deploy'){
@@ -129,8 +135,9 @@ export default class UnitData extends SubUnits{
 
         }
 
-
-        let ret = this.attack(city,foes)
+        if(foes.length>0){
+            let ret = this.attack(city,foes)
+        }
 
         if(city!=undefined){
             if(city.factionData.id == this.city.factionData.id){
@@ -181,19 +188,31 @@ export default class UnitData extends SubUnits{
 
     attackInd = (city,foes)=>{
         if(this.getTotalDamage()<=0) return;
-        const damage = {
-            piercing:this.getEffect('piercingDamage'),
-            blunt:this.getEffect('bluntDamage'),
-            slash:this.getEffect('slashDamage')};
+        const damage = this.getDamage();
 
         if(Math.random()>0.5 || city==undefined){
-            return this.attackUnit(city,foes,damage)
+            return this.attackUnit(foes,damage)
 
         }else{
             this.attackWall(city,damage,2)
         }
 
         return true;
+    }
+
+    getDamage = () =>{
+
+        let bonus = 0;
+        if(this.hero){
+            bonus = this.hero.valor /2
+        }
+        if(this.data.type=='militia'){
+            bonus+=Util.isEmpty(this.city.effect['militia damage'])
+        }
+        return {
+                    piercing:this.getEffect('piercingDamage') * (1+bonus/100),
+                    blunt:this.getEffect('bluntDamage') * (1+bonus/100),
+                    slash:this.getEffect('slashDamage') * (1+bonus/100)};
     }
 
     attackUnit = (foes,damage)=>{
@@ -286,10 +305,20 @@ export default class UnitData extends SubUnits{
        if(this.parent!=undefined){
             this.parent.removeUnit(this)
        }
+       if(this.hero !=undefined){
+          this.city.addHero(this.hero)
+       }
     }
 
     attackWall = (city,damage,mod)=>{
-        const d = Math.max(damage.piercing-5,0)+Math.max(damage.blunt-2,0)+Math.max(damage.slash-10,0);
+
+        let bonus = 0;
+        const hero =city.buildings.wall.hero
+        if(hero){
+            bonus = hero.valor/10
+        }
+
+        const d = (Math.max(damage.piercing-5,0)+Math.max(damage.blunt-2,0)+Math.max(damage.slash-10,0)-bonus);
         if(d>0){
 
             city.buildings.wall.completedQuantity -= (d*mod/100)
@@ -306,8 +335,36 @@ export default class UnitData extends SubUnits{
        }
     }
 
+    getFoodConsumption = () =>{
+        let rate = this.data["food consume"];
+        rate = rate?rate:1;
+        return this.manpower*rate /100;
+
+    }
+
+    foodConsumption = ()=>{
+        let consume = 0;
+
+        if(this.type=='group'){
+            this.units.forEach(unit=>{
+                consume += unit.getFoodConsumption()
+            })
+        }else{
+            consume = this.getFoodConsumption();
+        }
+
+
+        let bonus = 0;
+        if(this.hero){
+            bonus = this.hero.wisdom /500
+        }
+        consume *= (1-bonus)
+
+        return consume;
+    }
+
     consumeFood = (diff)=>{
-        const consume = this.manpower /100;
+        let consume = this.foodConsumption();
 
         const food = this.resources.food;
         let noFood = false;
@@ -492,7 +549,10 @@ export default class UnitData extends SubUnits{
     @computed get survivableDays(){
         let manpower = this.manpower;
         if(manpower == undefined || manpower ==0 ) return 0;
-        return Math.floor(this.totalFoods/(manpower/100)) ;
+        let consume = this.foodConsumption();
+
+
+        return Math.floor(this.totalFoods/(consume)) ;
     }
 
     @computed get nearByUnits(){
@@ -550,8 +610,8 @@ export default class UnitData extends SubUnits{
     addGroup(unit){
         unit.inGroup = true;
         unit.parent = this;
-        this.city.removeUnit(u);
-        this.units.push(u);
+        this.city.removeUnit(unit);
+        this.units.push(unit);
     }
 
 
@@ -600,6 +660,10 @@ export default class UnitData extends SubUnits{
         this.selectedProduction = selectedProduction;
     }
 
+    @action
+    setHero(hero){
+        this.hero = hero;
+    }
 
     startMove(path,destination){
         this.destination = destination;
@@ -751,6 +815,14 @@ export default class UnitData extends SubUnits{
                     }
                 }
             }
+        }
+    }
+
+    initMoral(){
+        const city = this.city;
+        this.moral = city.happiness;
+        if(this.hero){
+            this.moral += this.hero.authority/10
         }
     }
 

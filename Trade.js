@@ -99,7 +99,12 @@ export const Trade = ((props) => {
         const sourcePrice = sourceResource.price;
         const targetPrice = targetResource.price;
 
-        const totalPrice = (sourcePrice*amount*11)/10
+        let bonus = 0;
+        if(unit.hero){
+            bonus = unit.hero.wisdom/100
+        }
+
+        const totalPrice = (sourcePrice*amount*(11-bonus))/10
         let targetAmount = Util.intDivide(totalPrice,targetPrice);
         if(unit.resources[target]<targetAmount){
             if(amount) return {message:"Not enough resource to trade"};

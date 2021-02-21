@@ -23,6 +23,11 @@
     "icon": "heart",
     "color": "#ff6361"
   },
+  "manpower": {
+    "name": "Manpower",
+    "icon": "account",
+    "color": "#255e7e"
+  },
   "resource": {
     "name": "Resource",
     "icon": "cube"
@@ -244,7 +249,6 @@
     "name": "Stone",
     "icon": "alpha-s-box",
     "color": "#6D7876",
-    "storage": "stone",
     "price": 2
   },
   "polished stone": {

@@ -114,13 +114,17 @@ export default class Assign extends Component {
             if(building.data.worker==unit.type){
                 arr.push(building);
             }
+            if((building.data.production ||building.data["hero effect"])&& unit.type=='hero'){
+                arr.push(building);
+            }
 		});
 
-        if(unit.data.action.deploy){
+        if(unit.data.action?.deploy || unit.type=='hero'){
             city.units.forEach(u=>{
                 if(u.type=='group' && u.units.length<10){
                     arr.push(u);
                 }
+
             })
 		}
 
