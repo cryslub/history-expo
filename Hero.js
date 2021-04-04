@@ -5,7 +5,6 @@ import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheadi
 
 import Icon from './Icon.js';
 import Util from './Util.js';
-import {Progress} from './Common.js';
 
 import { observer} from "mobx-react"
 
@@ -72,6 +71,18 @@ const styles = StyleSheet.create({
 });
 
 const containerStyle = {backgroundColor: 'white', padding: 20};
+
+export const Progress = (props)=>{
+     const width = props.width
+     const style = props.style
+     style.width = width;
+     return <Animated.View
+         style={[StyleSheet.absoluteFill], style}
+      >
+      </Animated.View>
+}
+
+
 
 @observer
 export default class Hero extends Component {
@@ -168,7 +179,7 @@ export default class Hero extends Component {
                    {selected==true?<Icon icon="check-bold" style={{right: -24,position: 'absolute',top:1}} />:null}
 
                    <View style={{height:40,display:'flex'}}>
-                       <Paragraph style={{fontSize:12,textAlign:'center',lineHeight:13,verticalAlign:'middle'}}>{data.name}</Paragraph>
+                       <Paragraph style={{fontSize:12,textAlign:'center',lineHeight:13}}>{data.name}</Paragraph>
                    </View>
                    <View style={{flexDirection:'row'}}>
                        <Badge style={{marginRight:1,backgroundColor:'#ff1f13'}}>{data.valor}</Badge>

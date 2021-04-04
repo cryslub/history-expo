@@ -15,7 +15,6 @@ import snapshots from "./json/snapshot.json"
 import snapshotSubs from "./json/snapshotSub.json"
 import heroes from "./json/hero.json"
 
-
 export default class DataService{
 	constructor(objetcs){
 	
@@ -358,5 +357,7 @@ export default class DataService{
             city.init();
         });
     }
+
+
 	
 }

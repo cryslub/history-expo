@@ -27,16 +27,18 @@ export class CityAI{
         Object.keys(this.needs).forEach(key=>{
             const need = this.needs[key];
             if(need!=undefined){
+                const city = this.city;
                 this.needs[key] = undefined;
 
                 let building = key;
                 if(key=='sling') building ='ranged';
                 if(key=='mace') building ='melee';
+                if(key=="stone tool") building ='toolsmith';
 
                 if(this.city.buildings[building] != undefined){
                     const production  =buildings[building]?.production;
                     if(production!=undefined){
-                        const p = production;
+                        let p = production;
                         if(Array.isArray(production)){
                             production.forEach(pro=>{
                                 if(pro.result==key){
@@ -44,12 +46,24 @@ export class CityAI{
                                 }
                             });
                         }
-                        if(this.city.resourceConsume[key]==undefined || this.city.resourceConsume[key]<=(this.city.buildings[building]?.quantity*p.quantity)/p.delay){
+
+                        if(key=='livestock'){
+                            let a = 0;
+                        }
+                        if(this.city.resourceConsume[key]==undefined&&need<300){
                             return;
                         }
+                        if( (this.city.resourceConsume[key]<=(this.city.buildings[building]?.quantity*p.quantity)/p.delay)&&(typeof need != 'number' || need<300)){
+                            return;
+                        }
+
+                        this.city.buildings[building].units.forEach(unit=>{
+                            city.equipUnit(unit,'Main Hand','stone tool')
+                        })
                     }
                 }
 
+                if(this.city.manpower<=100 && key !='tablet') return;
 
                 switch(key){
                     case 'mud':
@@ -70,6 +84,12 @@ export class CityAI{
                     case 'wood':
                         this.orderUnitToBuild('worker',buildings.wood,need)
                     break;
+                    case 'stone':
+                        this.orderUnitToBuild('worker',buildings.stone)
+                    break;
+                    case 'polished stone':
+                        this.orderUnitToBuild('artisan',buildings['polished stone'])
+                    break;
                     case 'cloth':
                         this.orderUnitToBuild('artisan',buildings.cloth,need)
                     break;
@@ -82,9 +102,22 @@ export class CityAI{
                     case 'beer':
                         this.orderUnitToBuild('artisan',buildings.beer)
                     break;
-                    case 'sling':
-                        this.orderUnitToBuild('artisan',buildings.ranged)
+                    case 'tablet':
+                        this.orderUnitToBuild('artisan',buildings.tablet)
                     break;
+                    case 'sling':
+                    {
+                        if(city.buildings[building]==undefined){
+                           // console.log(city.name+" " +building + " " + city.buildings[building])
+                            this.orderUnitToBuild('artisan',buildings.ranged)
+                        }
+                    break;
+                    }
+
+                    case "stone tool":
+                        this.orderUnitToBuild('artisan',buildings.toolsmith)
+                    break;
+
                     case 'mace':
                         this.orderUnitToBuild('artisan',buildings.melee)
                     break;
@@ -92,13 +125,14 @@ export class CityAI{
                         this.orderUnitToBuild('worker',buildings.warehouse)
                     break;
                     case 'armoury':
-                        this.orderUnitToBuild('worker',buildings.armoury)
+                         if(this.city.buildings.armoury==undefined || this.city.buildings.armoury.quantity<2)
+                            this.orderUnitToBuild('worker',buildings.armoury)
                     break;
                     case 'wall':
                         this.orderUnitToBuild('worker',buildings.wall)
                     break;
                     case 'manpower':
-                        this.checkResidence();
+//                        this.checkManpower();
                     break;
                     case 'happiness':
                         this.checkHappinessBuildings();
@@ -140,33 +174,43 @@ export class CityAI{
             if(building.data.production !=undefined){
                 if(building.completedQuantity >building.units.length){
                     const type = buildings[key].worker
-                    this.city.employ(unitProto[type],(unit)=>{
-                        this.city.assign(unit,building)
-                    });
+                    if(type!=''){
+                        this.city.employ(unitProto[type],(unit)=>{
+                            this.city.assign(unit,building)
+                        });
+                    }
                 }
             }
         })
     }
 
     checkManpower(){
-        this.checkResidence();
+        if(this.city.manpower <  1000){
+            if((this.city.buildings.library || this.city.population<3000) && this.city.getMaxManpower()<800){
+                this.checkResidence();
+            }else{
+                    this.orderUnitToBuild('artisan',buildings.library)
+            }
+        }
     }
 
     checkResidence(){
-        if(this.city.population>=((this.city.buildings.residence.completedQuantity*buildings.residence.storage.quantity)-450)){
+        if(this.city.population>=((this.city.buildings.residence.completedQuantity*buildings.residence.storage.quantity)-450) ){
             this.orderUnitToBuild('worker',buildings.residence)
         }
     }
 
     checkHappinessBuildings(){
-        const market= this.city.buildings.market;
-        if((market==undefined || market.quantity < this.city.population/10000) && this.city.population>1500){
-            this.orderUnitToBuild('worker',buildings.market)
-        }
+        if(this.city.manpower>400){
+            const market= this.city.buildings.market;
+            if((market==undefined || market.quantity < this.city.population/10000) && this.city.population>1500){
+                this.orderUnitToBuild('worker',buildings.market)
+            }
 
-        const tavern= this.city.buildings.tavern;
-        if((tavern==undefined || tavern.quantity < this.city.population/10000) && this.city.population>5000){
-            this.orderUnitToBuild('artisan',buildings.tavern)
+            const tavern= this.city.buildings.tavern;
+            if((tavern==undefined || tavern.quantity < this.city.population/10000) && this.city.population>5000){
+                this.orderUnitToBuild('artisan',buildings.tavern)
+            }
         }
 
         const rate = this.city.foodConsumptionRate;
@@ -211,15 +255,22 @@ export class CityAI{
     }
 
     checkFarms(consumption){
+        const city = this.city;
         let ret = true;
         const farm = this.city.buildings.farm;
         let extra = this.city.resourceConsume?.food;
         extra = extra==undefined?0:extra;
 
-        if(farm.completedQuantity*buildings.farm.production.quantity<=(consumption+extra)*365){
-            this.city.employ(unitProto.farmer,(unit)=>{
-                this.city.build(unit,buildings.farm)
-            });
+        if(farm.getResultQuantity(buildings.farm.production.quantity)<=(consumption+extra)*365){
+
+            if(city.checkBuildingAvailability(buildings.irrigation)){
+                this.orderUnitToBuild('worker',buildings.irrigation)
+            }else{
+
+                this.city.employ(unitProto.farmer,(unit)=>{
+                    this.city.build(unit,buildings.farm)
+                });
+            }
             ret = false;
         }
 
@@ -256,9 +307,14 @@ export class CityAI{
 
 
     orderUnitToBuild(type,building,need){
+        const city = this.city;
         const b = this.city.buildings[building.key];
         if(b!=undefined){
             if(b.completedQuantity!=b.quantity || b.subs.length>0) return;
+        }
+
+        if(!city.checkBuildingAvailability(building)){
+            return false;
         }
 
         if(this.checkResourceForBuild(building)){
@@ -291,12 +347,15 @@ export class CityAI{
     }
 
     addNeed(cost){
+
         if(Array.isArray(cost)){
             cost.forEach(c=>{
-                this.needs[c.type] = c.quantity;
+                Util.initMap(this.needs,c.type,0)
+                this.needs[c.type] += c.quantity;
             })
         }else{
-            this.needs[cost.type] = cost.quantity;
+            Util.initMap(this.needs,cost.type,0)
+            this.needs[cost.type] += cost.quantity;
         }
     }
 
@@ -362,6 +421,63 @@ export class CityAI{
              this.city.employ(unitProto[type]);
         }
     }
+
+    makeGroup(){
+        const city = this.city;
+        if(this.militaryGroup == undefined){
+            this.militaryGroup = city.getUnit('group')
+            if(this.militaryGroup == undefined){
+                city.employ(unitProto.group,(group)=>{
+                    group.aiType= 'army'
+                    this.militaryGroup = group;
+                });
+            }
+        }else{
+            city.units.forEach(unit=>{
+                if(unit.type=='group' && unit.aiType=='army' && unit!=this.militaryGroup){
+                    unit.disband();
+                }
+            })
+
+            const group = this.militaryGroup
+            const worker = group.getUnit('worker') ;
+            if(worker == undefined){
+                city.addWorkerToGroup(group);
+            }else{
+                if(worker.equipments['Livestock']==undefined){
+                    city.equipUnit(worker,'Livestock','donkey1')
+                }else{
+                    const quantity = Math.min(500,        group.capacity - group.carrying)
+                    let consume = city.consumeResource('food',quantity)
+                    group.addResource('food', consume);
+                }
+            }
+
+
+             if(group.units.length<10){
+                city.units.forEach(unit=>{
+                    if(unit.type=='warrior' && unit.getTotalDamage()>0){
+                        group.addGroup(unit);
+                    }
+                })
+            }
+
+        }
+
+
+        return 0;
+    }
+
+    deploy(target){
+        const group = this.militaryGroup;
+        if(group == undefined) return;
+        const result = Util.aStar(group,target);
+
+        mainStore.addUnit(group);
+        group.startMove(result.path,target);
+        this.militaryGroup = undefined;
+      //  console.log(target.name)
+    }
 }
 
 export class FactionAI{
@@ -373,27 +489,49 @@ export class FactionAI{
     dailyJob(diff){
 
         const cities = [];
-        mainStore.units.forEach(unit=>{
-            if(unit.getTotalDamage()>0){
 
-                this.faction.cities.forEach(city=>{
-                    if(unit.object.position.distanceTo(city.object.position)<10){
-                        cities.push(city);
-                    }
-                });
-            }
-        })
+        this.faction.cities.forEach(city=>{
+            if(city.checkEnemy()) cities.push(city);
+        });
 
         if(cities.length>0){
             const c = cities[0]
             this.faction.cities.forEach(city=>{
-                const army = city.makeGroup();
-                if(army>0 && city.id != c.id){
-                    city.deploy(c);
+                if(c!=city){
+                    city.ai.makeGroup();
+                    if(city.ai.militaryGroup){
+                         const group = city.ai.militaryGroup
+                        if(group.getUnit('warrior')!=undefined && group.survivableDays>30){
+                            const army = group.getMilitaryUnits('armed')
+                            if(army>0 && city.id != c.id){
+                                city.ai.deploy(c);
+                            }
+
+                        }
+                    }
                 }
+
             });
         }
+
+        mainStore.units.forEach(unit=>{
+
+            if(unit.city.factionData.id == this.faction.id){
+                if(unit.state == 'waiting'){
+                    if(unit.currentLocation == unit.city && unit.currentRoad==undefined){
+                        unit.enter();
+                    }else{
+                        if(!unit.currentLocation.checkEnemy() || unit.currentRoad!=undefined){
+                             const result = Util.aStar(unit,unit.city);
+                             unit.startMove(result.path,unit.city);
+                        }
+                    }
+                }
+            }
+        })
     }
+
+
 
     weeklyJob(diff){
 
@@ -402,8 +540,11 @@ export class FactionAI{
     monthlyJob(diff){
 
         const armedCity = []
-        let min = 0;
+        let min ;
+        let target;
+        let cities = [];
         this.faction.cities.forEach(city=>{
+
             city.militaryJob();
 
             if(city.getMilitaryUnits('armed')>0){
@@ -413,31 +554,38 @@ export class FactionAI{
                 }
             }
 
-            city.destinies.forEach(destiny=>{
-                const c = destiny.city;
-                if(c.factionData.id !=this.faction.id && c.population>0){
-                    if(c.getMilitaryUnits('armed') <=min){
-                        this.target = c
-                        min = c.getMilitaryUnits('armed')
-                    }
-                }
-            })
-
+            cities = cities.concat(city.getAdjacentCities());
         })
 
-        if(this.target!=undefined){
+        cities.forEach(city=>{
+            if(city.factionData.id !=this.faction.id){
+                if(city.getMilitaryUnits('armed') <=min || min==undefined){
+                    target = city
+                    min = city.getMilitaryUnits('armed')
+                }
+            }
+        })
+
+
+        if(target!=undefined){
+
             let sum =0;
             const readyCity = [];
             armedCity.forEach(city=>{
-                const army = city.makeGroup();
-                if(army>0){
-                    readyCity.push(city);
-                    sum+=army
+                city.ai.makeGroup();
+                if(city.ai.militaryGroup){
+                    const group = city.ai.militaryGroup
+                     const army = group.getMilitaryUnits('armed')
+                     const result = Util.aStar(group,target)
+                    if(army>0 && group.survivableDays> (Util.intDivide((result.length/1000),group.speed))*2 +30 ) {
+                        readyCity.push(city);
+                        sum+=army
+                    }
                 }
             })
-            if(sum > this.target.getMilitaryUnits('armed')*1.5){
+            if(sum > target.getMilitaryUnits('armed')*1.5){
                 readyCity.forEach(city=>{
-                    city.deploy(this.target)
+                    city.ai.deploy(target)
                 });
             }
         }

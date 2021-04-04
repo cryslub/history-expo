@@ -90,12 +90,13 @@ export const Group =  (observer((props) => {
     const removable = unit.state=='' || (unit.currentRoad == undefined && unit.currentLocation.factionData.id==unit.city.factionData.id)
 
       return (
-        <ScrollView style={{padding:10}}>
+        <ScrollView >
+             <View style={{padding:10}}>
                 <Moral unit={unit}/>
 
                 <View style={{flexDirection:'row'}}>
                    <Paragraph >Capacity </Paragraph>
-                   <Caption>{Math.floor(unit.carrying())}/{unit.capacity} units</Caption>
+                   <Caption>{Math.floor(unit.carrying)}/{unit.capacity} units</Caption>
                    <Paragraph style={{marginLeft:5}}>Speed </Paragraph>
                    <Caption>{unit.speed}km/day</Caption>
                 </View>
@@ -105,9 +106,12 @@ export const Group =  (observer((props) => {
                 <Hero data={unit.hero}  {...props} type='group' remove={removeHero} removable={removable}/>
             </>:null
             }
+            </View>
              <UnitScreen unit={unit} type='group' {...props}/>
-             <Divider/>
-             <Resources unit={unit} />
+
+             <View style={{padding:10}}>
+                 <Resources unit={unit} />
+             </View>
         </ScrollView>
       );
 

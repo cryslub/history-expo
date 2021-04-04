@@ -338,7 +338,7 @@ export default class VariableObjects{
     
   }
   
-  addLines(lines) {
+    addLines(lines) {
 	  
 	  var self = this;
 	  
@@ -393,64 +393,77 @@ export default class VariableObjects{
 		
 		return mesh;
 
-  }
+    }
+
+    addUnitWithPosition(pos,color,unit){
+
+        var geometry = new THREE.CylinderGeometry( 0.05*this.totalSize, 0.05*this.totalSize, 0.5*this.totalSize,16  );
+
+        color = new THREE.Color(color);
+        var material = new THREE.MeshBasicMaterial( {color: color} );
+
+        var point = new THREE.Mesh(geometry,material);
+
+        point.position.x = pos.x;
+        point.position.y = pos.y;
+        point.position.z = pos.z;
+
+        point.geometry.rotateX((-90 * Math.PI) / 180);
+        point.geometry.translate(0,0,-0.3);
+        point.lookAt(this.mesh.position);
+
+
+        var scale =   0.7;
+  //		    scale = Math.sqrt(scale);
+        point.scale.x = scale;
+        point.scale.y = scale;
+        point.scale.z = scale; // avoid non-invertible matrix
+
+
+
+  //	     this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
+         this.scene.add(point);
+
+         var geo = new THREE.EdgesGeometry( point.geometry );
+         var mat = new THREE.LineBasicMaterial( { color: 0x333333, linewidth: 1 } );
+         var wireframe = new THREE.LineSegments( geo, mat );
+         wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+         point.add( wireframe );
+
+        // unit.latitude = lat;
+         //unit.longitude = lng;
+
+         this.addDom(point,unit,'unit');
+         unit.object = point;
+         return point;
+    }
 
     addUnit(lat,lng,color,unit) {
 
 
         const size = 1000;
-      var subgeo = new THREE.Geometry();
+        var subgeo = new THREE.Geometry();
 
-      color = new THREE.Color(color);
 
-     var sphereSize = this.radius-0.1*this.totalSize;;
-	var geometry = new THREE.CylinderGeometry( 0.05*this.totalSize, 0.05*this.totalSize, 0.5*this.totalSize,16  );
-      var material = new THREE.MeshBasicMaterial( {color: color} );
+        var sphereSize = this.radius-0.1*this.totalSize;;
   //		geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,-0.5));
 
-  	var point = new THREE.Mesh(geometry,material);
 
+        var phi = (90 - lat) * Math.PI / 180;
+        var theta = (180 - lng) * Math.PI / 180;
 
-      var phi = (90 - lat) * Math.PI / 180;
-      var theta = (180 - lng) * Math.PI / 180;
+        this.addUnitWithPosition(
+            {x:sphereSize * Math.sin(phi) * Math.cos(theta),
+            y:sphereSize * Math.cos(phi),
+            z:sphereSize * Math.sin(phi) * Math.sin(theta)}
+          ,color,unit)
 
-
-      point.position.x = sphereSize * Math.sin(phi) * Math.cos(theta);
-      point.position.y = sphereSize * Math.cos(phi);
-      point.position.z = sphereSize * Math.sin(phi) * Math.sin(theta);
-
-      point.geometry.rotateX((-90 * Math.PI) / 180);
-      point.geometry.translate(0,0,-0.3);
-      point.lookAt(this.mesh.position);
-
-
-      var scale =   0.7;
-  //		    scale = Math.sqrt(scale);
-      point.scale.x = scale;
-      point.scale.y = scale;
-      point.scale.z = scale; // avoid non-invertible matrix
-
-
-
-  //	     this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
-       this.scene.add(point);
-
-       var geo = new THREE.EdgesGeometry( point.geometry );
-       var mat = new THREE.LineBasicMaterial( { color: 0x333333, linewidth: 1 } );
-       var wireframe = new THREE.LineSegments( geo, mat );
-       wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
-       point.add( wireframe );
-
-        unit.latitude = lat;
-        unit.longitude = lng;
-
-        this.addDom(point,unit,'unit');
-        unit.object = point;
-       return point;
 
     }
 
-   globePoint(lat, lng,sphereSize){
+
+
+    globePoint(lat, lng,sphereSize){
 	    var phi = (90 - lat) * Math.PI / 180;
 	    var theta = (180 - lng) * Math.PI / 180;
 	
@@ -460,7 +473,7 @@ export default class VariableObjects{
 	    point.z = sphereSize * Math.sin(phi) * Math.sin(theta);
 	    
 	    return point;
-  }
+    }
   
     addVertex(vertices,colors,start,end,type){
 	  
@@ -494,73 +507,67 @@ export default class VariableObjects{
  		if(ret === false){
  			self.detail();
  		}
-	 }
+	}
 	 
-	  getSelected(mouse,camera,callback){
+	getSelected(mouse,camera,callback){
 		 
-		  var self = this;
+	    var self = this;
 		  
-		  var raycaster = new THREE.Raycaster();
-		  raycaster.setFromCamera( mouse, camera );
+		var raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( mouse, camera );
 		  
-		  var intersects = raycaster.intersectObjects( self.objects );
+		var intersects = raycaster.intersectObjects( self.objects );
 		
-		 self.clicked = [];
-		 intersects.forEach( function(intersect){
+		self.clicked = [];
+		intersects.forEach( function(intersect){
 		 	if(self.objectMap[intersect.object.id] !== undefined){
 		 		self.clicked.push(self.objectMap[intersect.object.id]);
 		 	}
-		 });
+		});
+
+		if(self.clicked.length>0){
+		    callback(self.clicked,self.objectMap[intersects[0].object.id]);
+			return true;
+		}
 		 
-		 
-		 if(self.clicked.length>0){
-			 
-			 callback(self.clicked,self.objectMap[intersects[0].object.id]);
-			 
-			 return true;
-		 }
-		 
-		 return false;
+		return false;
 	 }
 	 
 	 
-	   detail(city){
+    detail(city){
 		 	
-		  if(this.detailHtml === undefined){
-			  this.detailHtml = this.createTextLabel();			  
-		  }	 
+        if(this.detailHtml === undefined){
+	        this.detailHtml = this.createTextLabel();
+		}
 		  
-		  if(city === undefined){
+		if(city === undefined){
 //			  this.detailHtml.element.className = "text-hide";
-			  this.detailHtml.added = false;
-			  return;
-		  }
+	        this.detailHtml.added = false;
+			return;
+		}
 		  
 //		  this.detailHtml.element.className ="text-detail";
-		  this.detailHtml.name = city.name;
-		  this.detailHtml.added = true;
-		  this.detailHtml.factionName=city.factionData.name;
-          this.detailHtml.faction = city.factionData;
+		this.detailHtml.name = city.name;
+		this.detailHtml.added = true;
+		this.detailHtml.factionName=city.factionData.name;
+        this.detailHtml.faction = city.factionData;
 
-		  this.detailHtml.population = city.population;
-		  this.detailHtml.city = city;
+		this.detailHtml.population = city.population;
+		this.detailHtml.city = city;
 		  
-		  if(city.factionData.id > 0){
-			  this.detailHtml.color = city.factionData.color;
-	    	  this.detailHtml.isCapital=city.factionData.capital.id == city.id;
+		if(city.factionData.id > 0){
+		    this.detailHtml.color = city.factionData.color;
+	    	this.detailHtml.isCapital=city.factionData.capital.id == city.id;
 
-		  }else{
-			  this.detailHtml.color = 'black'
-			  this.detailHtml.isCapital=false;
+		}else{
+			this.detailHtml.color = 'black'
+			this.detailHtml.isCapital=false;
 
-		  }
-		  
-		 
-			  
+		}
+
 //		  this.detailHtml.setHTML(html);
-		  this.detailHtml.setParent(city.object);
-		 
-		  
+		this.detailHtml.setParent(city.object);
+
 	  }
 	  
 	  
@@ -583,12 +590,12 @@ export default class VariableObjects{
 	    	setParent: function(threejsobj) {
 	          this.parent = threejsobj;
 	        },
-	        updatePosition: function(show,camera) {
+	        updatePosition: function(show,camera,height) {
                 if(this.parent) {
                   this.position.copy(this.parent.position);
                 }
 
-                var coords2d = this.get2DCoords(this.position, camera);
+                var coords2d = this.get2DCoords(this.position, camera,height);
                 this.left = coords2d.x ;
                 this.top = coords2d.y;
                 if(mainStore.selectedFaction){
@@ -620,10 +627,10 @@ export default class VariableObjects{
 		        	
 	
 	      },
-	      get2DCoords: function(position, camera) {
+	      get2DCoords: function(position, camera,height) {
 	        var vector = position.project(camera);
 	        vector.x = (vector.x + 1)/2 * window.innerWidth;
-	        vector.y = -(vector.y - 1)/2 * window.innerHeight;
+	        vector.y = -(vector.y - 1)/2 * height;
 	        return vector;
 	      }
 	    };
@@ -637,14 +644,14 @@ export default class VariableObjects{
 		
 	  }
 	 
-	 render(mouse,camera){
+	 render(mouse,camera,height){
 		 
 		 for(var i=0; i<this.textlabels.length; i++) {
-  	      	this.textlabels[i].updatePosition(false,camera);
+  	      	this.textlabels[i].updatePosition(false,camera,height);
     	 }
 		// this.setTextLabels(this.textlabels)
 		 if(this.detailHtml!=undefined)
-			 this.detailHtml.updatePosition(true,camera);
+			 this.detailHtml.updatePosition(true,camera,height);
 		 return {textlabels:this.textlabels,detail:this.detailHtml}
 		 
 	 }
@@ -657,21 +664,22 @@ export default class VariableObjects{
 
     move(position,object,speed){
 
+        var dir = new THREE.Vector3();
+        if(position==null || object.position==null){
+            console.log("null")
+        }
+        dir.subVectors( position, object.position ).normalize();
 
-          var dir = new THREE.Vector3();
+        if( object.position.distanceTo(position) >= speed){
 
-          dir.subVectors( position, object.position ).normalize();
-
-         if( object.position.distanceTo(position) >= speed){
-
-              object.position.add(dir.multiplyScalar(speed));
-                object.lookAt(this.mesh.position);
-              return true;
-         }else{
-              object.position.add(dir.multiplyScalar(object.position.distanceTo(position)));
-                object.lookAt(this.mesh.position);
-             return false;
-         }
+            object.position.add(dir.multiplyScalar(speed));
+            object.lookAt(this.mesh.position);
+            return true;
+        }else{
+            object.position.add(dir.multiplyScalar(object.position.distanceTo(position)));
+            object.lookAt(this.mesh.position);
+            return false;
+        }
      }
 
      vertexReverse(position) {

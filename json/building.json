@@ -15,6 +15,34 @@
       "quantity": 3000
     }
   },
+  "irrigation": {
+    "id": 31,
+    "name": "Irrigation System",
+    "key": "irrigation",
+    "type": "",
+    "delay": 60,
+    "description": "Increases farm productivity. You can build 1 irrigation system per 1 farm. City needs water resource to build more than 1 irrigation system. When a hero has been assigned, farm production increases depends on the authority of the hero.",
+    "icon": "water",
+    "color": "#1ca3ec",
+    "worker": "",
+    "effect": {
+      "farm bonus": 10
+    },
+    "cost": [{
+      "type": "wood",
+      "quantity": 10
+      },
+      {
+        "type": "stone",
+        "quantity": 10
+      }],
+    "extension" : "farm",
+    "rare": "water",
+    "hero effect": {
+      "farm production" : 0.01,
+      "property" : "authority"
+    }
+  },
   "clay": {
     "id": 31,
     "name": "Clay pit",
@@ -221,10 +249,10 @@
       "quantity": 500
     }
   },
-  "polished": {
+  "polished stone": {
     "id": 31,
     "name": "Stonemasonry",
-    "key": "polished",
+    "key": "polished stone",
     "type": "production",
     "delay": 10,
     "description": "Artisans can polish stone from here",
@@ -470,10 +498,10 @@
         ]
       }
   },
-  "kiln": {
+  "tablet": {
     "id": 31,
     "name": "Kiln",
-    "key": "kiln",
+    "key": "tablet",
     "type": "production",
     "delay": 10,
     "description": "Artisans can make clay tablet from here",
@@ -618,7 +646,22 @@
     },
     "worker": "artisan",
 
-    "production": {
+    "production": [
+      {
+      "delay": 30,
+      "result": "stone tool",
+      "quantity": 20,
+      "cost": [
+        {
+          "type": "wood",
+          "quantity": 10
+        },
+        {
+          "type": "polished stone",
+          "quantity": 4
+        }
+      ]
+    },{
       "delay": 60,
       "result": "copper tool",
       "quantity": 20,
@@ -632,7 +675,22 @@
           "quantity": 2
         }
       ]
-    }
+    },{
+        "delay": 90,
+        "result": "bronze tool",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 2
+          }
+        ]
+      }
+    ]
   },
   "melee": {
     "id": 31,
@@ -709,7 +767,7 @@
   "ranged": {
     "id": 31,
     "name": "Weaponsmith (Ranged)",
-    "key": "weaponsmith",
+    "key": "ranged",
     "type": "production",
     "delay": 50,
     "description": "Artisan can make ranged weapons from here",
@@ -897,12 +955,12 @@
     "name": "Anu ziggurat",
     "originalName":"\uD808\uDC2D",
     "key": "anu ziggurat",
-    "type": "effect",
+    "type": "production",
     "delay": 3000,
     "description": "Ziggurat dedicated to sky god An. +3 max happiness, +2 max happiness faction wide when the city is capital",
     "icon": "triangle",
     "color": "#b53300",
-    "worker": "",
+    "worker": "priest",
     "cost": {
       "type": "brick",
       "quantity": 800
@@ -910,6 +968,16 @@
     "effect": {
       "faction max happiness" : 2,
       "max happiness" : 3
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
     }
   },
   "eanna": {
@@ -917,12 +985,12 @@
     "name": "Eanna",
     "originalName":"\uD808\uDC8D\uD808\uDC2D\uD808\uDE3E",
     "key": "eanna",
-    "type": "effect",
+    "type": "production",
     "delay": 3000,
     "description": "District dedicated to goddess Inanna. +5% base population growth rate, +0.05 happiness/month",
     "icon": "bank",
     "color": "#0085b5",
-    "worker": "",
+    "worker": "priest",
     "cost": {
       "type": "brick",
       "quantity": 800
@@ -930,6 +998,16 @@
     "effect": {
       "population growth" : 5,
       "happiness" : 0.05
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
     }
   },
   "nanna": {
@@ -1176,13 +1254,23 @@
     "description": "Garden of the gods.  +5 max happiness faction wide when the city is capital",
     "icon": "triangle",
     "color": "#26619C",
-    "worker": "",
+    "worker": "priest",
     "cost": {
       "type": "brick",
       "quantity": 400
     },
     "effect": {
       "faction max happiness" : 5
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
     }
   },
   "ninhursag": {

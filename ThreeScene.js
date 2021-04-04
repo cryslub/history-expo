@@ -139,6 +139,10 @@ export default class ThreeScene extends Component{
 	    this.objects.addUnit(lat,lon,color,unit)
 	 }
 
+    addUnitWithPosition = (pos,color,unit) =>{
+	    this.objects.addUnitWithPosition(pos,color,unit)
+	 }
+
 	onContextCreate = async ({ gl, arSession, width, height, scale }) => {
 
 		this.renderer = new ExpoTHREE.Renderer({ gl });
@@ -179,7 +183,7 @@ export default class ThreeScene extends Component{
   	onRender = delta => {
 	  this.cameraHandler.render();
 	    
-	    const ret = this.objects.render(this.cameraHandler.touch,this.camera);	    
+	    const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.height );
 	    
 	  //  console.log(this.state.textlabels)
 	    this.setState({textlabels:ret.textlabels,detail:ret.detail})
@@ -205,12 +209,17 @@ export default class ThreeScene extends Component{
         this.objects.remove(unit.object)
     }
 
+     onLayout = (event)=>{
+         var {x, y, width, height} = event.nativeEvent.layout;
+         this.height = height
+     }
+
 	render(){
 		const self = this;
 		const detail = this.state.detail;
 		
 	    return(
-	    	<View {...this.panResponder.panHandlers} style={{ flex: 1 ,overflow:'hidden'}}>
+	    	<View {...this.panResponder.panHandlers} style={{ flex: 1 ,overflow:'hidden'}}  onLayout={ this.onLayout}>
 		    	<ExpoGraphics.View
 		        	style={{ flex: 1 }}
 		            onContextCreate={this.onContextCreate}
@@ -223,7 +232,7 @@ export default class ThreeScene extends Component{
 		    		this.state.textlabels.map((label,i)=>{
 		    			if(!label.added) return null;
 
-		    			const style = {top:label.top,left:label.left,marginTop:label.placement==='top'?-25:10};
+		    			const style = {top:label.top,left:label.left,marginTop:label.placement==='top'?-25:0};
 		    			if(label.type=='unit'){
 		    			    style.marginTop=5;
 		    			    if(label.city.currentLocation.labelPosition!='top'){
@@ -252,17 +261,19 @@ export default class ThreeScene extends Component{
 		    				        <View  style={{flexDirection:'row'}}>
 		    				        {
 		    				            icons.map((icon,index)=>{
-                                            return  <View style={[styles.text,{padding:0}]}>
+                                            return  <View style={[{padding:0}]}>
                                                <Button icon={icon} color="#fc8b8b" style={[styles.text,{paddingRight:0,marginTop:2,marginLeft:-22-(index*14),minWidth:24,width:24,height:22}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
                                             </View>
 		    				            })
 		    				        }
-                                     <View style={[styles.text,{backgroundColor:label.textColor,padding:0}]}>
-                                         <Button icon={label.city.data.icon} color="white" style={[styles.text,{marginTop:2,minWidth:28,width:28,height:28}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
+                                     <View style={[{backgroundColor:label.textColor,padding:0,flexDirection:'row'}]}>
+                                         <Button icon={label.city.getIcon()} color="white" style={[styles.text,{marginTop:2,minWidth:28,width:28,height:28}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
+                                         {label.city.getMilitaryUnits('armed')>0?<Text  style={[styles.text,{paddingLeft:0,margin:'auto'}]}>{Math.floor(label.city.getMilitaryUnits('armed'))}</Text>:null}
                                       </View>
                                      </View>
 		    				     </>
-		    				    : <View style={[styles.text,{backgroundColor:label.textColor,padding:0}]}><Text  style={styles.text}>{label.name}</Text>
+		    				    : <View style={[{backgroundColor:label.textColor,padding:0}]}>
+		    				        <Text  style={styles.text}>{label.name}</Text>
 		    				     </View>
 		    					}
 

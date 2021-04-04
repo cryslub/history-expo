@@ -19,6 +19,7 @@
     "earcut": "^2.2.2",
     "expo": "37.0.0",
     "expo-asset-utils": "^1.2.0",
+    "expo-file-system": "~8.1.0",
     "expo-gl": "^8.1.0",
     "expo-gl-cpp": "~8.1.0",
     "expo-graphics": "^1.1.0",

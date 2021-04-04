@@ -3,8 +3,6 @@ import React, { useContext } from 'react';
 import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,Dimensions   } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu,Avatar,RadioButton,Badge  } from 'react-native-paper';
 
-import { NavigationContainer } from '@react-navigation/native';
-
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -97,6 +95,7 @@ export  const  HeroList =  (props) => {
 
 
     const changeGovernor = (id)=>{
+
         city.setGovernor(city.heroes[id-1])
 
     }
@@ -122,7 +121,7 @@ export  const  HeroList =  (props) => {
 
                 <Caption >-{(city.heroes[value-1]?.valor/2).toFixed(1)}% happiness cost of employing military unit </Caption>
                 <Caption >-{(city.heroes[value-1]?.wisdom/2).toFixed(1)}% happiness cost of employing non-military unit </Caption>
-                <Caption >+{(city.heroes[value-1]?.authority/100).toFixed(2)} happiness/month</Caption>
+                <Caption >+{(city.heroes[value-1]?.authority/200).toFixed(2)} happiness/month</Caption>
             </>
             }
 

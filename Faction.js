@@ -24,6 +24,21 @@ export default class Faction{
 
 	}
 
+	moveCapital(){
+	    let min = 0;
+	    let largest
+        this.cities.forEach(city=>{
+            if(city.population > min){
+                min = city.population
+                largest = city
+            }
+        })
+
+        if(largest){
+            this.capital = largest
+        }
+	}
+
     dailyJob(diff){
 
         if(mainStore.selectedFaction.id!=this.id){

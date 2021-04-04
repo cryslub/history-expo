@@ -3,8 +3,6 @@ import React, { useContext } from 'react';
 import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,Dimensions   } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu } from 'react-native-paper';
 
-import { NavigationContainer } from '@react-navigation/native';
-
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 import { Ionicons } from '@expo/vector-icons';

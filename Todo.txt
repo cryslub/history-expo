@@ -1,0 +1,18 @@
+AI - trade,  hero, multi army
+
+
+Units - extra food wage
+Unit moral decrease when attacked
+Unit moral critical chance
+
+Max happiness penalty by distance from capital
+
+Hero birth
+
+Hide unexplored city
+
+Civilization differance override
+
+Half screen UI
+
+Notification

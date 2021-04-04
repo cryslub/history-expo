@@ -192,7 +192,7 @@ const Equipment = (props)=>{
                     return false;
                }
                if(e.effect != undefined && e.effect.capacity!=undefined)  {
-                   if(unit.capacity+e.effect.capacity<unit.carrying()){
+                   if(unit.capacity+e.effect.capacity<unit.carrying){
                         disabled = true;
                         return false;
                    }
@@ -253,7 +253,7 @@ export default class Equip extends Component {
          const { unit } = this.props.route.params;
          const city = unit.currentLocation;
 
-        const quantity = Math.min(this.state.amount,        unit.capacity - unit.carrying())
+        const quantity = Math.min(this.state.amount,        unit.capacity - unit.carrying)
         let consume = city.consumeResource(key,quantity)
         unit.addResource(key, consume);
     }
@@ -307,7 +307,7 @@ export default class Equip extends Component {
 		    {deploy==true?<>
                 <View style={{flexDirection:'row'}}>
                    <Paragraph >Capacity </Paragraph>
-                   {unit.inGroup!=true?<Caption>{Math.floor(unit.carrying())}/</Caption>:null}
+                   {unit.inGroup!=true?<Caption>{Math.floor(unit.carrying)}/</Caption>:null}
                    <Caption>{unit.capacity} units</Caption>
                    <Paragraph style={{marginLeft:5}}>Speed </Paragraph>
                    <Caption>{unit.speed}km/day</Caption>
@@ -317,21 +317,24 @@ export default class Equip extends Component {
             <Caption>Equipments</Caption>
             {
                 Object.keys(equip).map(key=>{
-                    return <View style={{flexDirection:'row'}}>
+                    return <View style={{flexDirection:'row'}} key={key}>
                         <Paragraph>{key} </Paragraph>
-                        <Caption> {unit.equipments[key]==undefined?'None':null} </Caption>
+                        <Caption> {unit.equipments[key]==undefined?'None':unit.equipments[key].data.name} </Caption>
                         <Button icon="playlist-edit" onPress={()=>this.change(key)} />
                     </View>
                 })
 
             }
             {unit.inGroup!=true?<Resources unit={unit} />:null}
-
-            <Caption>Near by units</Caption>
-            {
-                unit.nearByUnits.map(u=>{
-                    return <NearByUnit unit={u} onExchange={this.onExchange}/>
-                })
+            {unit.nearByUnits.length>0?
+            <>
+                <Caption>Near by units</Caption>
+                {
+                    unit.nearByUnits.map((u,index)=>{
+                        return <NearByUnit key={index} unit={u} onExchange={this.onExchange}/>
+                    })
+                }
+            </>:null
             }
 	     </ScrollView>
 	}

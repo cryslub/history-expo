@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "history-expo",
-    "slug": "history-expo",
+    "name": "Historia - The dawn of civilization",
+    "slug": "historia-the-dawn-of-civilization",
     "platforms": [
       "ios",
       "android",
@@ -23,6 +23,7 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": "Historical simulation game"
   }
 }

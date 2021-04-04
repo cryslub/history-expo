@@ -149,7 +149,14 @@ import * as THREE from 'three';
 
     aStar (unit,end){
 
-
+        if(unit.currentLocation!=undefined && unit.currentRoad==undefined){
+            if(end.category!='unit'){
+                const result = unit.currentLocation.aStars[end.id]
+                if(result!=undefined){
+                    return result
+                }
+            }
+        }
 
         let start = unit.currentLocation;
         if(unit.currentRoad !=undefined){
@@ -228,12 +235,22 @@ import * as THREE from 'three';
             path.push(p.from);
             p = scores[p.from.id];
         }
-        return {
+
+
+        const result = {
             length:selectedLength,
-            path : path.reverse()
+            path : path.reverse(),
+            end:end
         }
 
+        if(unit.currentLocation!=undefined && unit.currentRoad==undefined){
+            if(end.category!='unit'){
+                unit.currentLocation.aStars[end.id] = result;
 
+            }
+        }
+
+        return result;
 
     }
 

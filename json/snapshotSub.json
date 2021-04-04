@@ -1,22 +1,32 @@
 {
   "8533":{
-    "heroes": [1,3,4,5,798,799,800,801,809],
+    "heroes": [1,3,4,5,798,799,800,809],
     "governor": 1,
     "chancellor": 809,
     "capital": true,
-    "buildings": ["anu ziggurat","eanna"]
+    "buildings": ["anu ziggurat","eanna"],
+    "resource":{
+      "water" : 50
+    }
   },
   "860":{
     "heroes": [804,802,805,6,806],
     "governor": 804,
     "capital": true,
-    "buildings": ["nanna"]
+    "buildings": ["nanna"],
+    "resource":{
+      "water" : 40
+    }
   },
   "1":{
-    "buildings": ["abzu"]
+    "buildings": ["abzu"],
+    "resource":{
+      "water" : 10
+    }
   },
   "25":{
     "resource":{
+      "water" : 10,
       "stone" : 2
     }
   },
@@ -25,10 +35,16 @@
     "heroes": [807,796],
     "governor": 807,
     "capital": true,
-    "buildings": ["dumuzid"]
+    "buildings": ["dumuzid"],
+    "resource":{
+      "water" : 40
+    }
   },
   "78":{
-    "buildings": ["babbar"]
+    "buildings": ["babbar"],
+    "resource":{
+      "water" : 30
+    }
   },
   "49":{
     "capital": true,
@@ -38,16 +54,25 @@
     "heroes": [797],
     "governor": 797,
     "capital": true,
-    "buildings": ["ninhursag"]
+    "buildings": ["ninhursag"],
+    "resource":{
+      "water" : 30
+    }
   },
   "102":{
     "heroes": [2],
     "governor": 2,
     "capital": true,
-    "buildings": ["ekur","eshumesha"]
+    "buildings": ["ekur","eshumesha"],
+    "resource":{
+      "water" : 30
+    }
   },
   "106":{
-    "buildings": ["ninlil"]
+    "buildings": ["ninlil"],
+    "resource":{
+      "water" : 30
+    }
   },
   "108":{
     "capital": true,
@@ -66,11 +91,22 @@
   "8535":{
     "heroes": [794,808],
     "governor": 794,
-    "buildings": ["shara","nisaba"]
+    "buildings": ["shara","nisaba"],
+    "resource":{
+      "water" : 30
+    }
   },
   "8534":{
     "heroes": [795],
-    "governor": 795
+    "governor": 795,
+    "resource":{
+      "water" : 40
+    }
+  },
+  "853":{
+    "resource":{
+      "water" : 40
+    }
   },
   "857":{
     "capital": true,
@@ -90,10 +126,16 @@
     "buildings": ["sikil"]
   },
   "216":{
-    "buildings": ["babbar"]
+    "buildings": ["babbar"],
+    "resource":{
+      "water" : 20
+    }
   },
   "222":{
-    "buildings": ["urash"]
+    "buildings": ["urash"],
+    "resource":{
+      "water" : 20
+    }
   },
   "228":{
     "resource":{
@@ -102,7 +144,10 @@
   },
   "296":{
     "heroes": [8],
-    "governor": 8
+    "governor": 8,
+    "resource":{
+      "water" : 20
+    }
   },
 
   "368":{
@@ -129,14 +174,20 @@
   },
   "639":{
     "fontSize": 16,
-    "buildings": ["neith"]
+    "buildings": ["neith"],
+    "resource":{
+      "water" : 30
+    }
   },
   "641":{
     "fontSize": 16,
     "buildings": ["wadjet"]
   },
   "668":{
-    "buildings": ["banebdjedet"]
+    "buildings": ["banebdjedet"],
+    "resource":{
+      "water" : 30
+    }
   },
   "858":{
     "resource":{
@@ -153,28 +204,39 @@
     "capital": true,
     "buildings": ["ptah","djoser"],
     "resource":{
-      "stone" : 2
+      "stone" : 2,
+      "water" : 40
     }
   },
   "149":{
       "heroes": [15,350],
     "governor": 15,
     "fontSize": 16,
-    "buildings": ["per aat"]
+    "buildings": ["per aat"],
+    "resource":{
+      "water" : 30
+    }
   },
   "153":{
     "heroes": [14],
     "governor": 14,
     "fontSize": 12,
-    "buildings": ["heryshaf"]
+    "buildings": ["heryshaf"],
+    "resource":{
+      "water" : 30
+    }
   },
   "163":{
-    "capital": true
+    "capital": true,
+    "resource":{
+      "water" : 20
+    }
   },
   "677":{
     "fontSize": 16,
     "buildings": ["khnum"],
     "resource":{
+      "water": 20,
       "stone" : 3
     }
   },
@@ -187,18 +249,25 @@
     "fontSize": 16,
     "buildings": ["anhur"],
     "resource":{
+      "water": 30,
       "stone" : 2
     }
   },
   "711":{
     "fontSize": 16,
-    "buildings": ["inpu"]
+    "buildings": ["inpu"],
+    "resource":{
+      "water" : 30
+    }
   },
   "719":{
     "heroes": [17],
     "governor": 17,
     "fontSize": 16,
-    "buildings": ["hathor"]
+    "buildings": ["hathor"],
+    "resource":{
+      "water" : 30
+    }
   },
 
   "720":{
@@ -209,6 +278,7 @@
     "governor": 10,
     "fontSize": 16,
     "resource":{
+      "water": 30,
       "stone" : 3
     }
   },
@@ -218,11 +288,20 @@
     "fontSize": 16,
     "buildings": ["horus"],
     "resource":{
+      "water": 20,
       "stone" : 2
     }
   },
+  "996":{
+    "resource":{
+      "water" : 20
+    }
+  },
   "1060":{
-    "buildings": ["pabilsag"]
+    "buildings": ["pabilsag"],
+    "resource":{
+      "water" : 20
+    }
   },
   "8681":{
     "capital": true

@@ -13,7 +13,7 @@ export default class ResourceRow extends Component {
         return <View style={{flexDirection:'row'}}>
             <Paragraph>{props.prefix} </Paragraph>
             <Resource icon={resource.icon} color={resource.color}/>
-            <Paragraph>{props.suffix}</Paragraph>
+            <Paragraph style={{marginLeft:3}}>{props.suffix}</Paragraph>
             {props.lv?<Caption> Lv.{props.lv}</Caption>:null}
         </View>
     }

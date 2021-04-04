@@ -10,7 +10,7 @@ export default class Resource extends Component {
         const color = this.props.color==undefined?'grey':this.props.color
 
         return <View style={{position:'relative',top:3}}>
-            <MaterialCommunityIcons name={this.props.icon} size={18}  style={style} color={color}  />
+            <MaterialCommunityIcons name={this.props.icon} size={18}    color={color}  />
         </View>
     }
 }

@@ -32,8 +32,14 @@ export const UnitScreen  = (observer((props) => {
 
     const unit = props.unit;
     const city= props.type=='group'?unit.city:mainStore.selectedCity;
-    const units = props.type=='group'?unit.units:city.units;
-    const heroes = props.type=='group'?unit.heroes:city.heroes;
+    const units = props.type=='group'?unit.units.slice():city.units.slice();
+    let heroes = props.type=='group'?unit.heroes:city.heroes;
+
+    if(heroes){
+        heroes = heroes.filter(hero => hero.assigned==undefined)
+    }else{
+        heroes = []
+    }
 
     const build = (unit,onAction)=>{
         props.navigation.navigate('Build', {unit:unit});
@@ -42,7 +48,7 @@ export const UnitScreen  = (observer((props) => {
 
 
     const disband= (unit,onAction)=>{
-        city.disband(unit)
+        unit.disband()
         onAction();
     }
 
@@ -131,16 +137,16 @@ export const UnitScreen  = (observer((props) => {
                 </View>
                  <View style={{flexDirection:'row'}}>
                     {props.unit.state==''?
-                    <Button  style={{marginRight:2}} onPress={()=>props.navigation.navigate('SelectUnit', {city:city,unit:unit})} icon="account-plus" mode="contained"  contentStyle={{marginLeft:16}} />
+                    <Button dark={true} style={{marginRight:2}}   onPress={()=>props.navigation.navigate('SelectUnit', {city:city,unit:unit})} icon="account-plus" contentStyle={{marginLeft:16}} />
                     :null}
                 </View>
             </>:<>
                  <View style={{flexDirection:'row'}}>
                     <Icon icon="account" />
-                    <Text>Available Manpower {Util.number(Math.floor(city?.manpower))} / {Util.number(city?.getMaxManpower())}</Text>
+                    <Paragraph>Available Manpower {Util.number(Math.floor(city?.manpower))} / {Util.number(city?.getMaxManpower())}</Paragraph>
                 </View>
                  <View style={{flexDirection:'row'}}>
-                    <Button  style={{marginRight:2}} onPress={()=>props.navigation.navigate('Employ', {city:city})} icon="account-plus" mode="contained"  contentStyle={{marginLeft:16}} />
+                    <Button  style={{marginRight:2}} onPress={()=>props.navigation.navigate('Employ', {city:city})} icon="account-plus" mode="contained"  labelStyle={{color:'white'}} contentStyle={{marginLeft:16}} />
                 </View>
             </>
         }
@@ -163,7 +169,7 @@ export const UnitScreen  = (observer((props) => {
 
             <View style={{padding:5}}>
                 {heroes&&heroes.length>0?<>
-                    <Caption>Heroes</Caption>
+                    <Caption>Idle Heroes</Caption>
                 </>:null
                 }
                  <FlatGrid
@@ -213,7 +219,7 @@ export class Resources extends Component {
              }
 
 
-            const quantity = Math.min(this.state.amount,        unit.capacity - unit.carrying())
+            const quantity = Math.min(this.state.amount,        unit.capacity - unit.carrying)
             let consume = city.consumeResource(key,quantity)
             unit.addResource(key, consume);
         }
@@ -235,7 +241,7 @@ export class Resources extends Component {
 
                 let quantity = this.state.amount
                 if(target != undefined){
-                    quantity = Math.min(this.state.amount,        target.capacity - target.carrying())
+                    quantity = Math.min(this.state.amount,        target.capacity - target.carrying)
                 }
                 const consume = unit.consumeResource(key, quantity);
                 city.addResource(key, consume);

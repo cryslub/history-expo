@@ -34,6 +34,7 @@ export default class City extends SubUnits{
     consumedManpower = 0;
     happinessAccu = 0;
     distance = {};
+    aStars = {}
 
     resourceConsume = {};
     effect = {};
@@ -106,20 +107,25 @@ export default class City extends SubUnits{
 
         if(this.snapshotSub != undefined){
             this.snapshotSub.heroes?.forEach(id=>{
-                this.heroes.push($scope.heroes[id])
+                const hero = $scope.heroes[id];
+                hero.assigned = undefined;
+
+                const index = this.heroes.push(hero)
+                if(this.snapshotSub.governor == id){
+                    this.governor = this.heroes[index-1];
+                    this.governor.assigned = 'governor'
+                }
+                if(this.snapshotSub.chancellor == id){
+                    this.chancellor = this.heroes[index-1];
+                    this.chancellor.assigned = 'chancellor'
+                }
+
+
             })
-            this.governor = this.snapshotSub.governor?$scope.heroes[this.snapshotSub.governor]:undefined;
-            this.chancellor = this.snapshotSub.chancellor?$scope.heroes[this.snapshotSub.chancellor]:undefined;
 
             this.snapshotSub.buildings?.forEach(building=>{
                 const b = this.initBuilding(building,1);
-                const effect = buildings[building].effect;
-                if(effect){
-                    Object.keys(effect).forEach(key=>{
-                        Util.initMap(this.effect,key,0)
-                        this.effect[key]+= effect[key];
-                    })
-                }
+
                 b.setState('')
             })
         }
@@ -142,7 +148,9 @@ export default class City extends SubUnits{
 
         this.setManpower(Math.min(1000,this.getMaxManpower()))
 
-        this.resources.mace=100;
+//        this.resources.mace=100;
+//        this.resources['copper arrow']=100;
+
     }
 
     initBuilding(key,quantity){
@@ -225,20 +233,11 @@ export default class City extends SubUnits{
         this.setManpower(this.manpower+manpower)
     }
 
-	initCity(){
-		var self = this;
-		if(this.faction ===0){
- 			self.buildings.residence.amount =  Math.floor((this.population/1000)+(this.population%1000===0?0:1));
- 			self.buildings.granary.amount =  1;
- 			self.buildings.silver.amount = 1;		 
- 		}else{
- 			self.buildings.residence.amount =  Math.floor((this.population/1000)+(this.population%1000===0?0:1));
- 			self.buildings.granary.amount =  Math.floor((this.food/1000)+(this.food%1000===0?0:1));
- 			self.buildings.silver.amount = Math.floor((this.silver/1000)+(this.silver%1000===0?0:1));	 		
- 		}
-	}
+
 
      employ(unit,callback){
+        if(this.manpower<unit.manpower) return;
+
         const city = this;
         const unitData = new UnitData(unit,this,'unit');
         city.addUnit(unitData)
@@ -415,12 +414,23 @@ export default class City extends SubUnits{
 
     @action
     setGovernor(hero){
+        if( this.governor){
+             this.governor.assigned = undefined;
+        }
         this.governor = hero;
+        this.governor.assigned = 'governor'
+        this.refreshHeroes();
     }
 
     @action
     setChancellor(hero){
+         if( this.chancellor){
+             this.chancellor.assigned = undefined;
+        }
         this.chancellor = hero;
+        this.chancellor.assigned = 'chancellor'
+
+        this.refreshHeroes();
     }
 
     @computed get maxHappiness(){
@@ -428,6 +438,7 @@ export default class City extends SubUnits{
          if(this.factionData?.capital){
             bonus += Util.isEmpty(this.factionData.capital.effect['faction max happiness'],0)
          }
+
         return 100 + bonus;
     }
 
@@ -443,8 +454,14 @@ export default class City extends SubUnits{
 
     assign(unit,building){
         if(unit.type=='hero'){
-           building.setHero(unit.data);
-           this.removeHero(unit.data)
+            if(building.hero){
+                building.hero.assigned = undefined;
+            }
+            const hero = unit.data
+           building.setHero(hero);
+            hero.assigned = building;
+            this.refreshHeroes();
+           //this.removeHero(unit.data)
         }else{
             unit.parent = building;
             building.units.push(unit);
@@ -498,6 +515,7 @@ export default class City extends SubUnits{
                     })
 
                 }
+                b.addEffect();
             }
             building.parent = b;
             b.subs.push(building);
@@ -518,22 +536,13 @@ export default class City extends SubUnits{
         this.refreshUnits()
     }
 
-    disband(unit){
-        if(unit.type=='group'){
-            this.units = this.units.concat(unit.units);
-            if(unit.hero!=undefined){
-                this.addHero(unit.hero)
-            }
-        }
-        this.removeUnit(unit);
-        if(unit.data.manpower!=undefined){
-            this.manpower+=unit.data.manpower;
-            this.consumedManpower -=unit.data.manpower
-        }
-    }
 
     getHygiene(){
-        return Math.floor(Math.pow(80000-this.population,2)/100000000)+Util.isEmpty(this.effect['hygiene']);
+        let ret =Math.floor(Math.pow(80000-this.population,2)/100000000)+Util.isEmpty(this.effect['hygiene'])
+        if(this.snapshotSub?.resource?.water){
+            ret += this.snapshotSub?.resource?.water/10
+        }
+        return ret ;
     }
 
     getHappinessGrowth(){
@@ -580,314 +589,16 @@ export default class City extends SubUnits{
         //return ray.intersectsBox( box);
     }
 
-	makeBlockSize(){
-		var size = 0;
-		
-		
-		this.totalBuildingSize =  size;
-	}
-	
-	makeMaxBlockSize(){
-		this.maxBuildingSize =  Math.floor(Math.sqrt(this.population)*2);
-		// 		return Math.pow(Math.floor(Math.sqrt(city.population)/10),2) + 10;
-	}
 
 
-	
-	addMusterSilver(amount){
-		var add = Math.min(this.silver,amount);
-		this.mustering.silver+= add;		
-		
-		this.calculateMuster();
-	}
-	subMusterSilver(amount){
-		var sub = Math.min(this.mustering.silver,amount);
-		this.mustering.silver-= sub;		
-		
-		this.calculateMuster();
-
-	}
-	addMusterFood(amount){
-		var add = Math.min(this.food,amount);
-		this.mustering.food+= add;
-
-		this.makeMusterFoodDays();
-	}
-	subMusterFood(amount){
-		var sub = Math.min(this.mustering.food,amount);
-		this.mustering.food-= sub;		
-
-		this.makeMusterFoodDays();
-	}
-	
-	makeMusterFood(){
-	
-		
-		
-		this.mustering.food = Math.min(this.food,this.getMusterSoldiers() *10/ 10);
-		this.mustering.days = this.mustering.food*10 / this.getMusterSoldiers();
-		
-		
-	}
-	
-	checkMuster(){
-		
-		if(this.mustering.food<=0) return true;
-				
-		return this.getMusterSoldiers() === 0;
-	}
-	
-	getMusterSoldiers(){
-		var amount = 0;
-		return amount;
-	}
-	
-	calculateMuster(){
-		var self = this;
-		
-		this.mustering.capacity = 0;
-		
-		
-		this.mustering.food = Math.min(this.food,self.mustering.capacity - self.mustering.silver);
-		this.mustering.days = this.mustering.food*10 / this.getMusterSoldiers();
-		
-	}
-	
-	assignClass(type,stat){
-		
-		var soldierClass = this.scope.soldierClasses[type];
-		
-		if(stat === 'organize'){
-			var add = Math.min(this.militia,soldierClass.unit);
-			this.soldierClasses[type].garrison += add;
-			this.militia -= add;
-			
-			if(type==='worker'){ 
-				this.workers += add;
-				this.idle += add;
-			}
-			
-		}else{
-			
-			var garrison = this.soldierClasses[type].garrison;
-			if(type==='worker'){
-				garrison = this.idle;
-			}
-			
-			this.mustering.assignClass(type,garrison);
-
-		}
-	}
-
-	unassignClass(type,stat){
-		
-		var soldierClass = this.scope.soldierClasses[type];
-
-		if(stat === 'organize'){
-			var sub = Math.min(this.soldierClasses[type].garrison,soldierClass.unit);
-
-			if(type==='worker'){ 
-				sub = Math.min(sub,this.idle);				
-				this.workers -= sub;
-				this.idle -= sub;
-
-			}
-			
-			this.soldierClasses[type].garrison -= sub;
-			this.militia +=sub;
-
-			
-		}else{
-			
-			this.mustering.unassignClass(type);
-
-			
-		}
-	}
-
-	make(building,type){
-		
-		var self = this;
-		
-		var unit = this.scope.weapons[type].unit;
-		this.weapons[type].making += unit;
-		if(this.scope.weapons[type].category === 'weapon'){
-			this.usedArmoury += unit * this.scope.weapons[type].space;
-		}
-		if(this.scope.weapons[type].category === 'livestock'){
-			this.usedStable += unit * this.scope.weapons[type].space;
-		}
-		
-		this.silver -= this.scope.weapons[type].cost * unit;
-		
-		var job =  {
-			fn:function(){
-				self.weapons[type].amount += unit;
-				self.weapons[type].making -= unit;							
-				building.makeJobs.shift();
-				if(building.makeJobs.length >0){			
-					self.scope.jobs.push(building.makeJobs[0]);
-				}
-			},
-			exec:function(){
-				this.delay -= building.workers;
-				this.delay++;
-			},
-			delay:this.scope.weapons[type].delay
-		};
-
-		building.makeJobs.push(job);
-		
-		if(building.makeJobs.length === 1){			
-			return job;
-		}else{
-			return undefined;
-		}
-		
-	}
-
-	calculateBuildingBonus(){
-		
-		this.makeBlockSize();
-		this.armoury = this.getOptions('armoury');
-		this.stable = this.getOptions('stable');
-
-		this.usedArmoury = 0;
-		this.usedStable = 0;
 
 
-				
-	}
-	
-	getOptions(option){
-		
-		var ret = 0;
 
-		
-		return ret;
-	}
-
-
-	checkMake(building,item){
-		var ret = false;
-		var weapon = this.scope.weapons[item];
-		if(weapon.category === 'weapon'){
-			ret= this.usedArmoury+weapon.unit*weapon.space<=this.armoury;					
-		}
-		if(weapon.category === 'livestock'){
-			ret= this.usedStable+weapon.unit*weapon.space<=this.stable;
-		}
-		
-		return !(building.workers!==0 && ret && this.silver >= weapon.unit * weapon.cost);
-
-	}
-		
-	muster(mustered){
-		
-		
-		var force = {
-			faction:this.faction,
-			longitude : this.longitude,
-			latitude : this.latitude,
-			type :'force',
-			soldiers : 0,
-			name :this.name+' Force',
-			origin : this,
-			position: this,
-			morale:this.loyalty,
-			soldierClasses : {},
-			silver : this.mustering.silver,
-			food : this.mustering.food,
-			heroes:{}
-		}
-		
-		
-
-		
-		
-		this.forces.push(force);
-
-		
-		return force;
-	}
-	
-	initMustering(){
- 		
-		
-	}
-
-	getAnnualFood(){
-	    return Math.floor(Util.initDivide(this.population,100)*365);
-	}
-
-	annualFoodEarning(){
-		
-		var city = this;
-		var ret = 0;
-
-		var add = city.getOptions('irrigationBonus');
-		var foodBonus = city.getOptions('foodBonus');
-		var irrigation = city.getOptions('irrigation');
-
-		ret += Math.floor(city.population*city.tax*(0.1+foodBonus*0.001));
-		ret += irrigation;
-		
-		if(city.buildings.irrigation !== undefined)
-			ret += city.buildings.irrigation.amount*add;
-		
-		return ret;
-
-	}
-	
-	annualSilverEarning(){
-
-		var city = this;
-
-		var ret = 0;
-		
-		var silverBonus = city.getOptions('silverBonus');										
-		var silver = city.getOptions('silver');
-		
-		ret += Math.floor(city.population*city.tax*(0.005+silverBonus*0.00005));
-		ret += silver;
-		
-		return ret;
-		
-	}
-	
 	annualJob(){
-		var city = this;
-		
-		var granary = city.getOptions('granary');
-		var deposite = city.getOptions('deposite');
 
-		var foodEarning = city.annualFoodEarning();
-		city.food += foodEarning;
 
-		
-		var silverEarning = city.annualSilverEarning();
-		
-		city.silver += silverEarning;
-		
-		
-		if(city.food > granary){
-			city.food = granary;
-		}
-		
-		if(city.silver > deposite){
-			city.silver = deposite;
-		}					
-		
-		if(city.silver<0){
-			city.silver = 0
-			city.loyalty -=20;
-			if(city.loyalty <0){
-				city.loyalty = 0;
-			}
-		}
-	
 	}
-	
+
 	dailyJob(diff){
 
         if(this.resources.food){
@@ -904,17 +615,17 @@ export default class City extends SubUnits{
 
         const governor = this.governor;
         if(governor){
-            this.happinessAccu += governor.authority/100;
+            this.happinessAccu += governor.authority/200;
             if(this.effect['wisdom happiness']){
-                this.happinessAccu += governor.wisdom/400;
+                this.happinessAccu += governor.wisdom/800;
             }
             if(this.effect['valor happiness']){
-                this.happinessAccu += governor.valor/400;
+                this.happinessAccu += governor.valor/800;
             }
         }
         const chancellor = this.chancellor;
         if(chancellor){
-            this.happinessAccu += chancellor.authority/200;
+            this.happinessAccu += chancellor.authority/400;
         }
 
         if(mainStore.selectedFaction.id!=this.factionData.id){
@@ -932,13 +643,16 @@ export default class City extends SubUnits{
 
     getFoes = (factionId)=>{
         let foes = []
-        mainStore.units.forEach(unit=>{
-            if(unit.city.factionData.id !=  factionId && unit.category=='army'){
-                if(this.checkCollision(unit) ){
-                     foes.push(unit)
+        this.destinies.forEach(destiny=>{
+            destiny.road.units.forEach(unit=>{
+                if(unit.city.factionData.id !=  factionId && unit.getTotalDamage()>0){
+                    if(this.checkCollision(unit) ){
+                         foes.push(unit)
+                    }
                 }
-            }
+            })
         })
+
 
         return foes;
     }
@@ -962,13 +676,13 @@ export default class City extends SubUnits{
             let growth = Math.floor((population*0.01*this.getGrowthRate())/12);
             if(growth <1) growth =1;
 
-            if(this.factionData.capital!=undefined){
+           // if(this.factionData.capital!=undefined){
 //                if(this.factionData.id==0 ||this.factionData.capital.id==this.id ){
                     if(this.population<3000){
-                     this.setManpower(this.manpower+growth/3)
+                         this.setManpower(this.getMaxManpower())
                     }
 //                }
-            }
+          //  }
 
             const residenceCoverage= this.buildings.residence.completedQuantity*1000;
             if(population+growth>residenceCoverage) growth = residenceCoverage - population;
@@ -1039,7 +753,25 @@ export default class City extends SubUnits{
 	}
 
     annex(faction){
-        Util.arrayRemove(this.factionData.cities,this);
+        if(this.factionData.cities){
+            Util.arrayRemove(this.factionData.cities,this);
+            if(this.factionData.capital == this){
+                this.factionData.moveCapital();
+            }
+
+            this.heroes.forEach(hero=>{
+                hero.assigned = undefined
+            })
+
+            if(this.factionData.cities.length>0){
+                this.factionData.capital.heroes = this.factionData.capital.heroes.concat(this.heroes)
+                this.heroes = [];
+            }
+
+        }
+
+        this.governor = undefined
+        this.chancellor = undefined
         this.factionData = faction;
         this.factionData.cities.push(this);
         this.changeColor(faction.color)
@@ -1070,7 +802,7 @@ export default class City extends SubUnits{
                     if(unit.type=='militia')  weapon ='sling'
                     if(unit.type=='warrior')  weapon ='mace'
 
-                    this.equipUnit(unit,weapon);
+                    this.equipUnit(unit,'Main Hand',weapon);
 
                 }
             }
@@ -1078,18 +810,14 @@ export default class City extends SubUnits{
 
     }
 
-    equipUnit(unit,weapon){
-        let equip;
-        unit.data.action.equip.forEach(e=>{
-            if(e.key==weapon){
-                equip = e;
-            }
-        })
+    equipUnit(unit,key,weapon){
+        if(unit.data.action.equip==undefined) return;
+        let equip = unit.data.action.equip[key][0];
 
         let resource = true;
         Object.keys(equip.require).forEach(key=>{
             if(this.resources[key] == undefined || this.resources[key]<unit.data.manpower){
-                this.addNeeds(key,1)
+                this.addNeeds(key,300)
                 resource = false;
             }else{
 
@@ -1098,7 +826,7 @@ export default class City extends SubUnits{
 
         if(resource){
             this.bringResource(equip.require,false)
-            unit.equipments[weapon] = {data:equip,amount:1};
+            unit.equipments[key] = {data:equip,amount:1};
         }
     }
 
@@ -1131,28 +859,33 @@ export default class City extends SubUnits{
             this.employ(unitProto.group,(group)=>{
             });
         }else{
-            const worker = group.getUnit(worker) ;
-            if(worker == undefined){
-                this.addWorkerToGroup(group);
-            }else{
-                if(worker.equipments['donkey1']==undefined){
-                    this.equipUnit(worker,'donkey1')
+
+                const worker = group.getUnit('worker') ;
+                if(worker == undefined){
+                    this.addWorkerToGroup(group);
                 }else{
-                    const quantity = Math.min(500,        unit.capacity - unit.carrying())
-                    let consume = this.consumeResource('food',quantity)
-                    unit.addResource('food', consume);
+                    if(worker.equipments['Livestock']==undefined){
+                        this.equipUnit(worker,'Livestock','donkey1')
+                    }else{
+                        const quantity = Math.min(500,        group.capacity - group.carrying)
+                        let consume = this.consumeResource('food',quantity)
+                        group.addResource('food', consume);
+                    }
                 }
-            }
 
-            this.units.forEach(unit=>{
-                if(unit.type=='warrior' && unit.getTotalDamage()>0){
-                    group.addGroup(unit);
+
+                 if(group.units.length<10){
+                    this.units.forEach(unit=>{
+                        if(unit.type=='warrior' && unit.getTotalDamage()>0){
+                            group.addGroup(unit);
+                        }
+                    })
                 }
-            })
 
-            if(group.getUnit('warrior')!=undefined && group.survivableDays>30){
-                return group.getMilitaryUnits('armed')
-            }
+                if(group.getUnit('warrior')!=undefined && group.survivableDays>30){
+                    return group.getMilitaryUnits('armed')
+                }
+
 
         }
 
@@ -1171,12 +904,136 @@ export default class City extends SubUnits{
         }
     }
 
-    deploy(target){
-        const group = this.getUnit('group');
-        const result = Util.aStar(group,target);
+    checkBuildingAvailability(building){
+        const key = building.key;
+        const req = building.require;
+        if(req){
+            if(this.rareResources[req]==undefined) return false;
+        }
 
-        mainStore.addUnit(group);
-        group.startMove(result.path,target.object.position);
+        const rare = building.rare;
+        if(rare){
+            if(this.snapshotSub?.resource != undefined){
+                if(this.snapshotSub?.resource[rare]==undefined && this.buildings[key]?.quantity>0) return false;
+            }else{
+                if(this.buildings[key]?.quantity>0) return false;
+            }
+        }
+
+
+
+        const extension = building.extension;
+        if(extension){
+            if(this.buildings[extension]==undefined) return false;
+            if(this.buildings[key]?.quantity>=this.buildings[extension].quantity) return false;
+        }
+
+        if(req || rare ){
+            const k = req?req:rare
+           if(this.buildings[key]?.quantity>0){
+                if(this.snapshotSub?.resource == undefined) return false;
+                if(this.buildings[key]?.quantity>=this.snapshotSub?.resource[k]) return false;
+            }
+        }
+
+        return true;
     }
 
+    checkEnemy(){
+        let ret = false;
+        this.destinies.forEach(destiny=>{
+            destiny.road.units.forEach(unit=>{
+                if(unit.getTotalDamage()>0 && unit.city.factionData.id != this.factionData.id){
+                    ret = true;
+                    return false;
+                }
+            })
+        })
+        return ret;
+    }
+
+    getAdjacentCities(checked){
+        if(checked ==undefined){
+            checked =[]
+        }else{
+            checked.push(this)
+        }
+
+        let cities = [];
+
+        this.destinies.forEach(destiny=>{
+            const city = destiny.city;
+
+            if(city.population==0 && !checked.includes(city)){
+                cities = cities.concat(city.getAdjacentCities(checked));
+            }else if( city.population>0 ){
+                cities.push(city);
+            }
+        })
+
+        return cities;
+    }
+
+    getCoreData(){
+
+        return {
+            id:this.id,
+            faction:this.factionData?.id,
+            manpower:this.manpower,
+            consumedManpower:this.consumedManpower,
+            population:this.population,
+            happiness:this.happiness,
+            happinessAccu:this.happinessAccu,
+            foodConsumptionRate:this.foodConsumptionRate,
+            governor:this.governor?.id,
+            chancellor:this.chancellor?.id,
+            heroes:this.heroes.map(hero=> {return hero.id}),
+            resources:this.resources,
+            trade :this.trade,
+            effect:this.effect,
+            units:this.units.map(unit=>{return unit.getCoreData()}),
+            buildings:Object.keys(this.buildings).map(key=>{return this.buildings[key].getCoreData()})
+        }
+    }
+
+    parseCoreData(saved,data){
+        this.factionData = data.factions[saved.faction]
+        if(this.factionData){
+            this.factionData.cities?.push(this);
+            this.changeColor(this.factionData.color)
+        }
+
+        this.manpower = saved.manpower
+        this.consumedManpower = saved.consumedManpower
+        this.population = saved.population
+        this.happiness = saved.happiness
+        this.happinessAccu = saved.happinessAccu
+        this.foodConsumptionRate = saved.foodConsumptionRate
+        this.governor = data.heroes[saved.governor]
+        this.chancellor = data.heroes[saved.chancellor]
+
+        this.heroes = saved.heroes.map(hero=>{
+            return data.heroes[hero]
+        })
+
+        this.resources = saved.resources
+        this.trade = saved.trade
+        this.effect = saved.effect
+
+        this.units = [];
+
+        saved.units.forEach(unit=>{
+            const u = new UnitData()
+            u.parseCoreData(unit,data)
+            this.units.push(u)
+        })
+
+        this.buildings = {};
+
+        saved.buildings.forEach(building=>{
+            const b = new BuildingData()
+            b.parseCoreData(building,data)
+            this.buildings[building.key] = b
+        })
+    }
 }

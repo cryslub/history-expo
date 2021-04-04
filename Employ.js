@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity  } from 'react-native';
+import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,SafeAreaView   } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu,TextInput } from 'react-native-paper';
 import { FlatGrid } from 'react-native-super-grid';
 
@@ -130,10 +130,10 @@ export const Employ = ((props) => {
             }
 		});
 
-    return <ScrollView contentContainerStyle={{ padding: 10 }}>
+    return <SafeAreaView  contentContainerStyle={{ padding: 10 }}>
          <View style={{flexDirection:'row'}}>
             <Icon icon="account" />
-            <Text>Available Manpower {Util.number(Math.floor(city?.manpower))}</Text>
+            <Paragraph>Available Manpower {Util.number(Math.floor(city?.manpower))}</Paragraph>
         </View>
          <FlatGrid
                    itemDimension={mainStore.unitSize}
@@ -147,7 +147,7 @@ export const Employ = ((props) => {
                    }}
          />
 
-     </ScrollView>
+     </SafeAreaView>
 
 	
 })

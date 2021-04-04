@@ -5,7 +5,8 @@ import * as THREE from 'three';
 import mainStore from './MainContext.js';
 import Util from './Util.js';
 import {SubUnits} from './Common.js'
-
+import unitProto from "./json/unit.json"
+import buildings from "./json/building.json"
 
 const maxWidth = mainStore.unitSize;
 
@@ -43,6 +44,27 @@ export default class UnitData extends SubUnits{
 
        super();
 
+       if(unit){
+            this.setBaseData(unit)
+        }
+        if(city){
+            this.setCity(city)
+        }
+        this.sort = sort;
+    }
+
+
+    setCity = (city)=>{
+        this.city = city;
+        this.delay = city.getConstructionDays(this.delay);
+        this.remain = this.delay;
+
+        this.factionData = city.factionData;
+        this.currentLocation = city;
+
+    }
+
+    setBaseData = (unit)=>{
         this.name = unit.name;
         this.originalName = unit.originalName;
         this.fontSize = unit.fontSize;
@@ -51,16 +73,14 @@ export default class UnitData extends SubUnits{
         this.color = unit.color;
         this.description = unit.description;
         this.type = unit.type;
-        this.delay = city.getConstructionDays(unit.delay);
+        this.delay = unit.delay;
         this.remain = this.delay;
         this.data = unit;
-        this.city = city;
         this.category = unit.category;
-        this.factionData = city.factionData;
-        this.currentLocation = city;
         this.men = unit.manpower;
-        this.sort = sort;
+
     }
+
 
     initProgress = ()=>{
         const production = this.getProduction();
@@ -123,13 +143,7 @@ export default class UnitData extends SubUnits{
                     foes = foes.concat(this.getSub(unit))
                 })
 
-                mainStore.units.forEach(unit=>{
-                    if(unit.city.factionData.id == city.factionData.id){
-                        if(unit.currentLocation.id==city.id && unit.currentRoad==undefined){
-                             foes = foes.concat(this.getSub(unit))
-                        }
-                    }
-                });
+
             }
 
 
@@ -149,12 +163,11 @@ export default class UnitData extends SubUnits{
                     city.buildings.wall.completedQuantity=0
                     city.buildings.wall.quantity = 0
                     this.annex(city)
-                }
-
-                 if(!ret){
+                }else if(foes.length<=0){
                     this.annex(city)
-
                 }
+
+
             }
         }
 
@@ -209,6 +222,10 @@ export default class UnitData extends SubUnits{
         if(this.data.type=='militia'){
             bonus+=Util.isEmpty(this.city.effect['militia damage'])
         }
+
+        const moral = Math.max(0,this.moral?this.moral:this.city.happiness)
+        bonus -= (100-moral)
+
         return {
                     piercing:this.getEffect('piercingDamage') * (1+bonus/100),
                     blunt:this.getEffect('bluntDamage') * (1+bonus/100),
@@ -218,7 +235,7 @@ export default class UnitData extends SubUnits{
     attackUnit = (foes,damage)=>{
 
         if(foes.length>0){
-            const index = Math.floor(Math.random*foes.length)
+            const index = Math.floor(Math.random()*foes.length)
             const foe = foes[index];
 
             this.attackIndUnit(foe,damage)
@@ -232,11 +249,11 @@ export default class UnitData extends SubUnits{
     getFoes = (factionId)=>{
         let foes = []
         mainStore.units.forEach(unit=>{
-            if(unit.city.factionData.id !=  factionId && unit.category=='army'){
+            if(unit.city.factionData.id !=  factionId && unit.hasArmy()){
                 if( this.object.position.distanceTo(unit.object.position)<=0.2){
-                     foes.push(unit)
+                    foes = foes.concat(this.getSub(unit))
                 }else if(this.currentRoad==undefined && this.currentLocation.checkCollision(unit) ){
-                     foes.push(unit)
+                    foes = foes.concat(this.getSub(unit))
                 }
             }
         })
@@ -271,20 +288,29 @@ export default class UnitData extends SubUnits{
 
     attackIndUnit = (unit,damage)=>{
 
-        if(unit.category=='army'){
+       // if(unit.category=='army'){
 
-           const d = Math.max(damage.piercing-unit.getEffect('piercingDefense'),0)
+           let d = Math.max(damage.piercing-unit.getEffect('piercingDefense'),0)
                +Math.max(damage.blunt-unit.getEffect('bluntDefense'),0)
                +Math.max(damage.slash-unit.getEffect('slashDefense'),0);
 
             if(d>0){
 
-                if(unit.currentRoad!=undefined){
+
+                d *= this.men/this.data.manpower
+
+                if(unit.currentRoad==undefined){
                     const city = unit.currentLocation;
                     d -= d*(Math.floor(city.getDefense())/city.getDefenseMax())*0.5
                 }
-
-                   ret = true;
+                if(unit.type=='group'){
+                    if(unit.units.length==0){
+                        unit.dead();
+                        return;
+                    }
+                    const index = Math.floor(Math.random()*unit.units.length)
+                    unit = unit.units[index];
+                }
                    d = Math.min(unit.men,d)
                    unit.men -= d
                    if(!unit.onDeploy()){
@@ -294,20 +320,54 @@ export default class UnitData extends SubUnits{
                         unit.dead();
                    }
            }
-       }
+     //  }
     }
 
     dead = ()=>{
+        this.initPath()
        Util.arrayRemove(this.city.units,this);
        if(this.onDeploy()){
             mainStore.removeUnit(this);
        }
        if(this.parent!=undefined){
-            this.parent.removeUnit(this)
+            const parent = this.parent
+            parent.removeUnit(this)
+            Object.keys(parent.resources).forEach(key=>{
+                if(parent.capacity<parent.carrying){
+                    parent.resources[key] -= Math.max(0,parent.carrying-parent.capacity)
+                }else{
+                    return false
+                }
+            })
+
        }
+
        if(this.hero !=undefined){
           this.city.addHero(this.hero)
        }
+
+    }
+
+     disband = () =>{
+        const city = this.city;
+        if(this.type=='group'){
+            city.units = city.units.concat(this.units);
+            if(this.hero!=undefined){
+                city.addHero(this.hero)
+            }
+        }else{
+            if(this.data.manpower!=undefined){
+                city.manpower+=this.data.manpower;
+                city.consumedManpower -=this.data.manpower
+            }
+        }
+
+        Object.keys(this.resources).forEach(key=>{
+            city.addResource(key, this.resources[key]);
+        })
+
+        city.removeUnit(this);
+
     }
 
     attackWall = (city,damage,mod)=>{
@@ -330,8 +390,11 @@ export default class UnitData extends SubUnits{
 
     dailyJob = (diff)=>{
       this.consumeFood(diff);
+      this.moral-=0.5
       if(this.getTotalDamage()>0){
          this.fighting();
+       }else{
+            if(this.state == 'fighting')  this.state = 'waiting'
        }
     }
 
@@ -411,7 +474,8 @@ export default class UnitData extends SubUnits{
             }
         }
         if(this.moral <-50){
-            mainStore.removeUnit(this);
+            this.dead();
+//            mainStore.removeUnit(this);
         }
     }
 
@@ -427,6 +491,8 @@ export default class UnitData extends SubUnits{
         city.addUnit(unit);
         city.population += unit.manpower;
         unit.state=''
+
+       this.initPath()
 
         mainStore.removeUnit(unit);
     }
@@ -470,6 +536,33 @@ export default class UnitData extends SubUnits{
         this.selected = !this.selected;
     }
 
+    @action
+    setEquipment(key,equipment){
+         this.equipments[key]  = equipment;
+         this.refreshEquipment()
+    }
+
+    isEquipmentAvailable(equipment){
+        let disabled = this.state==''?false:true;
+        const city= this.currentLocation;
+        if(disabled==false){
+             Object.keys(equipment.require).forEach(key=>{
+                   if(city.resources[key]==undefined || city.resources[key]<equipment.require[key]  ){
+                        disabled = true;
+                        return false;
+                   }
+                   if(equipment.effect != undefined && equipment.effect.capacity!=undefined)  {
+                       if(this.capacity+equipment.effect.capacity<this.carrying){
+                            disabled = true;
+                            return false;
+                       }
+                   }
+             })
+         }
+
+         return !disabled;
+    }
+
     getEffect(key){
          let ret = 0;
 
@@ -506,7 +599,7 @@ export default class UnitData extends SubUnits{
      @computed get speed(){
 
          const maxCapacity = this.capacity;
-         const carrying = this.carrying();
+         const carrying = this.carrying;
         let speed = this.data.speed;
 
         if(this.type=='group'){
@@ -574,7 +667,7 @@ export default class UnitData extends SubUnits{
             (this.type=='merchant' || this.hasUnit('merchant'))
     }
 
-    carrying(){
+    @computed get carrying(){
         let ret =  0;
 
         Object.keys(this.resources).forEach(key=>{
@@ -619,6 +712,8 @@ export default class UnitData extends SubUnits{
         Util.arrayRemove(this.units,unit);
         if(this.type=='group'&&this.units.length==0) {
            if(this.onDeploy()){
+                this.initPath()
+
                 mainStore.removeUnit(this);
            }
        }
@@ -665,12 +760,19 @@ export default class UnitData extends SubUnits{
         this.hero = hero;
     }
 
-    startMove(path,destination){
+    startMove(path,destination,targetUnit){
         this.destination = destination;
+        if(targetUnit){
+            this.targetUnit = {x:targetUnit.x,y:targetUnit.y,z:targetUnit.z}
+        }
+
         this.path = path;
         this.state ='traveling'
         this.remain = 1;
         this.city.removeUnit(this);
+        if(this.hero){
+            this.city.removeHero(this.hero)
+        }
         this.pathIndex =0;
         this.pause = false;
 
@@ -688,7 +790,7 @@ export default class UnitData extends SubUnits{
 
                 if(road.waypoint !== "" && road.waypoint !== null){
                     const waypoint = JSON.parse(road.waypoint);
-                    this.waypointIndex = waypoint.length - this.waypointIndex;
+                    this.waypointIndex = Math.max(0,waypoint.length - this.waypointIndex);
                 }
             }
          }
@@ -711,9 +813,9 @@ export default class UnitData extends SubUnits{
     }
 
     initPath = ()=>{
-        if(this.currentRoad!=undefined)
-            Util.arrayRemove(this.currentRoad.road.units,this);
-        this.currentRoad = undefined
+
+        this.setRoad(undefined)
+
         this.distanceFromLast =0;
     }
 
@@ -729,6 +831,8 @@ export default class UnitData extends SubUnits{
                     return false;
                 }
             });
+            this.setRoad(line)
+
         }else{
             line = this.currentRoad;
         }
@@ -736,8 +840,8 @@ export default class UnitData extends SubUnits{
         const road = line.road
         if(road==undefined) return;
 
-        this.currentRoad = line;
-        road.units.push(this)
+
+       // road.units.push(this)
 
         let t = this.target.object.position;
         let waypoint;
@@ -749,7 +853,7 @@ export default class UnitData extends SubUnits{
              if(road.end == this.currentLocation.id){
                 waypoint.reverse()
              }
-             if(this.waypointIndex==waypoint.length){
+             if(this.waypointIndex>=waypoint.length){
                 t = this.target.object.position;
                 this.blocked = this.target
              }else{
@@ -762,7 +866,7 @@ export default class UnitData extends SubUnits{
         if(this.currentRoad != undefined){
             this.currentRoad.road.units.forEach(unit=>{
                 if(unit.object.position.distanceTo(this.object.position)<0.2 && unit != this){
-                    if(unit.hasArmy()){
+                    if(unit.hasArmy() && unit.city.factionData.id != this.city.factionData.id){
                         this.blocked = unit;
                     }
                 }
@@ -795,8 +899,9 @@ export default class UnitData extends SubUnits{
             //this.endTravel();
 
         }else{
-            if(this.destination!=undefined && this.pathIndex ==this.path.length-1 &&this.object.position.distanceTo(this.destination) <speed){
-                this.move(t,this.object.position.distanceTo(this.destination)-0.2)
+            if(this.targetUnit!=undefined && this.pathIndex ==this.path.length-1 &&this.object.position.distanceTo(this.targetUnit) <speed){
+                this.move(t,this.object.position.distanceTo(this.targetUnit)-0.2)
+                this.nextPath(this.target);
                 this.endTravel();
             }else{
                 if(!this.move(t,speed)){
@@ -818,6 +923,17 @@ export default class UnitData extends SubUnits{
         }
     }
 
+    setRoad(line){
+       if(line==undefined){
+            if(this.currentRoad!=undefined)
+               Util.arrayRemove(this.currentRoad.road.units,this)
+       }else{
+            line.road.units.push(this);
+       }
+       this.currentRoad = line;
+
+    }
+
     initMoral(){
         const city = this.city;
         this.moral = city.happiness;
@@ -836,13 +952,12 @@ export default class UnitData extends SubUnits{
 //        this.remain = 0;
         this.initPath();
     }
+
     move(position,speed){
 
-           const object = this.object;
-
-            return mainStore.objects.move(position,object,speed);
-
-     }
+        const object = this.object;
+        return mainStore.objects.move(position,object,speed);
+    }
 
     toggleStop(){
         this.pause = !this.pause;
@@ -852,9 +967,9 @@ export default class UnitData extends SubUnits{
         let i =0;
         const city = this.currentLocation;
         if(Object.keys(this.resources).length>0){
-            while( this.capacity<this.carrying()){
+            while( this.capacity<this.carrying){
                 const key = Object.keys(this.resources)[i];
-                const quantity = this.carrying()-this.capacity;
+                const quantity = this.carrying-this.capacity;
                 const consume = this.consumeResource(key,quantity);
                 city.addResource(key,consume);
                 i++
@@ -866,6 +981,102 @@ export default class UnitData extends SubUnits{
         return this.units.some(unit=>{return unit.type==type});
      }
 
+    getIcon(){
+        if(this.type=='group'){
+            let priority = 0;
+            let icon
+            this.units.forEach(unit=>{
+                if(priority <= unit.data["icon priority"]){
+                    priority = unit.data["icon priority"]
+                    icon = unit.data.icon
+                }
+            })
+            return icon
+        }else{
+            return this.data.icon
+        }
+    }
+
+    getCoreData(){
+
+        let position
+        if(this.object){
+            const p = this.object.position
+            position = {x:p.x,y:p.y,z:p.z}
+        }
 
 
+        return {
+             type:this.data.type,
+             sort:this.sort,
+             state:this.state,
+             resources:this.resources,
+             hero:this.hero?.id,
+             remain:this.remain,
+             currentLocation:this.currentLocation?.id,
+             currentRoad:this.currentRoad?.id,
+             blocked:this.blocked?.id,
+             moral:this.moral,
+             position:position,
+             men:this.men,
+             city:this.city.id,
+             pathIndex:this.pathIndex,
+             waypointIndex:this.waypointIndex,
+             destination:this.destination?.id,
+             destinationType : this.destination?.type,
+             targetUnit:this.targetUnit,
+             pause:this.pause,
+             distanceFromLast:this.distanceFromLast,
+             units:this.units.map(unit=>{return unit.getCoreData()}),
+             equipments:this.equipments,
+             job:mainStore.jobs.includes(this)
+        }
+    }
+
+    parseCoreData(saved,data){
+
+        if(saved.sort =='unit'){
+            this.setBaseData(unitProto[saved.type])
+        }else{
+            this.setBaseData(buildings[saved.key])
+        }
+
+        this.setCity(data.cities[saved.city])
+        this.sort = saved.sort
+        this.state = saved.state
+        this.resources = saved.resources
+        this.hero = data.heroes[saved.hero]
+        this.remain = saved.remain
+        this.currentLocation = data.cities[saved.currentLocation]
+        this.currentRoad = data.roadMap[saved.currentRoad]
+        this.blocked = data.cities[saved.blocked]
+        this.moral = saved.moral
+        this.men  = saved.men
+        this.pathIndex = saved.pathIndex
+        this.waypointIndex = saved.waypointIndex
+        this.destination = data.cities[saved.destination]
+        this.targetUnit = saved.targetUnit
+
+        if(this.destination){
+            const result = Util.aStar(this,this.destination)
+            this.path = result.path
+        }
+
+        this.pause = saved.pause
+        this.distanceFromLast = saved.distanceFromLast
+        this.equipments = saved.equipments
+
+
+        this.units = [];
+
+        saved.units.forEach(unit=>{
+            const u = new UnitData()
+            u.parseCoreData(unit,data)
+            this.units.push(u)
+        })
+
+        if(saved.job){
+            mainStore.jobs.push(this)
+        }
+    }
 }

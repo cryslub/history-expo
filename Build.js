@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity  } from 'react-native';
+import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,SafeAreaView  } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu,TextInput } from 'react-native-paper';
 import { FlatGrid } from 'react-native-super-grid';
 
@@ -86,8 +86,8 @@ const Production = (props)=>{
         <View>
              <View style={{flexDirection:'row'}}><Paragraph>Produce</Paragraph></View>
             {
-                production.result.map(result=>{
-                    return   <View style={{flexDirection:'row',paddingLeft:10}}><ResourceRow prefix={result.key} resource={result.key} suffix={Util.number(result.quantity)}/></View>
+                production.result.map((result,index)=>{
+                    return   <View key={index} style={{flexDirection:'row',paddingLeft:10}}><ResourceRow prefix={result.key} resource={result.key} suffix={Util.number(result.quantity)}/></View>
                 })
             }
             <Paragraph>/ {production.delay} days</Paragraph>
@@ -104,7 +104,7 @@ const Production = (props)=>{
            {
                production.cost.map((cost,index)=>{
                    const resource = resources[cost.type];
-                   return  <View style={{flexDirection:'row',marginLeft:7}}>
+                   return  <View key={index} style={{flexDirection:'row',marginLeft:7}}>
                         {cost.optional==true&&index!=0?<Paragraph>or </Paragraph>:null}
                        <Paragraph>{cost.type}  </Paragraph>
                        <Resource icon={resource.icon} color={resource.color}/>
@@ -162,7 +162,7 @@ export default class Build extends Component {
                     Array.isArray(production)?<>
                     {
                         production.map((p,index)=>{
-                            return <Production data={p} city={city} index={index} showDetail={production.length<5}/>
+                            return <Production data={p} city={city} index={index} key={index} showDetail={production.length<5}/>
                         })
                     }
                     </>:<Production data={production} city={city} index={0} showDetail={true}/>
@@ -179,8 +179,8 @@ export default class Build extends Component {
                 {unit.cost?
                     Array.isArray(unit.cost)?<>
                     {
-                        unit.cost.map(cost=>{
-                            return <ResourceRow prefix={"Require "+cost.type} resource={cost.type} suffix={Util.number(cost.quantity)}/>
+                        unit.cost.map((cost,index)=>{
+                            return <ResourceRow key={index} prefix={"Require "+cost.type} resource={cost.type} suffix={Util.number(cost.quantity)}/>
                         })
                     }
                  </>
@@ -211,26 +211,11 @@ export default class Build extends Component {
 		const arr = Object.keys(buildings).filter(key=>{
 		    const building = buildings[key];
 
-            const req = building.require;
-            if(req){
-                if(city.rareResources[req]==undefined) return false;
+            if(!city.checkBuildingAvailability(building)){
+                return false;
             }
 
-            const rare = building.rare;
-            if(rare){
-                if(city.snapshotSub?.resource != undefined){
-                    if(city.snapshotSub?.resource[rare]==undefined && city.buildings[key]?.quantity>0) return false;
-                }else{
-                    if(city.buildings[key]?.quantity>0) return false;
-                }
-            }
 
-            if(req || rare){
-               if(city.buildings[key]?.quantity>0){
-                    if(city.snapshotSub?.resource == undefined) return false;
-                    if(city.buildings[key]?.quantity>=city.snapshotSub?.resource[key]) return false;
-                }
-            }
 
             if(key=='wall'){
                 if(city.buildings.wall.quantity>=city.getDefenseMax()) return false;
@@ -243,7 +228,7 @@ export default class Build extends Component {
             }
 		});
 
-		return <ScrollView contentContainerStyle={{ padding: 10 }}>
+		return <SafeAreaView contentContainerStyle={{ padding: 10 }}>
 		<FlatGrid
                    itemDimension={mainStore.unitSize}
                    data={arr}
@@ -269,7 +254,7 @@ export default class Build extends Component {
                    }}
          />
 
-	     </ScrollView>
+	     </SafeAreaView>
 	}
 	
 }

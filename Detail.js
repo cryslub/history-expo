@@ -82,26 +82,36 @@ export default class Detail extends Component{
 
         return <View style={[styles.detail,{top:detail.top,left:detail.left,backgroundColor:detail.color}]}>
             <View style={{flexDirection:'row'}}>
-                   {detail.isCapital?<Button icon="star" color="white" style={{marginTop:2,minWidth:24,width:24,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>:null}
+                   {detail.isCapital?<Button icon="star" color="white" style={{minWidth:24,width:24}} contentStyle={{marginLeft:6,marginRight:-4,height:30}}/>:null}
                    <Subheading style={{color:'white'}}>{detail.name}</Subheading>
             </View>
             {detail.population>0?
             <>
                 <View style={{flexDirection:'row'}}>
-                    <Button icon="bookmark" color="white" style={{marginTop:2,minWidth:22,width:22,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>
+                    <Button icon="bookmark" color="white" style={{minWidth:22,width:22}} contentStyle={{marginLeft:6,marginRight:-4,height:27}}/>
                     <Caption style={{color:'white',fontWeight: "bold"}}>{detail.factionName}</Caption>
                 </View>
                 <View style={{flexDirection:'row'}}>
-                    <Button icon="account-multiple" color="white" style={{marginTop:2,minWidth:16,width:16,height:16}} contentStyle={{marginLeft:0,marginRight:-15}}/>
+                    <Button icon="account-multiple" color="white" style={{minWidth:16,width:16}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
                     <Caption  style={{color:'white',marginLeft:5}}>{Util.number(city.population)}</Caption>
                 </View>
+                {mainStore.stage=='game'?<>
+                    <View style={{flexDirection:'row'}}>
+                        <Button icon="knife-military" color="white" style={{minWidth:16,width:16}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
+                        <Caption  style={{color:'white',marginLeft:5}}>{Util.number(city.getMilitaryUnits('armed'))}</Caption>
+                    </View>
+                    <View style={{flexDirection:'row'}}>
+                        <Button icon="chess-rook" color="white" style={{minWidth:16,width:16}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
+                        <Caption  style={{color:'white',marginLeft:5}}>{Math.floor(city.getDefense())}/{city.getDefenseMax()}</Caption>
+                    </View>
+                </>:null}
                  <View style={{flexDirection:'row',marginBottom:7}}>
                 {
                     city.snapshotSub?.resource?
                     <>
                     {
                         Object.keys(city.snapshotSub?.resource).map(key=>{
-                            return <Button icon={resources[key].icon} color="white" style={{marginTop:2,minWidth:24,width:24,height:16}} contentStyle={{marginLeft:6,marginRight:-4}}/>
+                            return <Button key={key} icon={resources[key].icon} color="white" style={{minWidth:24,width:24}} contentStyle={{marginLeft:6,marginRight:-4}}/>
                         })
                     }
                     </>
@@ -113,6 +123,7 @@ export default class Detail extends Component{
                     Choose
                 </Button>:null}
                 {mainStore.stage=='game'?<>
+
                     <Button mode="outlined"  onPress={()=>this.manage(detail)}
                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
                         Manage

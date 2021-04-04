@@ -13,11 +13,12 @@ class MainStore{
     @observable selectedFaction = {};
     @observable year=0;
     @observable date=0;
-    @observable speed=1;
-    @observable  stage="start";
+    @observable speed=0;
+    @observable  stage="main";
+    gameStarted = false
 
 
-
+    data = {era:{},region:{}};
 
     jobs = [];
     originalSpeed = 1;
@@ -90,6 +91,31 @@ class MainStore{
 
          this.scene.current.addUnit(city.latitude,city.longitude,city.factionData.color,unit)
          this.units.push(unit);
+     }
+
+     getCoreData = ()=>{
+        return {
+            selectedFaction:this.selectedFaction.id,
+            date:this.date.toJSON(),
+            units : this.units.map(unit=>{
+                return unit.getCoreData()
+            })
+        }
+     }
+
+     parseCoreData = (saved,data)=>{
+        this.setDate(new Date(saved.date))
+        this.setSelectedFaction(data.factions[saved.selectedFaction]);
+
+        this.units = [];
+
+        saved.units.forEach(unit=>{
+            const u = new UnitData()
+            u.parseCoreData(unit,data)
+            this.units.push(u)
+            const city = u.city
+            this.scene.current.addUnitWithPosition(unit.position,city.factionData.color,u)
+        })
      }
 }
 

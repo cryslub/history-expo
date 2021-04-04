@@ -21,7 +21,71 @@
     "manpower": 100,
     "action": {
       "build": ["farm"],
-      "assign": true
+      "assign": true,
+      "equip": {
+        "Main Hand": [
+          {
+            "key": "stone tool",
+            "name": "Stone Tool",
+            "description": "+5% production result",
+            "require": {
+              "stone tool": 100
+            },
+            "effect": {
+              "production result" : 5
+            }
+          },
+          {
+            "key": "copper tool",
+            "name": "Copper Tool",
+            "description": "+10% production result",
+            "require": {
+              "copper tool": 100
+            },
+            "effect": {
+              "production result" : 10
+            }
+          },
+          {
+            "key": "bronze tool",
+            "name": "Bronze Tool",
+            "description": "+20% production result",
+            "require": {
+              "bronze tool": 100
+            },
+            "effect": {
+              "production result" : 20
+            }
+          }
+        ],
+        "Livestock":[
+          {
+            "key": "ox",
+            "name": "Ox",
+            "description": "+20% production result",
+            "require": {
+              "livestock": 100,
+              "pottery": 200
+            },
+            "effect": {
+              "production result" : 20
+            }
+          }],
+        "Cart": [
+          {
+            "key": "cart",
+            "name": "Cart",
+            "description": "+10% production result",
+            "require": {
+              "cart": 50,
+              "pottery": 200
+            },
+            "effect": {
+              "production result" : 10
+            }
+          }
+        ]
+      }
     }
   },
   "worker": {
@@ -29,6 +93,7 @@
     "name": "Worker",
     "type": "worker",
     "icon": "shovel",
+    "icon priority": 0,
     "description": "Can build or be assigned to various manual labour places. +50% extra food consumption when traveling.",
     "delay": 2,
     "manpower": 50,
@@ -36,33 +101,75 @@
     "capacity": 50,
     "food consume": 1.5,
     "action": {
-      "build": ["residence","mud","clay","stone","wood","tin","copper","livestock","wool","granary","warehouse","armoury","trade","market","wall"],
+      "build": ["residence","irrigation","mud","clay","stone","wood","tin","copper","livestock","wool","granary","warehouse","armoury","trade","market","wall"],
       "assign": true,
       "equip": {
+        "Main Hand": [
+          {
+            "key": "stone tool",
+            "name": "Stone Tool",
+            "description": "+5% production result, +5% building construction speed",
+            "require": {
+              "stone tool": 50
+            },
+            "effect": {
+              "production result" : 5,
+              "construction speed" : 5
+            }
+          },
+          {
+            "key": "copper tool",
+            "name": "Copper Tool",
+            "description": "+10% production result, +10% building construction speed",
+            "require": {
+              "copper tool": 50
+            },
+            "effect": {
+              "production result" : 10,
+              "construction speed" : 10
+            }
+          },
+          {
+            "key": "bronze tool",
+            "name": "Bronze Tool",
+            "description": "+20% production result, +20% building construction speed",
+            "require": {
+              "bronze tool": 50
+            },
+            "effect": {
+              "production result" : 20,
+              "construction speed" : 20
+            }
+          }
+        ],
         "Livestock":[
         {
-          "key": "donkey1",
+          "key": "donkey",
           "name": "Donkey",
-          "description": "+200 capacity",
+          "description": "+200 capacity, +10% production result, +10% building construction speed",
           "require": {
             "livestock": 50,
             "pottery": 100
           },
           "effect": {
-            "capacity": 200
+            "capacity": 200,
+            "production result" : 10,
+            "construction speed" : 10
           }
         }],
         "Cart": [
         {
           "key": "cart",
           "name": "Cart",
-          "description": "+400 capacity",
+          "description": "+200 capacity, +10% production result, +10% building construction speed",
           "require": {
-            "cart": 50,
-            "pottery": 200
+            "cart": 25,
+            "pottery": 100
           },
           "effect": {
-            "capacity": 400
+            "capacity": 200,
+            "production result" : 10,
+            "construction speed" : 10
           }
         }
         ]
@@ -84,7 +191,47 @@
     "manpower": 10,
     "action": {
       "build": ["brick","pottery","cloth","furnace","beer","tavern","kiln","library","toolsmith","leather","polished","workshop","melee","ranged","armoursmith"],
-      "assign": true
+      "assign": true,
+      "equip": {
+        "Main Hand": [
+          {
+            "key": "stone tool",
+            "name": "Stone Tool",
+            "description": "+5% production result, +5% building construction speed",
+            "require": {
+              "stone tool": 10
+            },
+            "effect": {
+              "production result" : 5,
+              "construction speed" : 5
+            }
+          },
+          {
+            "key": "copper tool",
+            "name": "Copper Tool",
+            "description": "+10% production result, +10% building construction speed",
+            "require": {
+              "copper tool": 10
+            },
+            "effect": {
+              "production result" : 10,
+              "construction speed" : 10
+            }
+          },
+          {
+            "key": "bronze tool",
+            "name": "Bronze Tool",
+            "description": "+20% production result, +20% building construction speed",
+            "require": {
+              "bronze tool": 10
+            },
+            "effect": {
+              "production result" : 20,
+              "construction speed" : 20
+            }
+          }
+        ]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -123,6 +270,7 @@
     "name": "Merchant",
     "type": "merchant",
     "icon": "cached",
+    "icon priority": 1,
     "description": "Can sell resource from your trade post or buy it form foreign lands",
     "delay": 6,
     "manpower": 10,
@@ -131,43 +279,36 @@
     "action": {
       "assign": true,
       "deploy": true,
-      "equip":[ {
-          "key": "donkey1",
-          "name": "Donkey",
-          "description": "+40 capacity",
-          "require": {
-            "livestock": 10,
-            "pottery": 20
-          },
-          "effect": {
-            "capacity":40
+      "equip": {
+        "Livestock": [
+          {
+            "key": "donkey",
+            "name": "Donkey",
+            "description": "+40 capacity",
+            "require": {
+              "livestock": 10,
+              "pottery": 20
+            },
+            "effect": {
+              "capacity": 40
+            }
           }
-        },
-        {
-          "key": "donkey2",
-          "name": "Donkey",
-          "description": "+40 capacity",
-          "require": {
-            "livestock": 10,
-            "pottery": 20
-          },
-          "effect": {
-            "capacity":40
+        ],
+        "Cart": [
+          {
+            "key": "cart",
+            "name": "Cart",
+            "description": "+80 capacity",
+            "require": {
+              "cart": 10,
+              "pottery": 40
+            },
+            "effect": {
+              "capacity": 80
+            }
           }
-        },
-         {
-           "key": "cart",
-           "name": "Cart",
-           "description": "+80 capacity",
-           "require": {
-             "cart": 10,
-             "pottery": 40
-           },
-           "effect": {
-             "capacity":80
-           }
-        }
-      ]
+        ]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -184,18 +325,20 @@
     "delay": 3,
     "manpower": 100,
     "action": {
-      "equip":[ {
-        "key": "sling",
-        "name": "Sling",
-        "description": "2 range, 10 blunt damage",
-        "require": {
-          "sling": 100
-        },
-        "effect": {
-          "bluntDamage":10,
-          "range": 2
-        }
-      }]
+      "equip":{
+        "Main Hand":[ {
+          "key": "sling",
+          "name": "Sling",
+          "description": "2 range, 10 blunt damage",
+          "require": {
+            "sling": 100
+          },
+          "effect": {
+            "bluntDamage":10,
+            "range": 2
+          }
+        }]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -208,6 +351,7 @@
     "type": "warrior",
     "category": "army",
     "icon": "axe",
+    "icon priority": 2,
     "description": "Basic fighters.  +100% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
@@ -217,19 +361,8 @@
     "action": {
       "deploy": true,
       "assign": true,
-      "equip":[ {
-        "key": "copper axe",
-        "name": "Copper Axe",
-        "description": "15 slash damage, 30 weight",
-        "require": {
-          "copper axe": 100
-        },
-        "effect": {
-          "slashDamage":15,
-          "weight": 30
-        }
-      },
-        {
+      "equip":{
+        "Main Hand":[ {
           "key": "mace",
           "name": "Mace",
           "description": "10 blunt damage, 30 weight",
@@ -240,36 +373,53 @@
             "bluntDamage":10,
             "weight": 30
           }
-        },
-        {
-          "key": "cloak",
-          "name": "Leather Cloak",
-          "description": "+1 moral, +2 slash defense, -1 piercing defense",
+        },{
+          "key": "copper axe",
+          "name": "Copper Axe",
+          "description": "20 slash damage, 30 weight",
           "require": {
-            "cloak": 100
+            "copper axe": 100
           },
           "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":1
-          }
-        },
-        {
-          "key": "Helmet",
-          "name": "Copper Helmet",
-          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
-          "require": {
-            "helmet": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":2,
-            "bluntDefense":1,
-            "weight": 20
+            "slashDamage":15,
+            "weight": 30
           }
         }
-      ]
+
+        ],
+        "Cloak":[
+          {
+            "key": "cloak",
+            "name": "Leather Cloak",
+            "description": "+1 moral, +2 slash defense, -1 piercing defense",
+            "require": {
+              "cloak": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense":2,
+              "piercingDefense":1
+            }
+          }
+        ],
+        "Head": [
+          {
+            "key": "Helmet",
+            "name": "Copper Helmet",
+            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "require": {
+              "helmet": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense":2,
+              "piercingDefense":2,
+              "bluntDefense":1,
+              "weight": 20
+            }
+          }
+        ]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -292,63 +442,73 @@
     "action": {
       "deploy": true,
       "assign": true,
-      "equip":[ {
-        "key": "copper spear",
-        "name": "Copper Spear",
-        "description": "10 piercing damage, 30 weight",
-        "require": {
-          "copper spear": 100
-        },
-        "effect": {
-          "piercingDamage":10,
-          "weight": 30
-        }
-      },
-        {
-          "key": "cloak",
-          "name": "Leather Cloak",
-          "description": "+1 moral, +2 slash defense, +1 piercing defense",
-          "require": {
-            "cloak": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":1
+      "equip": {
+        "Main Hand": [
+          {
+            "key": "copper spear",
+            "name": "Copper Spear",
+            "description": "15 piercing damage, 30 weight",
+            "require": {
+              "copper spear": 100
+            },
+            "effect": {
+              "piercingDamage": 10,
+              "weight": 30
+            }
           }
-        },
-        {
-          "key": "Helmet",
-          "name": "Copper Helmet",
-          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
-          "require": {
-            "helmet": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":2,
-            "bluntDefense":1,
-            "weight": 20
+        ],
+        "Cloak": [
+          {
+            "key": "cloak",
+            "name": "Leather Cloak",
+            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "require": {
+              "cloak": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense": 2,
+              "piercingDefense": 1
+            }
           }
-        },
-        {
-          "key": "shield",
-          "name": "Tower Shield",
-          "description": "+1 moral, +4 slash defense, +5 piercing defense,  +2 blunt defense, -3 speed, 50 weight",
-          "require": {
-            "shield": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":4,
-            "piercingDefense":5,
-            "bluntDefense":2,
-            "speed": -3,
-            "weight": 50
+        ],
+        "Head": [
+          {
+            "key": "Helmet",
+            "name": "Copper Helmet",
+            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "require": {
+              "helmet": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense": 2,
+              "piercingDefense": 2,
+              "bluntDefense": 1,
+              "weight": 20
+            }
           }
-        }
-      ]
+        ],
+        "Off Hand": [
+          {
+            "key": "shield",
+            "name": "Tower Shield",
+            "description": "-5 piercing damage, +1 moral, +4 slash defense, +5 piercing defense,  +2 blunt defense, -3 speed, 50 weight",
+            "require": {
+              "shield": 100
+            },
+            "effect": {
+              "moral": 1,
+              "piercingDamage": -4,
+              "slashDefense": 4,
+              "piercingDefense": 5,
+              "bluntDefense": 2,
+              "speed": -3,
+              "weight": 50
+            }
+          }
+        ]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -371,83 +531,98 @@
     "action": {
       "deploy": true,
       "assign": true,
-      "equip":[ {
-        "key": "bow",
-        "name": "Bow",
-        "description": "8 piercing damage,3 range, 20 weight",
-        "require": {
-          "bow": 100
-        },
-        "effect": {
-          "piercingDamage":8,
-          "range": 3,
-          "weight": 20,
-          "consume": "arrow"
-        }
-      },{
-        "key": "copper dagger",
-        "name": "Copper Dagger",
-        "description": "5 slash damage, 20 weight",
-        "require": {
-          "copper dagger": 100
-        },
-        "effect": {
-          "slashDamage":5,
-          "weight": 20
-        }
-      },
-        {
-          "key": "quiver",
-          "name": "Quiver",
-          "description": "+40 capacity",
-          "require": {
-            "quiver": 100
-          },
-          "effect": {
-            "capacity":40
+      "equip": {
+        "Main Hand": [
+          {
+            "key": "bow",
+            "name": "Bow",
+            "description": "8 piercing damage,3 range, 20 weight",
+            "require": {
+              "bow": 100
+            },
+            "effect": {
+              "piercingDamage": 8,
+              "range": 3,
+              "weight": 20,
+              "consume": "arrow"
+            }
           }
-        },
-        {
-          "key": "copper arrow",
-          "name": "Copper Arrow",
-          "description": "instant use,5 weight",
-          "require": {
-            "copper arrow": 10
-          },
-          "instant": true,
-          "effect": {
-            "weight": 5
+        ],
+        "Util": [
+          {
+            "key": "copper dagger",
+            "name": "Copper Dagger",
+            "description": "7 slash damage, 20 weight",
+            "require": {
+              "copper dagger": 100
+            },
+            "effect": {
+              "slashDamage": 5,
+              "weight": 20
+            }
           }
-        },
-        {
-          "key": "cloak",
-          "name": "Leather Cloak",
-          "description": "+1 moral, +2 slash defense, +1 piercing defense",
-          "require": {
-            "cloak": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":1
+        ],
+        "Back": [
+          {
+            "key": "quiver",
+            "name": "Quiver",
+            "description": "+40 capacity",
+            "require": {
+              "quiver": 100
+            },
+            "effect": {
+              "capacity": 40
+            }
           }
-        },
-        {
-          "key": "Helmet",
-          "name": "Copper Helmet",
-          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
-          "require": {
-            "helmet": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":2,
-            "bluntDefense":1,
-            "weight": 20
+        ],
+        "Ammo": [
+          {
+            "key": "copper arrow",
+            "name": "Copper Arrow",
+            "description": "instant use,+2 extra piercing damage, 5 weight",
+            "require": {
+              "copper arrow": 10
+            },
+            "instant": true,
+            "effect": {
+              "piercingDamageBonus": 2,
+              "weight": 5
+            }
           }
-        }
-      ]
+        ],
+        "Cloak": [
+          {
+            "key": "cloak",
+            "name": "Leather Cloak",
+            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "require": {
+              "cloak": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense": 2,
+              "piercingDefense": 1
+            }
+          }
+        ],
+        "Head": [
+          {
+            "key": "Helmet",
+            "name": "Copper Helmet",
+            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "require": {
+              "helmet": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense": 2,
+              "piercingDefense": 2,
+              "bluntDefense": 1,
+              "weight": 20
+            }
+          }
+        ]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -470,66 +645,71 @@
     "action": {
       "deploy": true,
       "assign": true,
-      "equip":[ {
-        "key": "copper javelin",
-        "name": "Copper Javelin",
-        "description": "20 piercing damage,2 range, instant use, 20 weight",
-        "require": {
-          "copper javelin": 100
-        }
-        ,
-        "instant": true,
-        "effect": {
-          "piercingDamage":20,
-          "range": 2,
-          "weight": 20
-        }
-      },
-        {
-        "key": "stick",
-        "name": "Throwing Stick",
-        "description": "8 blunt damage,2 range, instant use, 10 weight",
-        "require": {
-          "stick": 100
-        }
-      ,
-        "instant": true,
-        "effect": {
-          "bluntDamage":8,
-          "range": 2,
-          "weight": 10
-        }
-      }
-        ,
-        {
-          "key": "cloak",
-          "name": "Leather Cloak",
-          "description": "+1 moral, +2 slash defense, +1 piercing defense",
+      "equip":{
+        "Main Hand":[
+          {
+          "key": "copper javelin",
+          "name": "Copper Javelin",
+          "description": "20 piercing damage,2 range, instant use, 20 weight",
           "require": {
-            "cloak": 100
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":1
+            "copper javelin": 100
           }
-        },
-        {
-          "key": "Helmet",
-          "name": "Copper Helmet",
-          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
-          "require": {
-            "helmet": 100
-          },
+          ,
+          "instant": true,
           "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":2,
-            "bluntDefense":1,
+            "piercingDamage":20,
+            "range": 2,
             "weight": 20
           }
+        },
+          {
+          "key": "stick",
+          "name": "Throwing Stick",
+          "description": "8 blunt damage,2 range, instant use, 10 weight",
+          "require": {
+            "stick": 100
+          }
+        ,
+          "instant": true,
+          "effect": {
+            "bluntDamage":8,
+            "range": 2,
+            "weight": 10
+          }
         }
-      ]
+        ] ,
+        "Cloak": [
+          {
+            "key": "cloak",
+            "name": "Leather Cloak",
+            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "require": {
+              "cloak": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense":2,
+              "piercingDefense":1
+            }
+        }],
+        "Head": [
+          {
+            "key": "Helmet",
+            "name": "Copper Helmet",
+            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "require": {
+              "helmet": 100
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense":2,
+              "piercingDefense":2,
+              "bluntDefense":1,
+              "weight": 20
+            }
+          }
+        ]
+      }
     },
     "cost": {
       "type": "happiness",
@@ -552,68 +732,76 @@
     "action": {
       "deploy": true,
       "assign": true,
-      "equip":[ {
-        "key": "copper javelin",
-        "name": "Copper Javelin",
-        "description": "20 piercing damage,2 range, instant use, 5 weight",
-        "instant": true,
-        "require": {
-          "copper javelin": 25
-        },
-        "effect": {
-          "piercingDamage":20,
-          "range": 2,
-          "instant": true,
-          "weight": 10
-        }
-      },
-        {
-          "key": "chariot",
-          "name": "Chariot",
-          "description": "+5 moral,+4 slash defense, +3 piercing defense,  +2 blunt defense, +5 piercing damage, +50 capacity",
-          "require": {
-            "cart":25,
-            "livestock": 50
-          },
-          "effect": {
-            "moral": 5,
-            "slashDefense":4,
-            "piercingDefense":3,
-            "bluntDefense":2,
-            "piercingDamageBonus": 5,
-            "capacity": 50
+      "equip": {
+        "Main Hand": [
+          {
+            "key": "copper javelin",
+            "name": "Copper Javelin",
+            "description": "20 piercing damage,2 range, instant use, 5 weight",
+            "instant": true,
+            "require": {
+              "copper javelin": 25
+            },
+            "effect": {
+              "piercingDamage": 20,
+              "range": 2,
+              "instant": true,
+              "weight": 10
+            }
           }
-        },
-
-        {
-          "key": "cloak",
-          "name": "Leather Cloak",
-          "description": "+1 moral, +2 slash defense, +1 piercing defense",
-          "require": {
-            "cloak": 50
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":1
+        ],
+        "Chariot": [
+          {
+            "key": "chariot",
+            "name": "Chariot",
+            "description": "+5 moral,+4 slash defense, +3 piercing defense,  +2 blunt defense, +5 extra piercing damage, +50 capacity",
+            "require": {
+              "cart": 25,
+              "livestock": 50
+            },
+            "effect": {
+              "moral": 5,
+              "slashDefense": 4,
+              "piercingDefense": 3,
+              "bluntDefense": 2,
+              "piercingDamageBonus": 5,
+              "capacity": 50
+            }
           }
-        },
-        {
-          "key": "Helmet",
-          "name": "Copper Helmet",
-          "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 10 weight",
-          "require": {
-            "helmet": 50
-          },
-          "effect": {
-            "moral": 1,
-            "slashDefense":2,
-            "piercingDefense":2,
-            "bluntDefense":1,
-            "weight": 10
+        ],
+        "Cloak": [
+          {
+            "key": "cloak",
+            "name": "Leather Cloak",
+            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "require": {
+              "cloak": 50
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense": 2,
+              "piercingDefense": 1
+            }
           }
-        }
-      ]
+        ],
+        "Head": [
+          {
+            "key": "Helmet",
+            "name": "Copper Helmet",
+            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 10 weight",
+            "require": {
+              "helmet": 50
+            },
+            "effect": {
+              "moral": 1,
+              "slashDefense": 2,
+              "piercingDefense": 2,
+              "bluntDefense": 1,
+              "weight": 10
+            }
+          }
+        ]
+      }
     },
     "cost": {
       "type": "happiness",

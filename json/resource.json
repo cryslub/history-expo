@@ -92,11 +92,11 @@
     "storage": "warehouse",
     "price": 100
   },
-  "river": {
-    "name": "River",
+  "water": {
+    "name": "Water",
     "icon": "waves",
     "color": "#1ca3ec",
-    "storage": "river"
+    "storage": "water"
   },
   "bronze": {
     "name": "Bronze",
@@ -126,12 +126,26 @@
     "storage": "warehouse",
     "price": 800
   },
+  "stone tool": {
+    "name": "Stone Tool",
+    "icon": "hammer",
+    "color": "#6D7876",
+    "storage": "warehouse",
+    "price": 15
+  },
   "copper tool": {
     "name": "Copper Tool",
     "icon": "hammer",
     "color": "#b87333",
     "storage": "warehouse",
     "price": 50
+  },
+  "bronze tool": {
+    "name": "Bronze Tool",
+    "icon": "hammer",
+    "color": "#794909",
+    "storage": "warehouse",
+    "price": 100
   },
   "silver": {
     "name": "Silver",

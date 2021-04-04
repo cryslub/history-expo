@@ -23,9 +23,10 @@ const Unit = (props) =>{
            <View style={{flexDirection:'row',justifyContent:'space-between'}} key={props.index}>
                <View style={{flexDirection:'row',height:40,display:'flex',justifyContent:'center'}}>
                    <Icon  icon={unit.icon} contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
-                   <Text style={{position:'relative',top:11}}>{unit.name}</Text>
+                   <Paragraph style={{position:'relative',top:11}}>{unit.name}</Paragraph>
                </View>
                <View style={{flexDirection:'row'}}>
+                    <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="hammer" color="grey" onPress={()=>props.equip(unit)}/>
                     <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="account-minus" color="grey" onPress={()=>props.unassign(unit)}/>
                     <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="account-remove" color="grey" onPress={()=>props.disband(unit)}/>
 
@@ -72,6 +73,11 @@ export  const  Building =  (observer((props) => {
         city.manpower+=unit.data.manpower;
     }
 
+    const equip = (unit)=>{
+         mainStore.pause();
+         props.navigation.navigate('Equip', {unit:unit});
+    }
+
     const select = (value)=>{
         if(building.data.production[value]!=undefined){
             building.setSelectedProduction(value);
@@ -83,8 +89,11 @@ export  const  Building =  (observer((props) => {
 
 
     const removeHero = ()=>{
-        city.addHero(building.hero);
+       // city.addHero(building.hero);
+
+        building.hero.assigned = undefined;
         building.setHero(undefined);
+        this.refreshHeroes();
     }
 
     return <ScrollView style={{padding:10,paddingBottom:30}}>
@@ -112,7 +121,7 @@ export  const  Building =  (observer((props) => {
                <ToggleButton.Row onValueChange={value => select(value)} value={building.selectedProduction} >
                   {
                     building.data.production.map((p,index)=>{
-                        return   <ToggleButton icon={resources[p.result].icon} value={index} disabled={building.state=='deploy'}/>
+                        return   <ToggleButton key={index} icon={resources[p.result].icon} value={index} disabled={building.state=='deploy'}/>
                     })
                   }
                </ToggleButton.Row>
@@ -122,7 +131,7 @@ export  const  Building =  (observer((props) => {
                <Paragraph>Production consumes</Paragraph>
                {
                    production.cost.map((cost,index)=>{
-                       return <View style={{flexDirection:'row'}}>
+                       return <View style={{flexDirection:'row'}} key={index}>
                        {cost.optional==true&&index!=0?<Paragraph>or </Paragraph>:null}
                         <Paragraph>{cost.type}  </Paragraph>
                         <Resource icon={resources[cost.type].icon} />
@@ -183,7 +192,7 @@ export  const  Building =  (observer((props) => {
            </Caption>:null}
             {
                 building.units.map((unit,index)=>{
-                    return <Unit unit={unit} index={index} disband={disband} unassign={unassign}/>
+                    return <Unit key={index} unit={unit} index={index} disband={disband} unassign={unassign} equip={equip}/>
                 })
             }
            </>:null}

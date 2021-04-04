@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { View ,Text} from 'react-native';
 import { PanGestureHandler, RotationGestureHandler,State } from 'react-native-gesture-handler';
-import { Provider as PaperProvider,Title,Caption } from 'react-native-paper';
+import { DefaultTheme, Provider as PaperProvider,Title,Caption,Paragraph,Headline } from 'react-native-paper';
 import { NavigationContainer} from '@react-navigation/native';
 import { createStackNavigator,HeaderBackButton } from '@react-navigation/stack';
 import DataService from './DataService.js';
@@ -39,6 +39,20 @@ import mainStore from './MainContext.js';
 
 const Stack = createStackNavigator();
 
+const theme = {
+  ...DefaultTheme,
+  dark :true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#3498db',
+    accent: '#f1c40f',
+    background : '#363b3d',
+    surface :'rgba(65, 78, 82,0.75)',
+    card :"#212526",
+    text :'#ffffff',
+    border :'#575757'
+  }
+}
 
 export default class Main extends Component{
 
@@ -60,8 +74,8 @@ export default class Main extends Component{
 	
 	
 	render(){
-		return  <PaperProvider>
-                <NavigationContainer>
+		return  <PaperProvider  theme={theme}>
+                <NavigationContainer theme={theme}>
                     <Stack.Navigator initialRouteName="Home">
                         <Stack.Screen name="Home" component={Interface} options={{ headerStyle: {height: 0},title:''}} onLoad={this.onLoad}/>
                         <Stack.Screen name="Scenario" component={Scenario} options={{ title:'Select Scenario'}}/>
@@ -72,8 +86,8 @@ export default class Main extends Component{
                                 options={({ route }) => ({
                                     headerTitle: props =>
                                         <View style={{flexDirection:'row'}}>
-                                            <Text style={{position:'relative',top:5,fontSize:18}}> {route.params.city.name} </Text>
-                                            <Title style={{fontSize:route.params.city.snapshotSub?.fontSize}}> {route.params.city.originalName}</Title>
+                                            <Paragraph style={{position:'relative',top:5,fontSize:18}}> {mainStore.data.cities[route.params.city].name} </Paragraph>
+                                            <Title style={{fontSize:route.params.city.snapshotSub?.fontSize}}> {mainStore.data.cities[route.params.city].originalName}</Title>
                                         </View>}
                                 )}
                          />
@@ -81,7 +95,7 @@ export default class Main extends Component{
                                 options={({ route }) => ({
                                     headerTitle: props =>
                                         <View style={{flexDirection:'row'}}>
-                                            <Text style={{fontSize:18}}> {route.params.city.name} </Text>
+                                            <Paragraph style={{fontSize:18}}> {route.params.city.name} </Paragraph>
                                             <Caption style={{position: 'relative',top: 2}}> {route.params.city.originalName}</Caption>
                                         </View>}
                                 )}
@@ -90,7 +104,7 @@ export default class Main extends Component{
                                 options={({ route }) => ({
                                     headerTitle: props =>
                                         <View style={{flexDirection:'row'}}>
-                                            <Text style={{position:'relative',top:5,fontSize:18}}> {route.params.hero.name} </Text>
+                                            <Paragraph style={{position:'relative',top:5,fontSize:18}}> {route.params.hero.name} </Paragraph>
                                             <Title > {route.params.hero.originalName}</Title>
                                         </View>}
                                 )}
@@ -120,7 +134,7 @@ export default class Main extends Component{
                             options={({ route }) => ({
                                 headerTitle: props =>
                                     <View style={{flexDirection:'row'}}>
-                                        <Text style={{position:'relative',top:5,fontSize:18}}> {route.params.building.name} </Text>
+                                        <Paragraph style={{position:'relative',top:5,fontSize:18}}> {route.params.building.name} </Paragraph>
                                         <Title style={{fontSize:route.params.building.fontSize}}> {route.params.building.originalName}</Title>
                                     </View>}
                             )}

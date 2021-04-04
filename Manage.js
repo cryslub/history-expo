@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 
-import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,Dimensions   } from 'react-native';
+import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,Dimensions ,SafeAreaView   } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu } from 'react-native-paper';
 
-import { NavigationContainer } from '@react-navigation/native';
 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
@@ -177,7 +176,7 @@ const ResourceScreen = (observer((props) => {
     }
 
       return (
-        <ScrollView style={{padding:10}}>
+        <SafeAreaView  style={{padding:10}}>
                  <Caption>Resources</Caption>
 
         <FlatGrid
@@ -200,7 +199,7 @@ const ResourceScreen = (observer((props) => {
 
         <TradeScreen {...props}/>
 
-        </ScrollView>
+        </SafeAreaView >
       );
 }))
 
@@ -231,7 +230,7 @@ const TradeScreen = (observer((props) => {
 
         <FlatGrid
            itemDimension={mainStore.unitSize}
-           data={city.trade}
+           data={city.trade.slice()}
 
            spacing={1}
            renderItem={({ item }) => {
@@ -263,9 +262,9 @@ const RoadScreen = (observer((props) => {
       return (
         <View style={{padding:10}}>
              <Caption>Roads</Caption>
-             {city.destinies.map(destiny=>{
+             {city.destinies.map((destiny,index)=>{
                     const road = destiny.road;
-                     return <Surface style={{marginBottom:4}}>
+                     return <Surface style={{marginBottom:5,elevation:1}} key={index}>
                         <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                             <View style={{flexDirection:'row',display:'flex',justifyContent:'center',padding:10}}>
                                    <View>
@@ -373,13 +372,13 @@ const InfoScreen =  (observer((props) => {
 
         <Divider/>
         <View style={{flexDirection:'row'}}>
-            <Icon icon="sword-cross"  />
+            <Icon icon="knife-military"  />
             <Paragraph style={{position:'relative',top:-2}}>Military Units </Paragraph>
-            <Caption>{city.getMilitaryUnits()} </Caption>
+            <Caption>{Math.floor(city.getMilitaryUnits())} </Caption>
             <Paragraph style={{position:'relative',top:-2}}>Armed </Paragraph>
-            <Caption>{city.getMilitaryUnits('armed')} </Caption>
+            <Caption>{Math.floor(city.getMilitaryUnits('armed'))} </Caption>
             <Paragraph style={{position:'relative',top:-2}}>Unarmed </Paragraph>
-            <Caption>{city.getMilitaryUnits('unarmed')} </Caption>
+            <Caption>{Math.floor(city.getMilitaryUnits('unarmed'))} </Caption>
 
         </View>
 
@@ -395,7 +394,7 @@ const InfoScreen =  (observer((props) => {
             {
                 Object.keys(city.snapshotSub.resource).map(key=>{
                     const resource = city.snapshotSub.resource[key]
-                    return <ResourceRow resource={key} suffix={resources[key].name} lv={resource}/>
+                    return <ResourceRow key={key} resource={key} suffix={resources[key].name} lv={resource}/>
                 })
             }
         </>:null}
@@ -416,8 +415,7 @@ export  const  Manage =  (observer((props) => {
 
     const { city } = props.route.params;
 
-    mainStore.setSelectedCity(city);
-    console.log("init")
+    mainStore.setSelectedCity(mainStore.data.cities[city]);
 
 
     return <View contentContainerStyle={{ padding: 10,height:'100%' }} style={{height:'100%'}}>
