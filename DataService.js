@@ -1,3 +1,5 @@
+import i18n from 'i18n-js';
+
 import City from './City.js';
 import Faction from './Faction.js';
 
@@ -14,16 +16,20 @@ import cities from "./json/city.json"
 import snapshots from "./json/snapshot.json"
 import snapshotSubs from "./json/snapshotSub.json"
 import heroes from "./json/hero.json"
+import buildings from "./json/building.json"
+import resources from "./json/resource.json"
+import units from "./json/unit.json"
 
 export default class DataService{
-	constructor(objetcs){
+
+	constructor(objects){
 	
 		var self = this;
 	
 		self.host = "http://cryslub.cafe24app.com/history/";
 		//self.host = "";
 
-		self.globe = objetcs;
+		self.globe = objects;
 		
 		self.cities ={};
 		self.showUnuse = false;
@@ -52,22 +58,54 @@ export default class DataService{
 		
 	}
 	
-	load =  ()=>{
+	load =  (callback)=>{
 		
 		const self = this;
 		
 	
 		self.getFaction();
 		self.getHero();
-		
+		self.initBuildings()
+		self.initResources()
+		self.initUnits()
+
 		self.selectScenario(scenarios[0]);			
 		self.makeEra();
 		
-	
-		
+
 	}
 	
-	
+	initBuildings(){
+    	this.buildings = buildings
+
+        Object.keys(this.buildings).forEach(key=>{
+           const building = this.buildings[key]
+           building.name = i18n.t('building.'+key+'.name')
+           building.description = i18n.t('building.'+key+'.description')
+        })
+	}
+
+
+	initResources(){
+        this.resources = resources
+
+        Object.keys(this.resources).forEach(key=>{
+           const resource = this.resources[key]
+           resource.name = i18n.t('resource.'+key+'.name')
+        })
+    }
+
+    initUnits(){
+        this.units = units
+
+        Object.keys(this.units).forEach(key=>{
+           const unit = this.units[key]
+           unit.name = i18n.t('unit.'+key+'.name')
+           unit.description = i18n.t('unit.'+key+'.description')
+
+        })
+    }
+
 	 makeEra(callback){
 		 var self = this;
 		 	 
@@ -170,23 +208,35 @@ export default class DataService{
 							self.cities[line.start].destinies.push({road:line,city:self.cities[line.end],length:length,cost:cost});
 							self.cities[line.end].destinies.push({road:line,city:self.cities[line.start],length:length,cost:cost});
 
-							self.lineCoord.push({start:self.cities[line.start],end:self.cities[line.end],waypoint:line.waypoint,type:line.type});
+						//	self.lineCoord.push({start:self.cities[line.start],end:self.cities[line.end],waypoint:line.waypoint,type:line.type});
 					}
 			 	});
 				
-				self.roads = self.globe.addLines(self.lineCoord);
+				//self.roads = self.globe.addLines(self.lineCoord);
 
-				var interval = setInterval(function(){ 
-					if(self.globe.loaded){
+				//var interval = setInterval(function(){
+				//	if(self.globe.loaded){
 //						self.closeLoading();					
-						 clearInterval(interval);
-					}
-				}, 1000);
+				//		 clearInterval(interval);
+				//	}
+			//	}, 1000);
 			
 		}
 		
 		
-		
+	redrawRoads(){
+	    const self = this;
+	    self.lineCoord = [];
+        Object.entries(self.roadMap).forEach(([key, line]) => {
+
+            if(self.cities[line.start] !== undefined && self.cities[line.end] !== undefined){
+                if(self.cities[line.start].explored && self.cities[line.end].explored)
+                    self.lineCoord.push({start:self.cities[line.start],end:self.cities[line.end],waypoint:line.waypoint,type:line.type});
+            }
+        });
+
+        self.roads = self.globe.addLines(self.lineCoord);
+	}
 		
 		
 		
@@ -195,6 +245,10 @@ export default class DataService{
 		
     	factions.forEach(faction => {
 			self.factions[faction.id] = new Faction(faction);
+			self.factions[faction.id].name = i18n.t('faction.'+faction.id+'.name')
+			self.factions[faction.id].region = i18n.t('faction.'+faction.id+'.region')
+			self.factions[faction.id].area = i18n.t('faction.'+faction.id+'.area')
+
 	 	});
 		
 		
@@ -204,6 +258,7 @@ export default class DataService{
 		var self = this;
 
     	heroes.forEach(hero => {
+    	    hero.name = i18n.t('hero.'+hero.id+'.name')
 			self.heroes[hero.id] = hero;
 	 	});
 
@@ -238,16 +293,19 @@ export default class DataService{
         scenarioCities[scenario.id].forEach(id=>{
             var city = {};
              Object.assign(city, cities[id]);
-            if(id==266){
-                console.log("here")
-            }
+            //if(id==266){
+             //   console.log("here")
+          //  }
             var lastSnapshot = undefined;
             for(const snapshot of snapshots[id]){
 
                 if(scenario.year>=snapshot.year){
 
                     city.population = snapshot.population;
-                    if(snapshot.name != null) city.name = snapshot.name;
+                    city.name = i18n.t('city.'+city.id+'.name')
+                    if(snapshot.name != null){
+                        city.name = i18n.t('snapshot.'+snapshot.id+'.name');
+                    }
                     city.snapshot = snapshot.id;
                     city.faction = snapshot.faction;
                     city.color = self.factions[city.faction].color;
@@ -301,7 +359,7 @@ export default class DataService{
 
 
 
-       self.addData(scenario);
+       self.addData(scenario,self.data);
 
 
 
@@ -311,19 +369,17 @@ export default class DataService{
 
 
 
-        setTimeout(function(){
+//        setTimeout(function(){
 //		       		$('#faction li:first-child a').tab('show');
-        },100);
+//        },100);
 
 
     }
 		
 		
-    addData(scenario){
+    addData(scenario,data){
 
         var self = this;
-
-        var data = [];
 
         if(self.roads !== undefined){
             self.globe.remove(self.roads);
@@ -333,9 +389,6 @@ export default class DataService{
             self.globe.remove(city.object);
         });
 
-        window.data.forEach(function(city){
-            data.push(city);
-        });
 
         self.globe.addData(data);
 
@@ -352,12 +405,50 @@ export default class DataService{
     }
 
 
-    init(){
+    init(faction){
+
+        faction.cities.forEach(city=>{
+            city.explored = true
+            city.destinies.forEach(destiny=>{
+                destiny.city.show()
+
+            })
+        })
+
+
         this.data.forEach(city=>{
             city.init();
         });
+
+        this.redrawRoads()
     }
 
+    checkExplored(){
+        this.data.forEach(city=>{
+            city.checkExplored();
+        });
+        this.redrawRoads()
 
+    }
+
+     checkHeroMaturity = (date)=>{
+        const year = date.getFullYear()
+        Object.keys(this.heroes).forEach(id=>{
+            const hero = this.heroes[id]
+            if(hero.birth + 16== year){
+                let city
+                if(hero.parent>0){
+                    const parent = this.heroes[hero.parent]
+                    city = this.cities[parent.city]
+
+                }else{
+                    city = this.cities[hero.city]
+                }
+                if(city)
+                    city.addHero(hero)
+            }
+
+        })
+     }
 	
 }

@@ -1,0 +1,10 @@
+{
+  "ui": {
+    "menu": {
+      "new game": "New Game",
+      "import": "Import",
+      "export": "Export",
+      "resume": "Resume"
+    }
+  }
+}

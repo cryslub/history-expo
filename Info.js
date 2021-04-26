@@ -14,11 +14,10 @@ import { observer} from "mobx-react"
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
+import ResourceIcon from './ResourceIcon.js';
 
 
 import Unit from './Unit.js';
-import ResourceRow from './ResourceRow.js';
 
 
 import {MainContext} from './MainContext.js'
@@ -26,8 +25,7 @@ import {CityContext} from './CityContext.js'
 import cityStore from './CityContext.js';
 import mainStore from './MainContext.js';
 
-import resources from './json/resource.json';
-
+import {InfoContent,TradeScreen,RoadScreen} from './Common.js'
 
 const styles = StyleSheet.create({
 
@@ -211,16 +209,16 @@ const ResourceScreen = (observer((props) => {
 
             return <Paragraph>This resource is already on trade</Paragraph>
         }
-        const resource = resources[key];
+        const resource = mainStore.data.resources[key];
         return <>
             <Paragraph>Trade with food</Paragraph>
             <View style={{flexDirection:'row',marginBottom:10}}>
                 <Caption> 1 </Caption>
-                <Resource icon={resource.icon}/>
+                <ResourceIcon icon={resource.icon}/>
                 <Caption> {resource.name} To </Caption>
                 <Caption> {resource.price} </Caption>
-                <Resource icon={resources.food.icon}/>
-                <Caption> {resources.food.name}</Caption>
+                <ResourceIcon icon={mainStore.data.resources.food.icon}/>
+                <Caption> {mainStore.data.resources.food.name}</Caption>
             </View>
             <Button onPress={()=>trade(key,onAction)}>OK</Button>
         </>
@@ -238,7 +236,7 @@ const ResourceScreen = (observer((props) => {
            renderItem={({ item }) => {
                 const key = item;
                 const quantity = city.resources[key];
-                const resource = resources[key];
+                const resource = mainStore.data.resources[key];
 
                return   <Unit data={resource} action={(onAction)=>action(item,onAction)}
                     quantity={
@@ -255,133 +253,12 @@ const ResourceScreen = (observer((props) => {
 
 
 
-const TradeScreen = (observer((props) => {
-
-    const city= mainStore.selectedCity;
-
-    const remove = (key,onAction)=>{
-        city.removeTrade(key)
-        onAction();
-    }
-
-    const action = (key,onAction)=>{
-        return <>
-             <Menu.Item onPress={() =>remove(key,onAction)} title="Remove"/>
-        </>
-    }
-
-      return (
-        <View style={{padding:10}}>
-           <Caption>Trade {city.buildings.trade?<>{city.trade.length}/{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)}</>:'0/0'}</Caption>
-
-
-        <FlatGrid
-           itemDimension={mainStore.unitSize}
-           data={city.trade}
-
-           spacing={1}
-           renderItem={({ item }) => {
-                const key = item;
-                const resource = resources[key];
-
-               return   <Unit data={resource}
-
-               />
-           }}
-         />
-
-
-        </View>
-      );
-}))
-
 
 const InfoScreen =  (observer((props) => {
 
-    const city= mainStore.selectedCity;
-
    return (
-     <View style={{padding:10}}>
-
-        {city?.factionData?.capital?.id == city.id?
-            <View style={{flexDirection:'row'}}>
-                <Icon icon="star"  />
-            <Paragraph style={{position:'relative',top:-2}}>Capital City</Paragraph>
-            </View>
-        :null}
-        <View style={{flexDirection:'row'}}>
-            <Icon icon="account-multiple"  />
-            <Paragraph style={{position:'relative',top:-2}}>Population </Paragraph><Caption>{Util.number(city?.population)}</Caption>
-        </View>
-
-        <View style={{flexDirection:'row'}}>
-            <Icon icon="chess-rook"  />
-            <Paragraph style={{position:'relative',top:-2}}>City defense </Paragraph>
-            <Caption>{Math.floor(city.getDefense())}/100</Caption>
-        </View>
-        {Object.keys(city.rareResources).length>0?
-        <>
-            <Divider/>
-            <Paragraph>Natural resources</Paragraph>
-            {
-                Object.keys(city.rareResources).map(key=>{
-                    const resource = city.rareResources[key]
-                    return <ResourceRow resource={key} suffix={resource.name}/>
-                })
-            }
-        </>:null}
-     </View>
+        <InfoContent navigation={props.navigation} type="info"/>
    );
-}))
-
-
-const RoadScreen = (observer((props) => {
-
-    const city= mainStore.selectedCity;
-
-
-    const action = (key,onAction)=>{
-        return <>
-             <Menu.Item onPress={() =>remove(key,onAction)} title="Remove"/>
-        </>
-    }
-
-      return (
-        <View style={{padding:10}}>
-             <Caption>Roads</Caption>
-             {city.destinies.map(destiny=>{
-                    const road = destiny.road;
-                     return <Surface style={{marginBottom:4}}>
-                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                            <View style={{flexDirection:'row',display:'flex',justifyContent:'center',padding:10}}>
-                                   <View>
-                                    <View style={{flexDirection:'row'}}>
-                                        <Paragraph style={{position:'relative',top:-2,marginRight:2}}>To {destiny.city.name}</Paragraph>
-                                        <Caption >{(destiny.length/1000).toFixed(1)}km</Caption>
-                                    </View>
-                                    <View style={{flexDirection:'row'}}>
-                                        <Paragraph style={{position:'relative',top:-2,marginRight:2}}>Road type</Paragraph>
-                                        <Caption >{road.type}</Caption>
-                                    </View>
-                                    <View style={{maxWidth:300}}>
-                                        {road.type=='mountain'?<Caption >Travel time will be increased by 50% </Caption>:null}
-                                        {road.type=='desert'?<>
-                                            <Caption >In summer season (Apr-Sep), moral will decrease 50% faster</Caption>
-                                            <Caption >Unit needs to carry water to survive</Caption>
-                                        </>:null}
-                                    </View>
-
-                                </View>
-                            </View>
-
-                        </View>
-                    </Surface>
-
-             })}
-
-
-        </View>
-      );
 }))
 
 const TabBar = (props)=>{

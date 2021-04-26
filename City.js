@@ -6,10 +6,6 @@ import BuildingData from './BuildingData.js';
 import mainStore from './MainContext.js'
 import Util from './Util.js';
 
-import buildings from "./json/building.json"
-import unitProto from "./json/unit.json"
-import resources from './json/resource.json';
-
 import {CityAI} from './AI.js';
 import {SubUnits} from './Common.js'
 
@@ -35,6 +31,8 @@ export default class City extends SubUnits{
     happinessAccu = 0;
     distance = {};
     aStars = {}
+    wage = 0
+    explored = false
 
     resourceConsume = {};
     effect = {};
@@ -99,8 +97,8 @@ export default class City extends SubUnits{
 		
         const arr = this.traits.split(',');
         arr.forEach(a=>{
-            if(resources[a]){
-                this.rareResources[a] = resources[a]
+            if(mainStore.data.resources[a]){
+                this.rareResources[a] = mainStore.data.resources[a]
             }
         })
 
@@ -110,7 +108,7 @@ export default class City extends SubUnits{
                 const hero = $scope.heroes[id];
                 hero.assigned = undefined;
 
-                const index = this.heroes.push(hero)
+                const index = this.addHero(hero)
                 if(this.snapshotSub.governor == id){
                     this.governor = this.heroes[index-1];
                     this.governor.assigned = 'governor'
@@ -148,13 +146,20 @@ export default class City extends SubUnits{
 
         this.setManpower(Math.min(1000,this.getMaxManpower()))
 
+        this.checkExplored()
 //        this.resources.mace=100;
 //        this.resources['copper arrow']=100;
 
     }
 
+    checkExplored(){
+        if(!this.explored){
+            this.hide()
+        }
+    }
+
     initBuilding(key,quantity){
-        const building =  new BuildingData(buildings[key],this,"building");
+        const building =  new BuildingData(mainStore.data.buildings[key],this,"building");
         this.buildings[key]=(building);
         building.onDone();
         building.quantity = quantity;
@@ -173,12 +178,12 @@ export default class City extends SubUnits{
     addFarmsAndFood(){
          const annualFood = (this.population*365/100 );
 
-            const farms = Util.intDivide(annualFood,3000)
+         const farms = Util.intDivide(annualFood,3000)
 
          const farm = this.initBuilding("farm",farms);
 
             for(var i = 0;i<farms;i++){
-                const farmer = new UnitData(unitProto.farmer,this,'unit');
+                const farmer = new UnitData(mainStore.data.units.farmer,this,'unit');
                 farmer.state=''
                  farmer.remain = 0;
 
@@ -194,7 +199,7 @@ export default class City extends SubUnits{
             const building = this.initBuilding("granary",granaries);
             building.goods = annualFood;
 
-            this.addManpower(-farms*unitProto.farmer.manpower);
+            this.addManpower(-farms*mainStore.data.units.farmer.manpower);
 
             /*
             if(this.manpower <0){
@@ -256,11 +261,26 @@ export default class City extends SubUnits{
 
         const cost = unit.cost;
         if(cost){
-            if(cost.type =='happiness'){
-                let quantity = this.getHiringCost(unit);
-
-                city.happiness-=quantity;
+            if(Array.isArray(cost)){
+                cost.forEach(c=>{
+                    this.payCost(unit,c)
+                })
+            }else{
+                this.payCost(unit,cost)
             }
+        }
+        if(unit.wage){
+            this.wage+=unit.wage
+        }
+    }
+
+    payCost(unit,cost){
+       if(cost.type =='happiness'){
+            let quantity = this.getHiringCost(unit);
+
+            this.happiness-=quantity;
+        }else{
+            this.resources[cost.type] -= cost.quantity
         }
     }
 
@@ -348,11 +368,11 @@ export default class City extends SubUnits{
         if(this.resources[key] == undefined){
             this.resources[key] = 0;
         }
-        if(resources[key] == undefined){
+        if(mainStore.data.resources[key] == undefined){
             console.log(key);
             return;
         }
-        const storage = resources[key].storage;
+        const storage = mainStore.data.resources[key].storage;
         if(storage){
             const building = this.buildings[storage];
             if(building){
@@ -397,7 +417,7 @@ export default class City extends SubUnits{
         if(this.resources[key] == undefined ) return 0;
         const consume = Math.min(Math.floor(quantity),this.resources[key]);
         this.resources[key]  -=consume;
-        const storage = resources[key].storage;
+        const storage = mainStore.data.resources[key].storage;
 
         return consume;
     }
@@ -424,7 +444,7 @@ export default class City extends SubUnits{
 
     @action
     setChancellor(hero){
-         if( this.chancellor){
+        if( this.chancellor){
              this.chancellor.assigned = undefined;
         }
         this.chancellor = hero;
@@ -437,9 +457,20 @@ export default class City extends SubUnits{
         let bonus = Util.isEmpty(this.effect['max happiness'],0);
          if(this.factionData?.capital){
             bonus += Util.isEmpty(this.factionData.capital.effect['faction max happiness'],0)
+            if(this.factionData.capital.id!=this.id){
+                const result = Util.aStar(this,this.factionData.capital)
+                bonus -= Util.intDivide(result.length,20000)
+            }
          }
 
-        return 100 + bonus;
+        if(this.governor){
+            bonus += Math.floor(this.governor.authority/4)
+        }
+        if(this.chancellor){
+            bonus += Math.floor(this.chancellor.authority/8)
+        }
+
+        return Math.max(100 + bonus,20);
     }
 
 	setUnits(units){
@@ -470,8 +501,10 @@ export default class City extends SubUnits{
     }
 
     addHero(hero){
-        this.heroes.push(hero);
+        const index = this.heroes.push(hero);
+        hero.city = this.id;
         if(this.governor == undefined) this.setGovernor(hero)
+        return index
     }
 
     removeHero(hero){
@@ -540,8 +573,12 @@ export default class City extends SubUnits{
     getHygiene(){
         let ret =Math.floor(Math.pow(80000-this.population,2)/100000000)+Util.isEmpty(this.effect['hygiene'])
         if(this.snapshotSub?.resource?.water){
-            ret += this.snapshotSub?.resource?.water/10
+            ret += this.snapshotSub?.resource?.water/20
         }
+        if(this.buildings['irrigation']){
+            ret += this.buildings['irrigation']?.completedQuantity/2
+        }
+
         return ret ;
     }
 
@@ -561,8 +598,7 @@ export default class City extends SubUnits{
 
     getFoodConsumption(){
         const ret = Util.intDivide(this.population,100) * this.foodConsumptionRate;
-
-        return Math.floor(ret);
+        return Math.floor(ret+this.wage);
     }
 
     getMaxManpower(){
@@ -615,7 +651,7 @@ export default class City extends SubUnits{
 
         const governor = this.governor;
         if(governor){
-            this.happinessAccu += governor.authority/200;
+            this.happinessAccu += governor.authority/400;
             if(this.effect['wisdom happiness']){
                 this.happinessAccu += governor.wisdom/800;
             }
@@ -625,7 +661,7 @@ export default class City extends SubUnits{
         }
         const chancellor = this.chancellor;
         if(chancellor){
-            this.happinessAccu += chancellor.authority/400;
+            this.happinessAccu += chancellor.authority/800;
         }
 
         if(mainStore.selectedFaction.id!=this.factionData.id){
@@ -709,7 +745,7 @@ export default class City extends SubUnits{
 	    }
 
         let bonus = 0;
-        const hero = this.buildings.residence.hero;
+        const hero = this.buildings.residence?.hero;
         if(hero){
            bonus = hero.wisdom/10
         }
@@ -764,7 +800,10 @@ export default class City extends SubUnits{
             })
 
             if(this.factionData.cities.length>0){
-                this.factionData.capital.heroes = this.factionData.capital.heroes.concat(this.heroes)
+                this.heroes.forEach(hero=>{
+                    this.factionData.capital.addHero(hero)
+                })
+
                 this.heroes = [];
             }
 
@@ -780,7 +819,7 @@ export default class City extends SubUnits{
 	 changeColor(color){
 
         this.object.material.color = new THREE.Color(color);
-
+        mainStore.redraw()
     }
 
     militaryJob(){
@@ -802,7 +841,7 @@ export default class City extends SubUnits{
                     if(unit.type=='militia')  weapon ='sling'
                     if(unit.type=='warrior')  weapon ='mace'
 
-                    this.equipUnit(unit,'Main Hand',weapon);
+                    this.equipUnit(unit,'main hand',weapon);
 
                 }
             }
@@ -856,7 +895,7 @@ export default class City extends SubUnits{
     makeGroup(){
         const group = this.getUnit('group');
         if(group==undefined){
-            this.employ(unitProto.group,(group)=>{
+            this.employ(mainStore.data.units.group,(group)=>{
             });
         }else{
 
@@ -896,7 +935,7 @@ export default class City extends SubUnits{
     addWorkerToGroup(group){
         const worker =this.getUnit('worker');
         if(worker==undefined){
-            this.employ(unitProto.worker,worker=>{
+            this.employ(mainStore.data.units.worker,worker=>{
                 group.addGroup(worker)
             });
         }else{
@@ -979,6 +1018,7 @@ export default class City extends SubUnits{
         return {
             id:this.id,
             faction:this.factionData?.id,
+            explored:this.explored,
             manpower:this.manpower,
             consumedManpower:this.consumedManpower,
             population:this.population,
@@ -1002,6 +1042,8 @@ export default class City extends SubUnits{
             this.factionData.cities?.push(this);
             this.changeColor(this.factionData.color)
         }
+
+        this.explored = saved.explored
 
         this.manpower = saved.manpower
         this.consumedManpower = saved.consumedManpower
@@ -1035,5 +1077,30 @@ export default class City extends SubUnits{
             b.parseCoreData(building,data)
             this.buildings[building.key] = b
         })
+    }
+
+    hide(){
+        this.object.visible = false
+    }
+
+    show(){
+        if(this.explored==false){
+            this.explored = true
+            this.object.visible = true
+            return true
+        }
+
+        return false
+    }
+
+    reached(){
+        let changed = false
+        this.destinies.forEach(destiny=>{
+            const ret = destiny.city.show()
+            if(ret) changed = true
+        })
+        if(changed){
+            mainStore.data.redrawRoads()
+        }
     }
 }

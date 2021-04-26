@@ -7,6 +7,7 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
+import ResourceIcon from './ResourceIcon.js';
 import Resource from './Resource.js';
 
 
@@ -17,11 +18,9 @@ import BuildingData from './BuildingData.js';
 import ResourceRow from './ResourceRow.js';
 
 
-
-import buildings from "./json/building.json"
-import resources from './json/resource.json';
-
 import mainStore from './MainContext.js';
+
+import i18n from 'i18n-js';
 
 const styles = StyleSheet.create({
 
@@ -79,41 +78,29 @@ const Production = (props)=>{
     const city = props.city;
     return <>
       <View style={{flexDirection:'row'}}>
-        {props.index>0?<Paragraph>or </Paragraph>:null}
+        {props.index>0?<Paragraph>{i18n.t("ui.build.or")} </Paragraph>:null}
        {production.result=='happiness'?
-       <ResourceRow prefix="Increase happiness " resource={production.result} suffix={(production.quantity/(city.population/1000)).toFixed(3)+'/'+production.delay+' days'}/>
+       <ResourceRow  showResourceName={false} prefix={i18n.t("ui.build.increase happiness")} resource={production.result} suffix={(production.quantity/(city.population/1000)).toFixed(3)+'/'+production.delay+i18n.t("ui.build.days")}/>
        :Array.isArray(production.result)?
         <View>
-             <View style={{flexDirection:'row'}}><Paragraph>Produce</Paragraph></View>
+             <View style={{flexDirection:'row'}}>
+                 {props.index==0?<Paragraph>{i18n.t("ui.build.produce")}</Paragraph>:null}
+             </View>
             {
                 production.result.map((result,index)=>{
-                    return   <View key={index} style={{flexDirection:'row',paddingLeft:10}}><ResourceRow prefix={result.key} resource={result.key} suffix={Util.number(result.quantity)}/></View>
+                    return   <View key={index} style={{flexDirection:'row',paddingLeft:10}}>
+                        <ResourceRow resource={result.key} suffix={Util.number(result.quantity)}/>
+                   </View>
                 })
             }
-            <Paragraph>/ {production.delay} days</Paragraph>
+            <Paragraph>/ {production.delay} {i18n.t("ui.build.days")}</Paragraph>
         </View>
-        :<ResourceRow prefix={"Produce "+production.result} resource={production.result} suffix={Util.number(production.quantity)+'/'+production.delay+' days'}/>
+        :<ResourceRow prefix={props.index==0?i18n.t("ui.build.produce"):''} resource={production.result} suffix={Util.number(production.quantity)+'/'+production.delay+i18n.t("ui.build.days")}/>
 
        }
         </View>
 
 
-
-       {production.cost&&props.showDetail?<>
-           <Paragraph>Production consumes</Paragraph>
-           {
-               production.cost.map((cost,index)=>{
-                   const resource = resources[cost.type];
-                   return  <View key={index} style={{flexDirection:'row',marginLeft:7}}>
-                        {cost.optional==true&&index!=0?<Paragraph>or </Paragraph>:null}
-                       <Paragraph>{cost.type}  </Paragraph>
-                       <Resource icon={resource.icon} color={resource.color}/>
-                       <Paragraph>{Util.number(cost.quantity)}</Paragraph>
-                   </View>
-               })
-           }
-       </>:null
-       }
    </>
 }
 
@@ -169,25 +156,27 @@ export default class Build extends Component {
                 :null}
                 {storage?<>
                     {storage.type=='resource'?
-                    <Paragraph>Increase resource storage capacity by {Util.number(storage.quantity)} </Paragraph>
-                    :<ResourceRow prefix={"Can hold "+storage.type} resource={storage.type} suffix={Util.number(storage.quantity)}/>
+                    <Paragraph>{i18n.t("ui.build.increase resource storage capacity by")} {Util.number(storage.quantity)} </Paragraph>
+                    :<ResourceRow prefix={i18n.t("ui.build.can hold")} resource={storage.type} suffix={Util.number(storage.quantity)}/>
                     }
                 </>:null}
-                 {unit.defense?<ResourceRow prefix="Increase Defense" resource="defense" suffix={unit.defense}/>
+                 {unit.defense?<ResourceRow prefix={i18n.t("ui.build.increase defense")}  showResourceName={false} resource="defense" suffix={unit.defense}/>
                  :null
                  }
                 {unit.cost?
                     Array.isArray(unit.cost)?<>
+                    <Paragraph>{i18n.t("ui.build.require")}</Paragraph>
+
                     {
                         unit.cost.map((cost,index)=>{
-                            return <ResourceRow key={index} prefix={"Require "+cost.type} resource={cost.type} suffix={Util.number(cost.quantity)}/>
+                            return <ResourceRow key={index}  resource={cost.type} suffix={Util.number(cost.quantity)}/>
                         })
                     }
                  </>
-                :<ResourceRow prefix={"Require "+unit.cost.type} resource={unit.cost.type} suffix={Util.number(unit.cost.quantity)}/>
+                :<ResourceRow prefix={i18n.t("ui.build.require")} resource={unit.cost.type} suffix={Util.number(unit.cost.quantity)}/>
                 :null
                 }
-                {unit.require?<ResourceRow prefix="Require" resource={unit.require} suffix={resources[unit.require].name}/>
+                {unit.require?<ResourceRow prefix={i18n.t("ui.build.require")} showResourceName={false} resource={unit.require} suffix={mainStore.data.resources[unit.require].name}/>
                  :null
                  }
             </View>
@@ -198,7 +187,7 @@ export default class Build extends Component {
              :null}
             {disabled?null:<Button  onPress={()=>this.add(unit,1)}>Build</Button>}
              <View style={{width:'100%'}}>
-                <Caption style={{textAlign:'center'}}>Takes {city.getConstructionDays(unit.delay)} days</Caption>
+                <Caption style={{textAlign:'center'}}>Takes {city.getConstructionDays(unit.delay)} {i18n.t("ui.build.days")}</Caption>
             </View>
         </>
     }
@@ -208,8 +197,8 @@ export default class Build extends Component {
 		const { unit } = this.props.route.params;
 		 const city = mainStore.selectedCity;
 
-		const arr = Object.keys(buildings).filter(key=>{
-		    const building = buildings[key];
+		const arr = Object.keys(mainStore.data.buildings).filter(key=>{
+		    const building = mainStore.data.buildings[key];
 
             if(!city.checkBuildingAvailability(building)){
                 return false;
@@ -235,7 +224,7 @@ export default class Build extends Component {
 
                    spacing={1}
                    renderItem={({ item }) => {
-            		    const building = buildings[item];
+            		    const building = mainStore.data.buildings[item];
 
                         let disabled = false;
                         const cost = building.cost;

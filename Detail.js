@@ -4,11 +4,10 @@ import { Subheading,Paragraph,Button,Caption  } from 'react-native-paper';
 
 import { observer} from "mobx-react"
 import Util from './Util.js';
-import ResourceRow from './ResourceRow.js';
-import resources from './json/resource.json';
-
 
 import mainStore from './MainContext.js'
+
+import i18n from 'i18n-js';
 
 const styles = StyleSheet.create({
 	text:{
@@ -88,19 +87,15 @@ export default class Detail extends Component{
             {detail.population>0?
             <>
                 <View style={{flexDirection:'row'}}>
-                    <Button icon="bookmark" color="white" style={{minWidth:22,width:22}} contentStyle={{marginLeft:6,marginRight:-4,height:27}}/>
-                    <Caption style={{color:'white',fontWeight: "bold"}}>{detail.factionName}</Caption>
-                </View>
-                <View style={{flexDirection:'row'}}>
+                    <Button icon="bookmark" color="white" style={{minWidth:22,width:22}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
+                    <Caption style={{color:'white',fontWeight: "bold",marginRight:8}}>{detail.factionName}</Caption>
                     <Button icon="account-multiple" color="white" style={{minWidth:16,width:16}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
                     <Caption  style={{color:'white',marginLeft:5}}>{Util.number(city.population)}</Caption>
                 </View>
                 {mainStore.stage=='game'?<>
                     <View style={{flexDirection:'row'}}>
                         <Button icon="knife-military" color="white" style={{minWidth:16,width:16}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
-                        <Caption  style={{color:'white',marginLeft:5}}>{Util.number(city.getMilitaryUnits('armed'))}</Caption>
-                    </View>
-                    <View style={{flexDirection:'row'}}>
+                        <Caption  style={{color:'white',marginLeft:5,marginRight:8}}>{Util.number(city.getMilitaryUnits('armed'))}</Caption>
                         <Button icon="chess-rook" color="white" style={{minWidth:16,width:16}} contentStyle={{marginLeft:0,marginRight:-15,height:27}}/>
                         <Caption  style={{color:'white',marginLeft:5}}>{Math.floor(city.getDefense())}/{city.getDefenseMax()}</Caption>
                     </View>
@@ -111,7 +106,7 @@ export default class Detail extends Component{
                     <>
                     {
                         Object.keys(city.snapshotSub?.resource).map(key=>{
-                            return <Button key={key} icon={resources[key].icon} color="white" style={{minWidth:24,width:24}} contentStyle={{marginLeft:6,marginRight:-4}}/>
+                            return <Button key={key} icon={mainStore.data.resources[key].icon} color="white" style={{minWidth:24,width:24}} contentStyle={{marginLeft:6,marginRight:-4}}/>
                         })
                     }
                     </>
@@ -120,18 +115,19 @@ export default class Detail extends Component{
                 </View>
                 {mainStore.stage=='start'&&detail.factionName!='None'?<Button mode="outlined"  onPress={()=>inf.chooseFaction(detail.faction)}
                     compact={true} color="white" style={{borderColor:'white',marginRight:3}} labelStyle={{fontSize:9}}>
-                    Choose
+                    {i18n.t("ui.button.choose")}
                 </Button>:null}
                 {mainStore.stage=='game'?<>
 
-                    <Button mode="outlined"  onPress={()=>this.manage(detail)}
+                    {detail.manageable?<Button mode="outlined"  onPress={()=>this.manage(detail)}
                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                        Manage
+                        {i18n.t("ui.button.manage")}
                     </Button>
-                    <Button mode="outlined"  onPress={()=>inf.info(city,detail.faction)}
-                        compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                        Info
-                    </Button>
+                    :<Button mode="outlined"  onPress={()=>inf.info(city,detail.faction)}
+                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
+                         {i18n.t("ui.button.info")}
+                     </Button>
+                     }
                 </>:null}
             </>
             :null
@@ -139,26 +135,26 @@ export default class Detail extends Component{
             {mainStore.stage=="choose"&&mainStore.movingUnit!=city?
                 <Button mode="outlined" onPress={()=>inf.go(city)}
                     compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                    Go
+                    {i18n.t("ui.button.go")}
                 </Button>
             :null}
             {city.sort=='unit'?
-                mainStore.stage=="game"?<>
+                mainStore.stage=="game"&&detail.manageable?<>
                     {city.moral>0?
                     <Button mode="outlined" onPress={()=>inf.moveUnit(city)}
                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                        Move
+                        {i18n.t("ui.button.move")}
                     </Button>
                     :null
                     }
-                    {city.type=='group'?<Button mode="outlined" onPress={()=>inf.group(city)}
+                    {city.type=='group'&&detail.manageable?<Button mode="outlined" onPress={()=>inf.group(city)}
                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                        Manage
-                    </Button>
-                    :<Button mode="outlined" onPress={()=>inf.inventory(city)}
+                        {i18n.t("ui.button.mange")}
+                    </Button>:null}
+                    {city.type!='group'&&detail.manageable?<Button mode="outlined" onPress={()=>inf.inventory(city)}
                          compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                         Inventory
-                     </Button>
+                         {i18n.t("ui.button.inventory")}
+                     </Button>:null
                     }
                     {
                         city.state=='traveling'&&city.moral>0?<Button mode="outlined" onPress={()=>city.toggleStop()}
@@ -170,7 +166,7 @@ export default class Detail extends Component{
                             city.canTrade?
                              <Button mode="outlined" onPress={()=>inf.trade(city)}
                                  compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                                 Trade
+                                 {i18n.t("ui.button.trade")}
                              </Button>
                             :null
                         }
@@ -178,7 +174,7 @@ export default class Detail extends Component{
                             city.currentLocation.id == city.city.id&&city.currentRoad==undefined?
                             <Button mode="outlined" onPress={()=>this.enter(city)}
                                  compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                                 Enter
+                                 {i18n.t("ui.button.enter")}
                             </Button>
                             :null
                         }

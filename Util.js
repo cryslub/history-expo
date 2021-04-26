@@ -148,45 +148,58 @@ import * as THREE from 'three';
 	},
 
     aStar (unit,end){
+        let start;
+        if(unit.type=='city'){
+            start = unit
+        }else{
+            if(unit.currentLocation!=undefined && unit.currentRoad==undefined){
+                if(end.category!='unit'){
+                    const result = unit.currentLocation.aStars[end.id]
+                    if(result!=undefined){
+                        return result
+                    }
+                }
+            }
 
-        if(unit.currentLocation!=undefined && unit.currentRoad==undefined){
-            if(end.category!='unit'){
-                const result = unit.currentLocation.aStars[end.id]
-                if(result!=undefined){
-                    return result
+            start = unit.currentLocation;
+            if(unit.currentRoad !=undefined){
+                const line = unit.currentRoad;
+                const road = line.road;
+
+                start = {destinies:[
+                    {city:road.destinies[0].city,cost:line.cost},
+                    {city:road.destinies[1].city,cost:line.cost}
+                ],
+                id:0}
+            }
+
+             if(end.category=='unit'){
+                if(end.currentRoad == undefined){
+                    end = end.currentLocation;
+                }else{
+                    let s;
+                    if(unit.currentRoad==undefined){
+                        s = unit.currentLocation.object.position;
+                    }else{
+                        s = unit.object.position;
+                    }
+                    if(s.distanceTo(end.currentRoad.destinies[0].city.object.position) >s.distanceTo(end.currentRoad.destinies[1].city.object.position)){
+                        end = end.currentRoad.destinies[1].city
+                    }else{
+                        end = end.currentRoad.destinies[0].city
+                    }
                 }
             }
         }
 
-        let start = unit.currentLocation;
-        if(unit.currentRoad !=undefined){
-            const line = unit.currentRoad;
-            const road = line.road;
 
-            start = {destinies:[
-                {city:road.destinies[0].city,cost:line.cost},
-                {city:road.destinies[1].city,cost:line.cost}
-            ],
-            id:0}
+        if(start.aStars){
+           const result = start.aStars[end.id]
+           if(result!=undefined){
+               return result
+           }
         }
 
-         if(end.category=='unit'){
-            if(end.currentRoad == undefined){
-                end = end.currentLocation;
-            }else{
-                let s;
-                if(unit.currentRoad==undefined){
-                    s = unit.currentLocation.object.position;
-                }else{
-                    s = unit.object.position;
-                }
-                if(s.distanceTo(end.currentRoad.destinies[0].city.object.position) >s.distanceTo(end.currentRoad.destinies[1].city.object.position)){
-                    end = end.currentRoad.destinies[1].city
-                }else{
-                    end = end.currentRoad.destinies[0].city
-                }
-            }
-        }
 
         const scores = {};
         scores[start.id] = {selected :true};
@@ -243,12 +256,12 @@ import * as THREE from 'three';
             end:end
         }
 
-        if(unit.currentLocation!=undefined && unit.currentRoad==undefined){
-            if(end.category!='unit'){
-                unit.currentLocation.aStars[end.id] = result;
-
-            }
+        if(start.aStars){
+           if(end.category!='unit'){
+               start.aStars[end.id] = result;
+           }
         }
+
 
         return result;
 

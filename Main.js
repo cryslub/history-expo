@@ -37,6 +37,12 @@ import cityStore from './CityContext.js';
 import { Provider } from 'mobx-react';
 import mainStore from './MainContext.js';
 
+import * as Localization from 'expo-localization';
+import i18n from 'i18n-js';
+
+import en from "./locale/en.json"
+import ko from "./locale/ko.json"
+
 const Stack = createStackNavigator();
 
 const theme = {
@@ -63,7 +69,16 @@ export default class Main extends Component{
 	     this.state = {
               selectedCity:{}
          };
-		    
+
+		 i18n.translations = {
+           en: en,
+           "ko-KR":ko
+         };
+         // Set the locale once at the beginning of your app.
+         //console.log( Localization.locale)
+         i18n.locale = 'en'
+
+         //i18n.locale = Localization.locale;
 	}
 	
 	componentDidMount(){
@@ -79,8 +94,8 @@ export default class Main extends Component{
                     <Stack.Navigator initialRouteName="Home">
                         <Stack.Screen name="Home" component={Interface} options={{ headerStyle: {height: 0},title:''}} onLoad={this.onLoad}/>
                         <Stack.Screen name="Scenario" component={Scenario} options={{ title:'Select Scenario'}}/>
-                        <Stack.Screen name="FactionList" component={FactionList} options={{ title:'Select Faction'}}/>
-                        <Stack.Screen name="Deployed" component={Deployed} options={{ title:'Deployed Units'}}/>
+                        <Stack.Screen name="FactionList" component={FactionList} options={{ title:i18n.t("ui.title.faction list")}}/>
+                        <Stack.Screen name="Deployed" component={Deployed} options={{ title:i18n.t("ui.title.deployed")}}/>
 
                         <Stack.Screen name="Manage" component={Manage}
                                 options={({ route }) => ({
@@ -109,15 +124,15 @@ export default class Main extends Component{
                                         </View>}
                                 )}
                          />
-                         <Stack.Screen name="HeroList" component={HeroList} options={({ route }) => ({ title: "Select Governor" })}/>
-                         <Stack.Screen name="SelectChancellor" component={SelectChancellor} options={({ route }) => ({ title: "Select Chancellor" })}/>
+                         <Stack.Screen name="HeroList" component={HeroList} options={({ route }) => ({ title: i18n.t("ui.title.hero list") })}/>
+                         <Stack.Screen name="SelectChancellor" component={SelectChancellor} options={({ route }) => ({ title: i18n.t("ui.title.select chancellor") })}/>
 
-                        <Stack.Screen name="Employ" component={Employ} options={{ title:'Add Unit'}}/>
-                        <Stack.Screen name="Build" component={Build} options={{ title:'Build'}}/>
-                        <Stack.Screen name="Assign" component={Assign} options={{ title:'Assign'}}/>
+                        <Stack.Screen name="Employ" component={Employ} options={{ title:i18n.t("ui.title.employ")}}/>
+                        <Stack.Screen name="Build" component={Build} options={{ title:i18n.t("ui.title.build")}}/>
+                        <Stack.Screen name="Assign" component={Assign} options={{ title: i18n.t("ui.title.assign")}}/>
                         <Stack.Screen name="Equip" component={Equip}
                             options={({ navigation, route }) => ({
-                                 title:'Inventory',
+                                 title: i18n.t("ui.title.equip"),
                                 headerLeft: (props) => (
                                     <HeaderBackButton
                                       {...props}

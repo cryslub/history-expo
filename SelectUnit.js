@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity  } from 'react-native';
+import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity ,SafeAreaView } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu,TextInput } from 'react-native-paper';
 import { FlatGrid } from 'react-native-super-grid';
 
@@ -7,16 +7,12 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
-import ResourceRow from './ResourceRow.js';
 
 
 
 import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
-import unitProto from "./json/unit.json"
-import resources from './json/resource.json';
 
 import { observer,inject } from "mobx-react"
 
@@ -109,7 +105,7 @@ export const SelectUnit = ((props) => {
 
 
       return (
-        <ScrollView style={{padding:10}}>
+        <SafeAreaView style={{padding:10}}>
              <Caption>You can select {10-unit.units.length} units</Caption>
              <FlatGrid
                 itemDimension={mainStore.unitSize}
@@ -122,7 +118,7 @@ export const SelectUnit = ((props) => {
               />
 
 
-        </ScrollView>
+        </SafeAreaView>
       );
 
 	

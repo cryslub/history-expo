@@ -7,12 +7,10 @@ import { FlatGrid } from 'react-native-super-grid';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
+import ResourceIcon from './ResourceIcon.js';
 
 import mainStore from './MainContext.js';
 import Hero from './Hero.js';
-
-import resources from './json/resource.json';
 
 
 const Unit = (props) =>{
@@ -75,7 +73,8 @@ export  const  Building =  (observer((props) => {
 
     const equip = (unit)=>{
          mainStore.pause();
-         props.navigation.navigate('Equip', {unit:unit});
+        mainStore.selectedUnit = unit
+         props.navigation.navigate('Equip');
     }
 
     const select = (value)=>{
@@ -109,7 +108,7 @@ export  const  Building =  (observer((props) => {
              <Paragraph>Resource storage capacity {Util.number(storage.quantity*building.completedQuantity)} </Paragraph>
              :<View style={{flexDirection:'row'}}>
                 <Paragraph>Can hold {storage.type}</Paragraph>
-                <Resource icon={resources[storage.type].icon} />
+                <ResourceIcon icon={mainStore.data.resources[storage.type].icon} />
                 <Paragraph>{Util.number(storage.quantity*building.completedQuantity)}</Paragraph>
              </View>
              }
@@ -121,7 +120,7 @@ export  const  Building =  (observer((props) => {
                <ToggleButton.Row onValueChange={value => select(value)} value={building.selectedProduction} >
                   {
                     building.data.production.map((p,index)=>{
-                        return   <ToggleButton key={index} icon={resources[p.result].icon} value={index} disabled={building.state=='deploy'}/>
+                        return   <ToggleButton key={index} icon={mainStore.data.resources[p.result].icon} value={index} disabled={building.state=='deploy'}/>
                     })
                   }
                </ToggleButton.Row>
@@ -134,7 +133,7 @@ export  const  Building =  (observer((props) => {
                        return <View style={{flexDirection:'row'}} key={index}>
                        {cost.optional==true&&index!=0?<Paragraph>or </Paragraph>:null}
                         <Paragraph>{cost.type}  </Paragraph>
-                        <Resource icon={resources[cost.type].icon} />
+                        <ResourceIcon icon={mainStore.data.resources[cost.type].icon} />
                         <Paragraph>{Util.number(cost.quantity)}</Paragraph>
                       </View>
                    })
@@ -154,7 +153,7 @@ export  const  Building =  (observer((props) => {
            {production.result=='happiness'?
             <View style={{flexDirection:'row'}}>
                 <Paragraph>Increase happiness </Paragraph>
-                <Resource icon={resources[production.result].icon}/>
+                <ResourceIcon icon={mainStore.data.resources[production.result].icon}/>
                 <Paragraph>{(building.getResultQuantity(production.quantity)/(city.population/1000)).toFixed(3)}/{production.delay} days</Paragraph>
             </View>
            :<>
@@ -165,7 +164,7 @@ export  const  Building =  (observer((props) => {
                 production.result.map(result=>{
                     return <>
                          <Paragraph>{result.key} </Paragraph>
-                         <Resource icon={resources[result.key].icon}/>
+                         <ResourceIcon icon={mainStore.data.resources[result.key].icon}/>
                          <Paragraph>{Util.number(building.getResultQuantity(result.quantity))} </Paragraph>
                     </>
                 })
@@ -177,7 +176,7 @@ export  const  Building =  (observer((props) => {
                </>
                :<View style={{flexDirection:'row'}}>
                  <Paragraph>{production.result} </Paragraph>
-                 <Resource icon={resources[production.result].icon}/>
+                 <ResourceIcon icon={mainStore.data.resources[production.result].icon}/>
                  <Paragraph>{Util.number(building.getResultQuantity(production.quantity))}  will be produced with max effort</Paragraph>
                </View>
            }

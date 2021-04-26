@@ -23,7 +23,7 @@
       "build": ["farm"],
       "assign": true,
       "equip": {
-        "Main Hand": [
+        "main hand": [
           {
             "key": "stone tool",
             "name": "Stone Tool",
@@ -58,7 +58,7 @@
             }
           }
         ],
-        "Livestock":[
+        "livestock":[
           {
             "key": "ox",
             "name": "Ox",
@@ -71,7 +71,7 @@
               "production result" : 20
             }
           }],
-        "Cart": [
+        "cart": [
           {
             "key": "cart",
             "name": "Cart",
@@ -100,11 +100,12 @@
     "speed": 25,
     "capacity": 50,
     "food consume": 1.5,
+    "wage": 3,
     "action": {
       "build": ["residence","irrigation","mud","clay","stone","wood","tin","copper","livestock","wool","granary","warehouse","armoury","trade","market","wall"],
       "assign": true,
       "equip": {
-        "Main Hand": [
+        "main hand": [
           {
             "key": "stone tool",
             "name": "Stone Tool",
@@ -142,7 +143,7 @@
             }
           }
         ],
-        "Livestock":[
+        "livestock":[
         {
           "key": "donkey",
           "name": "Donkey",
@@ -157,7 +158,7 @@
             "construction speed" : 10
           }
         }],
-        "Cart": [
+        "cart": [
         {
           "key": "cart",
           "name": "Cart",
@@ -189,11 +190,12 @@
     "description": "Can build or assigned to various crafting places",
     "delay": 4,
     "manpower": 10,
+    "wage": 1,
     "action": {
-      "build": ["brick","pottery","cloth","furnace","beer","tavern","kiln","library","toolsmith","leather","polished","workshop","melee","ranged","armoursmith"],
+      "build": ["brick","pottery","cloth","furnace","beer","tavern","tablet","library","toolsmith","leather","polished stone","workshop","melee","ranged","armoursmith"],
       "assign": true,
       "equip": {
-        "Main Hand": [
+        "main hand": [
           {
             "key": "stone tool",
             "name": "Stone Tool",
@@ -246,6 +248,7 @@
     "description": "Can serve in a temple or beer places",
     "delay": 10,
     "manpower": 10,
+    "wage": 3,
     "action": {
       "assign": true
     }
@@ -260,6 +263,7 @@
     "speed": 20,
     "capacity": 0,
     "manpower": 5,
+    "wage": 3,
     "action": {
       "assign": true,
       "deploy": true
@@ -276,11 +280,12 @@
     "manpower": 10,
     "speed": 30,
     "capacity": 10,
+    "wage": 2,
     "action": {
       "assign": true,
       "deploy": true,
       "equip": {
-        "Livestock": [
+        "livestock": [
           {
             "key": "donkey",
             "name": "Donkey",
@@ -294,7 +299,7 @@
             }
           }
         ],
-        "Cart": [
+        "cart": [
           {
             "key": "cart",
             "name": "Cart",
@@ -324,9 +329,10 @@
     "description": "Can defend their own hometown. Cannot be deployed to outside of city.",
     "delay": 3,
     "manpower": 100,
+    "wage": 1,
     "action": {
       "equip":{
-        "Main Hand":[ {
+        "main hand":[ {
           "key": "sling",
           "name": "Sling",
           "description": "2 range, 10 blunt damage",
@@ -355,6 +361,7 @@
     "description": "Basic fighters.  +100% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
+    "wage": 10,
     "speed": 25,
     "food consume": 2,
     "capacity": 100,
@@ -362,7 +369,7 @@
       "deploy": true,
       "assign": true,
       "equip":{
-        "Main Hand":[ {
+        "main hand":[ {
           "key": "mace",
           "name": "Mace",
           "description": "10 blunt damage, 30 weight",
@@ -387,10 +394,10 @@
         }
 
         ],
-        "Cloak":[
+        "cloak":[
           {
             "key": "cloak",
-            "name": "Leather Cloak",
+            "name": "Leather cloak",
             "description": "+1 moral, +2 slash defense, -1 piercing defense",
             "require": {
               "cloak": 100
@@ -402,7 +409,7 @@
             }
           }
         ],
-        "Head": [
+        "head": [
           {
             "key": "Helmet",
             "name": "Copper Helmet",
@@ -436,6 +443,7 @@
     "description": "Main tankers. +100% extra food consumption when traveling",
     "delay": 35,
     "manpower": 100,
+    "wage": 10,
     "capacity": 100,
     "speed": 25,
     "food consume": 2,
@@ -443,7 +451,7 @@
       "deploy": true,
       "assign": true,
       "equip": {
-        "Main Hand": [
+        "main hand": [
           {
             "key": "copper spear",
             "name": "Copper Spear",
@@ -457,10 +465,10 @@
             }
           }
         ],
-        "Cloak": [
+        "cloak": [
           {
             "key": "cloak",
-            "name": "Leather Cloak",
+            "name": "Leather cloak",
             "description": "+1 moral, +2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 100
@@ -472,7 +480,7 @@
             }
           }
         ],
-        "Head": [
+        "head": [
           {
             "key": "Helmet",
             "name": "Copper Helmet",
@@ -525,6 +533,7 @@
     "description": "Main range unit. +50% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
+    "wage": 10,
     "speed": 25,
     "food consume": 1.5,
     "capacity": 100,
@@ -532,7 +541,7 @@
       "deploy": true,
       "assign": true,
       "equip": {
-        "Main Hand": [
+        "main hand": [
           {
             "key": "bow",
             "name": "Bow",
@@ -590,10 +599,10 @@
             }
           }
         ],
-        "Cloak": [
+        "cloak": [
           {
             "key": "cloak",
-            "name": "Leather Cloak",
+            "name": "Leather cloak",
             "description": "+1 moral, +2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 100
@@ -605,7 +614,7 @@
             }
           }
         ],
-        "Head": [
+        "head": [
           {
             "key": "Helmet",
             "name": "Copper Helmet",
@@ -639,6 +648,7 @@
     "description": "Light infantry unit. +50% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
+    "wage": 10,
     "speed": 25,
     "food consume": 1.5,
     "capacity": 100,
@@ -646,7 +656,7 @@
       "deploy": true,
       "assign": true,
       "equip":{
-        "Main Hand":[
+        "main hand":[
           {
           "key": "copper javelin",
           "name": "Copper Javelin",
@@ -678,10 +688,10 @@
           }
         }
         ] ,
-        "Cloak": [
+        "cloak": [
           {
             "key": "cloak",
-            "name": "Leather Cloak",
+            "name": "Leather cloak",
             "description": "+1 moral, +2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 100
@@ -692,7 +702,7 @@
               "piercingDefense":1
             }
         }],
-        "Head": [
+        "head": [
           {
             "key": "Helmet",
             "name": "Copper Helmet",
@@ -723,17 +733,18 @@
     "type": "charioteer",
     "category": "army",
     "icon": "buddhism",
-    "description": "Tank of ancient era. +100% extra food consumption when traveling",
+    "description": "Tank of ancient era. +150% extra food consumption when traveling",
     "delay": 50,
     "manpower": 50,
+    "wage": 20,
     "speed": 25,
-    "food consume": 2,
+    "food consume": 2.5,
     "capacity": 25,
     "action": {
       "deploy": true,
       "assign": true,
       "equip": {
-        "Main Hand": [
+        "main hand": [
           {
             "key": "copper javelin",
             "name": "Copper Javelin",
@@ -750,7 +761,7 @@
             }
           }
         ],
-        "Chariot": [
+        "cart": [
           {
             "key": "chariot",
             "name": "Chariot",
@@ -769,10 +780,10 @@
             }
           }
         ],
-        "Cloak": [
+        "cloak": [
           {
             "key": "cloak",
-            "name": "Leather Cloak",
+            "name": "Leather cloak",
             "description": "+1 moral, +2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 50
@@ -784,7 +795,7 @@
             }
           }
         ],
-        "Head": [
+        "head": [
           {
             "key": "Helmet",
             "name": "Copper Helmet",
@@ -803,11 +814,15 @@
         ]
       }
     },
-    "cost": {
-      "type": "happiness",
-      "quantity": 5,
-      "equip": true
-    }
+    "cost": [
+      {
+        "type": "happiness",
+        "quantity": 5
+      },{
+        "type": "silver",
+        "quantity": 5
+      }
+    ]
   }
 
 }

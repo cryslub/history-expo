@@ -7,7 +7,6 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 import ResourceRow from './ResourceRow.js';
 
 
@@ -15,65 +14,13 @@ import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
 import buildings from "./json/building.json"
-import resources from './json/resource.json';
 
 import mainStore from './MainContext.js';
 
 import {Resources,Moral} from './Common.js';
 
 import { observer} from "mobx-react"
-
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
-
+import i18n from 'i18n-js';
 
 
 const NearByUnit = (props) =>{
@@ -221,7 +168,7 @@ const Equipment = (props)=>{
                Object.keys(e.require).map(key=>{
                    return <>
                        <Paragraph style={{marginLeft:5}}> </Paragraph>
-                       <ResourceRow prefix={resources[key].name} resource={key} suffix={e.require[key]}/>
+                       <ResourceRow prefix={mainStore.data.resources[key].name} resource={key} suffix={e.require[key]}/>
                    </>
 
                })
@@ -250,7 +197,7 @@ export default class Equip extends Component {
     }
 
     transferToUnit = (key)=>{
-         const { unit } = this.props.route.params;
+         const unit = mainStore.selectedUnit
          const city = unit.currentLocation;
 
         const quantity = Math.min(this.state.amount,        unit.capacity - unit.carrying)
@@ -259,7 +206,8 @@ export default class Equip extends Component {
     }
 
     transferToCity = (key)=>{
-         const { unit } = this.props.route.params;
+         const unit = mainStore.selectedUnit
+
          const city = unit.currentLocation;
          if(city.factionData.id==mainStore.selectedFaction.id){
 
@@ -271,18 +219,21 @@ export default class Equip extends Component {
     }
 
     onExchange = (target)=>{
-        const { unit } = this.props.route.params;
+         const unit = mainStore.selectedUnit
+
         this.props.navigation.navigate('Exchange', {unit:unit,target:target});
     }
 
     change = (key)=>{
-         const { unit } = this.props.route.params;
-        this.props.navigation.navigate('ChangeEquip', {unit:unit,key:key});
+         const unit = mainStore.selectedUnit
+
+        this.props.navigation.navigate('ChangeEquip', {key:key});
     }
 
 	render(){
 
-		const { unit } = this.props.route.params;
+         const unit = mainStore.selectedUnit
+
 		 const city = unit.currentLocation;
 
 		const arr = Object.keys(city.buildings).filter(key=>{
@@ -306,20 +257,20 @@ export default class Equip extends Component {
 
 		    {deploy==true?<>
                 <View style={{flexDirection:'row'}}>
-                   <Paragraph >Capacity </Paragraph>
+                   <Paragraph >{i18n.t("ui.equip.capacity")} </Paragraph>
                    {unit.inGroup!=true?<Caption>{Math.floor(unit.carrying)}/</Caption>:null}
-                   <Caption>{unit.capacity} units</Caption>
-                   <Paragraph style={{marginLeft:5}}>Speed </Paragraph>
-                   <Caption>{unit.speed}km/day</Caption>
+                   <Caption>{unit.capacity} {i18n.t("ui.equip.units")}</Caption>
+                   <Paragraph style={{marginLeft:5}}>{i18n.t("ui.equip.speed")} </Paragraph>
+                   <Caption>{unit.speed}km/{i18n.t("ui.common.day")}</Caption>
                 </View>
                 <Divider/>
             </>:null}
-            <Caption>Equipments</Caption>
+            <Caption>{i18n.t("ui.equip.equipments")}</Caption>
             {
                 Object.keys(equip).map(key=>{
                     return <View style={{flexDirection:'row'}} key={key}>
-                        <Paragraph>{key} </Paragraph>
-                        <Caption> {unit.equipments[key]==undefined?'None':unit.equipments[key].data.name} </Caption>
+                        <Paragraph>{i18n.t("ui.equip.type."+key)} </Paragraph>
+                        <Caption> {unit.equipments[key]==undefined?i18n.t("ui.equip.none"):unit.equipments[key].data.name} </Caption>
                         <Button icon="playlist-edit" onPress={()=>this.change(key)} />
                     </View>
                 })
@@ -328,7 +279,7 @@ export default class Equip extends Component {
             {unit.inGroup!=true?<Resources unit={unit} />:null}
             {unit.nearByUnits.length>0?
             <>
-                <Caption>Near by units</Caption>
+                <Caption>{i18n.t("ui.equip.near by units")}</Caption>
                 {
                     unit.nearByUnits.map((u,index)=>{
                         return <NearByUnit key={index} unit={u} onExchange={this.onExchange}/>

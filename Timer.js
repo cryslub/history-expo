@@ -4,10 +4,13 @@ import addHours from 'date-fns/addHours'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 import differenceInCalendarMonths from 'date-fns/differenceInCalendarMonths'
 import differenceInCalendarWeeks from 'date-fns/differenceInCalendarWeeks'
+import differenceInCalendarYears from 'date-fns/differenceInCalendarYears'
+
 
 
 
 export default   function timer(data){
+
    if(mainStore.speed>0){
 
         const newDate = addHours(mainStore.date,mainStore.speed*6);
@@ -16,6 +19,7 @@ export default   function timer(data){
 
 
         const monthDiff = differenceInCalendarMonths( newDate,mainStore.date);
+        const yearlyDiff = differenceInCalendarYears( newDate,mainStore.date);
 
 
        mainStore.setDate(newDate);
@@ -36,7 +40,7 @@ export default   function timer(data){
        dailyJob(data,diff);
        weeklyJob(data,weekDiff);
        monthlyJob(data,monthDiff);
-
+       annualJob(data,yearlyDiff);
    }
 }
 
@@ -93,5 +97,12 @@ function monthlyJob(data,diff){
                 }
             }
         });
+    }
+}
+
+
+function annualJob(data,diff){
+    if(diff>0){
+        mainStore.checkHeroMaturity()
     }
 }

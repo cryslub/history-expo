@@ -7,16 +7,12 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
-import ResourceRow from './ResourceRow.js';
 import Hero from './Hero.js';
 
 
 import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
-import unitProto from "./json/unit.json"
-import resources from './json/resource.json';
 
 import { observer,inject } from "mobx-react"
 
@@ -79,7 +75,7 @@ const styles = StyleSheet.create({
 
 export const Group =  (observer((props) => {
 
-     const { unit} = props.route.params;
+         const unit = mainStore.selectedUnit
 
     const removeHero = ()=>{
         const city = unit.currentLocation;

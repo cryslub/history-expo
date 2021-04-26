@@ -64,15 +64,7 @@ export default class VariableObjects{
 	  var self = this;
 	  
 	  this.textlabels = [];
-	  
-	  if( this._baseGeometry !== undefined){
-//		  while (scene.children.length>8)
-//		  {
-//			  scene.remove(scene.children[8]);
-//		  }
-		  
-	  }
-	  
+
 	  var  color;
 
     this.is_animated = false;
@@ -81,7 +73,7 @@ export default class VariableObjects{
 	self.objects = [];
 
 
-    var subgeo = new THREE.Geometry();
+//    var subgeo = new THREE.Geometry();
     data.forEach(function(city){
         if(city.color === null){
         	color = new THREE.Color("#ffffff");        	
@@ -92,7 +84,7 @@ export default class VariableObjects{
         
         city.object = self.makePoint(city, city.population, color);
         
-        subgeo.merge(city.object.geometry, city.object.matrix);
+     //   subgeo.merge(city.object.geometry, city.object.matrix);
         self.scene.add(city.object);
         
         self.objects.push(city.object);
@@ -101,7 +93,7 @@ export default class VariableObjects{
 
     });
 
-      this._baseGeometry = subgeo;
+//      this._baseGeometry = subgeo;
       
      // this.setTextLabels(this.textlabels)
 
@@ -129,7 +121,7 @@ export default class VariableObjects{
 		
 		
 	    var material = new THREE.MeshBasicMaterial( {color: color} );
-	
+
 		var point = new THREE.Mesh(geometry,material);
 	
 	
@@ -181,7 +173,11 @@ export default class VariableObjects{
 	    var wireframe = new THREE.LineSegments( geo, mat );
 	    wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
 	    point.add( wireframe );
-	    
+
+         if(city.factionData.id==0){
+            point.visible = false
+        }
+
 	    return point;
   }
   
@@ -333,7 +329,9 @@ export default class VariableObjects{
 	    var wireframe = new THREE.LineSegments( geo, mat );
 	    wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
 	    point.add( wireframe );
-	    
+
+
+
 	    return point;
     
   }
@@ -435,6 +433,7 @@ export default class VariableObjects{
 
          this.addDom(point,unit,'unit');
          unit.object = point;
+         point.visible = unit.explored
          return point;
     }
 
@@ -554,7 +553,8 @@ export default class VariableObjects{
 
 		this.detailHtml.population = city.population;
 		this.detailHtml.city = city;
-		  
+		this.detailHtml.manageable =city.factionData?.id==mainStore.selectedFaction.id
+
 		if(city.factionData.id > 0){
 		    this.detailHtml.color = city.factionData.color;
 	    	this.detailHtml.isCapital=city.factionData.capital.id == city.id;
@@ -575,7 +575,7 @@ export default class VariableObjects{
   	
   		var self =this;
   		
-  		if(city===undefined) city = {factionData:{}};
+  		if(city===undefined) city = {factionData:{},detail:true};
 	    
 	    return {
 	    	top:-1000,
@@ -590,12 +590,12 @@ export default class VariableObjects{
 	    	setParent: function(threejsobj) {
 	          this.parent = threejsobj;
 	        },
-	        updatePosition: function(show,camera,height) {
+	        updatePosition: function(show,camera,width,height) {
                 if(this.parent) {
                   this.position.copy(this.parent.position);
                 }
 
-                var coords2d = this.get2DCoords(this.position, camera,height);
+                var coords2d = this.get2DCoords(this.position, camera,width,height);
                 this.left = coords2d.x ;
                 this.top = coords2d.y;
                 if(mainStore.selectedFaction){
@@ -623,13 +623,14 @@ export default class VariableObjects{
                     }
 
                 }
+                if(city.object?.visible==false && !city.detail) this.added=false
 
 		        	
 	
 	      },
-	      get2DCoords: function(position, camera,height) {
+	      get2DCoords: function(position, camera,width,height) {
 	        var vector = position.project(camera);
-	        vector.x = (vector.x + 1)/2 * window.innerWidth;
+	        vector.x = (vector.x + 1)/2 * width;
 	        vector.y = -(vector.y - 1)/2 * height;
 	        return vector;
 	      }
@@ -644,14 +645,14 @@ export default class VariableObjects{
 		
 	  }
 	 
-	 render(mouse,camera,height){
+	 render(mouse,camera,width,height){
 		 
 		 for(var i=0; i<this.textlabels.length; i++) {
-  	      	this.textlabels[i].updatePosition(false,camera,height);
+  	      	this.textlabels[i].updatePosition(false,camera,width,height);
     	 }
 		// this.setTextLabels(this.textlabels)
 		 if(this.detailHtml!=undefined)
-			 this.detailHtml.updatePosition(true,camera,height);
+			 this.detailHtml.updatePosition(true,camera,width,height);
 		 return {textlabels:this.textlabels,detail:this.detailHtml}
 		 
 	 }

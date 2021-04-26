@@ -7,14 +7,12 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 
 
 import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
 import buildings from "./json/building.json"
-import resources from './json/resource.json';
 
 import mainStore from './MainContext.js';
 
@@ -128,8 +126,7 @@ export default class Assign extends Component {
             })
 		}
 
-		return <ScrollView contentContainerStyle={{ padding: 10 }}>
-		<FlatGrid
+		return 	<FlatGrid
                    itemDimension={mainStore.unitSize}
                    data={arr}
 
@@ -140,7 +137,6 @@ export default class Assign extends Component {
                    }}
          />
 
-	     </ScrollView>
 	}
 	
 }

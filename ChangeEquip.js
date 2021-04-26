@@ -7,7 +7,6 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 import ResourceRow from './ResourceRow.js';
 
 
@@ -15,7 +14,6 @@ import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
 import buildings from "./json/building.json"
-import resources from './json/resource.json';
 
 import mainStore from './MainContext.js';
 
@@ -35,28 +33,38 @@ const Equipment = (props)=>{
     const e = props.data;
     const unit = props.unit;
     const index = props.index
+    const city = props.city;
 
+    const onSelect = ()=>{
+        if(!props.disabled)
+            props.onSelect()
+    }
 
-    return  <Surface style={{marginBottom:10,padding:10,width:300,minHeight:80}} key={'equipment-'+index}>
-       <View style={{flexDirection:'row'}}>
-           <Subheading style={{marginLeft:5,top: -3,position: 'relative'}}>{e.name} </Subheading>
+    return  <Surface style={{marginBottom:10,padding:10,width:'100%',minHeight:80,opacity:props.disabled?0.5:1}} >
+        <TouchableOpacity onPress={onSelect}>
+           <View style={{flexDirection:'row'}}>
+               <Subheading style={{marginLeft:5,top: -3,position: 'relative'}}>{e.name} </Subheading>
+                {props.equipped?<Icon icon="check-bold" style={{right: -24,position: 'absolute'}} />:null}
+           </View>
+           <Caption>{e.description} </Caption>
+           {e.require?
+           <View style={{flexDirection:'row'}}>
+               <Paragraph >Require</Paragraph>
+               {
+                   Object.keys(e.require).map(key=>{
 
-       </View>
-       <Caption>{e.description} </Caption>
-       {e.require?
-       <View style={{flexDirection:'row'}}>
-           <Paragraph >Require</Paragraph>
-           {
-               Object.keys(e.require).map(key=>{
-                   return <View key={key}>
-                       <Paragraph style={{marginLeft:5}}> </Paragraph>
-                       <ResourceRow prefix={resources[key].name} resource={key} suffix={e.require[key]}/>
-                   </View>
+                        const availability = city.resources[key]>=e.require[key]
 
-               })
-           }
-       </View>
-       :null}
+                       return <>
+                           <Paragraph style={{marginLeft:2}}> </Paragraph>
+                           <ResourceRow prefix={mainStore.data.resources[key].name} resource={key} suffix={e.require[key]} color={availability?'white':'red'}/>
+                       </>
+
+                   })
+               }
+           </View>
+           :null}
+       </TouchableOpacity>
    </Surface>
 }
 
@@ -65,12 +73,13 @@ const Equipment = (props)=>{
 export const ChangeEquip = (props)=>{
 
 
-		const { unit } = props.route.params;
+         const unit = mainStore.selectedUnit
+
 		 const city = unit.currentLocation;
 		const { key } = props.route.params;
 		const equipment = unit.equipments[key];
 
-        let equipIndex = 1;
+        let equipIndex = 0;
         if(unit.equipments[key]){
             unit.data.action.equip[key].forEach((equipment,index)=>{
                 if(equipment == unit.equipments[key].data)   equipIndex = index+2;
@@ -95,10 +104,10 @@ export const ChangeEquip = (props)=>{
             if(unit.equipments[key]){
                 bringResource(true,unit.equipments[key].data,unit.equipments[key].amount)
             }
-            if(id==1){
+            if(id==0){
                 unit.setEquipment(key,undefined)
             }else{
-                const equipment = unit.data.action.equip[key][id-2];
+                const equipment = unit.data.action.equip[key][id-1];
                 unit.setEquipment(key,{data:equipment,amount:1})
                 setAmount(1)
                 bringResource(false,equipment,1)
@@ -133,22 +142,18 @@ export const ChangeEquip = (props)=>{
             }
         }
 
+        const onSelect = (value)=>{
+            setValue(value);
+            change(value)
+        }
+
 		return <ScrollView contentContainerStyle={{ padding: 10 }}>
-		     <RadioButton.Group onValueChange={value => {setValue(value);change(value)}} value={value}>
-                 <RadioButton.Item   label={
-                     <Equipment data={{name:'None'}} unit={unit}/>
-                } value={1} />
-                {
-
-                    unit.data.action.equip[key].map((equipment,index)=>{
-
-
-                        return <RadioButton.Item  key={index} disabled={!unit.isEquipmentAvailable(equipment)} label={
-                            <Equipment data={equipment} unit={unit} index={index} key={index}/>
-                       } value={index+2} />
-                    })
-                }
-            </RadioButton.Group>
+            <Equipment data={{name:'None'}} unit={unit}  equipped={value==0} onSelect={()=>onSelect(0)}/>
+            {unit.data.action.equip[key].map((equipment,index)=>{
+                    return <Equipment data={equipment} unit={unit} city={city} index={index+1} key={index} equipped={(index+1)==value}
+                        disabled={!unit.isEquipmentAvailable(equipment)} onSelect={()=>onSelect(index+1)}/>
+                })
+            }
              {equipment?.data.instant==true?
                 <View style={{flexDirection:'row'}}>
                     <Paragraph>Quantity </Paragraph>

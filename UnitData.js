@@ -5,8 +5,6 @@ import * as THREE from 'three';
 import mainStore from './MainContext.js';
 import Util from './Util.js';
 import {SubUnits} from './Common.js'
-import unitProto from "./json/unit.json"
-import buildings from "./json/building.json"
 
 const maxWidth = mainStore.unitSize;
 
@@ -39,6 +37,7 @@ export default class UnitData extends SubUnits{
     distanceFromLast = 0;
     pause = false;
     moral = 0;
+    explored = true
 
     constructor(unit,city,sort) {
 
@@ -223,13 +222,21 @@ export default class UnitData extends SubUnits{
             bonus+=Util.isEmpty(this.city.effect['militia damage'])
         }
 
+        if(this.parent!=undefined){
+            this.moral = parent.moral
+        }
         const moral = Math.max(0,this.moral?this.moral:this.city.happiness)
-        bonus -= (100-moral)
+        const isCritical = moral > Math.random()*100
+        if(isCritical){
+            bonus = 50
+        }
+//        bonus -= (100-moral)
 
         return {
                     piercing:this.getEffect('piercingDamage') * (1+bonus/100),
                     blunt:this.getEffect('bluntDamage') * (1+bonus/100),
-                    slash:this.getEffect('slashDamage') * (1+bonus/100)};
+                    slash:this.getEffect('slashDamage') * (1+bonus/100),
+                    isCritical:isCritical};
     }
 
     attackUnit = (foes,damage)=>{
@@ -316,6 +323,14 @@ export default class UnitData extends SubUnits{
                    if(!unit.onDeploy()){
                         unit.city.population-=d
                    }
+                   if(damage.isCritical){
+                        if(unit.parent==undefined){
+                            unit.moral--
+                        }else{
+                            unit.parent.moral -= 1/unit.parent.units.length
+                        }
+
+                    }
                    if(Math.floor(unit.men)<=0){
                         unit.dead();
                    }
@@ -345,7 +360,9 @@ export default class UnitData extends SubUnits{
        if(this.hero !=undefined){
           this.city.addHero(this.hero)
        }
-
+        if(this.data.wage){
+            this.city.wage-=this.data.wage
+        }
     }
 
      disband = () =>{
@@ -367,7 +384,9 @@ export default class UnitData extends SubUnits{
         })
 
         city.removeUnit(this);
-
+        if(this.data.wage){
+            city.wage-=this.data.wage
+        }
     }
 
     attackWall = (city,damage,mod)=>{
@@ -391,6 +410,9 @@ export default class UnitData extends SubUnits{
     dailyJob = (diff)=>{
       this.consumeFood(diff);
       this.moral-=0.5
+      if(this.currentRoad?.road.type=='desert'){
+        this.moral-=0.25
+      }
       if(this.getTotalDamage()>0){
          this.fighting();
        }else{
@@ -808,6 +830,12 @@ export default class UnitData extends SubUnits{
 
     nextPath = (target)=>{
         this.currentLocation = target;
+        if(this.city.factionData.id==mainStore.selectedFaction.id){
+            this.currentLocation.reached()
+
+        }else{
+            this.checkVisible()
+        }
         this.pathIndex++;
         this.initPath();
     }
@@ -940,6 +968,9 @@ export default class UnitData extends SubUnits{
         if(this.hero){
             this.moral += this.hero.authority/10
         }
+        this.units.forEach(unit=>{
+            unit.moral = this.moral
+        })
     }
 
     onDeploy(){
@@ -956,7 +987,10 @@ export default class UnitData extends SubUnits{
     move(position,speed){
 
         const object = this.object;
-        return mainStore.objects.move(position,object,speed);
+        const ret = mainStore.objects.move(position,object,speed);
+        mainStore.scene.current.rendered = false
+        console.log("move")
+        return ret
     }
 
     toggleStop(){
@@ -1008,6 +1042,7 @@ export default class UnitData extends SubUnits{
 
         return {
              type:this.data.type,
+             explored:this.explored,
              sort:this.sort,
              state:this.state,
              resources:this.resources,
@@ -1036,10 +1071,13 @@ export default class UnitData extends SubUnits{
     parseCoreData(saved,data){
 
         if(saved.sort =='unit'){
-            this.setBaseData(unitProto[saved.type])
+            this.setBaseData(mainStore.data.units[saved.type])
         }else{
-            this.setBaseData(buildings[saved.key])
+            this.setBaseData(mainStore.data.buildings[saved.key])
         }
+
+
+        this.explored = saved.explored
 
         this.setCity(data.cities[saved.city])
         this.sort = saved.sort
@@ -1057,7 +1095,7 @@ export default class UnitData extends SubUnits{
         this.destination = data.cities[saved.destination]
         this.targetUnit = saved.targetUnit
 
-        if(this.destination){
+        if(this.destination && this.destination.id!=this.currentLocation.id){
             const result = Util.aStar(this,this.destination)
             this.path = result.path
         }
@@ -1078,5 +1116,24 @@ export default class UnitData extends SubUnits{
         if(saved.job){
             mainStore.jobs.push(this)
         }
+    }
+
+    checkVisible(){
+        if(this.explored != this.currentLocation.explored){
+            this.explored = this.currentLocation.explored
+            if(this.explored){
+                this.show()
+            }else{
+                this.hide()
+            }
+        }
+    }
+
+    hide(){
+        this.object.visible = false
+    }
+
+    show(){
+        this.object.visible = true
     }
 }

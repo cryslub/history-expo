@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import i18n from 'i18n-js';
 
 import {  View,StyleSheet ,ScrollView } from 'react-native';
 
@@ -34,8 +35,8 @@ export default class ConfirmDialog extends Component{
           {this.state.text}
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => this.setState({show:false})}>Cancel</Button>
-            <Button onPress={() => this.onOK()}>OK</Button>
+            <Button onPress={() => this.setState({show:false})}>{i18n.t("ui.button.cancel")}</Button>
+            <Button onPress={() => this.onOK()}>{i18n.t("ui.button.ok")}</Button>
           </Dialog.Actions>
         </Dialog>
     }

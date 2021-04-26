@@ -5,6 +5,8 @@ import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Surface ,Caption
 import mainStore from './MainContext.js'
 import Icon from './Icon.js';
 
+import i18n from 'i18n-js';
+
 const styles = StyleSheet.create({
 
 	title:{
@@ -86,11 +88,11 @@ const Unit = (props) =>{
            </View>
            <View style={{flexDirection:'row',justifyContent:'space-between',height:28,margin:9}} >
                 <View style={{flexDirection:'row'}}>
-                    <Paragraph>Location </Paragraph>
+                    <Paragraph>{i18n.t("ui.deployed.location")} </Paragraph>
                    <Caption >{currentPosition}</Caption>
                </View>
                 <View style={{flexDirection:'row'}}>
-                    <Paragraph>Origin </Paragraph>
+                    <Paragraph>{i18n.t("ui.deployed.origin")} </Paragraph>
                    <Caption >{unit.city.name}</Caption>
                </View>
            </View>
@@ -114,17 +116,19 @@ export const Deployed = (props)=>{
 
 	 const inventory = (unit)=>{
         mainStore.pause();
-         props.navigation.navigate('Equip', {unit:unit});
+        mainStore.selectedUnit = unit
+         props.navigation.navigate('Equip');
     }
     const group = (unit)=>{
         mainStore.pause();
-         props.navigation.navigate('Group', {unit:unit});
+        mainStore.selectedUnit = unit
+
+         props.navigation.navigate('Group');
     }
 
 	const select = (unit) =>{
-		const { onSelect } = props.route.params;
 
-		onSelect(unit);
+		mainStore.onSelect(unit);
 
 		props.navigation.navigate('Home')
 	}
@@ -139,9 +143,9 @@ export const Deployed = (props)=>{
 
     return <ScrollView >
      {
-        mainStore.units.map(unit=>{
+        mainStore.units.map((unit,index)=>{
             if(unit.city.factionData.id == mainStore.selectedFaction.id){
-                return <Unit unit={unit} onSelect={select} move={move} info={info} trade={trade}/>
+                return <Unit key={index} unit={unit} onSelect={select} move={move} info={info} trade={trade}/>
             }
         })
      }

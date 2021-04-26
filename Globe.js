@@ -370,7 +370,7 @@ export default class Globe{
   
    makeFace(geo,pointA,pointB,pointC,radius,color){
 	  
-		var max =12;
+		var max =24;
 
 		
 	   var arr = [{

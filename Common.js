@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,Animated  } from 'react-native';
+import {  View,StyleSheet ,ScrollView,Text,TouchableOpacity,Animated,SafeAreaView  } from 'react-native';
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheading,Title,Divider ,Surface,Menu } from 'react-native-paper';
 
 import { FlatGrid } from 'react-native-super-grid';
@@ -9,12 +9,14 @@ import Unit from './Unit.js';
 import Util from './Util.js';
 import Hero from './Hero.js';
 
+import ResourceRow from './ResourceRow.js';
+
+
 import mainStore from './MainContext.js';
 import { observer} from "mobx-react"
 import { observable, computed, action } from 'mobx';
 
-import resources from './json/resource.json';
-
+import i18n from 'i18n-js';
 
 export const Progress = (props)=>{
      const width = props.width
@@ -26,6 +28,208 @@ export const Progress = (props)=>{
       </Animated.View>
 }
 
+
+export const RoadScreen = (observer((props) => {
+
+    const city= mainStore.selectedCity;
+
+
+    const action = (key,onAction)=>{
+        return <>
+             <Menu.Item onPress={() =>remove(key,onAction)} title="Remove"/>
+        </>
+    }
+
+    const getTypeString = (type)=>{
+
+    }
+
+      return (
+        <ScrollView style={{padding:10}}>
+             <Caption>{i18n.t("ui.manage.road.roads")} </Caption>
+             {city.destinies.map((destiny,index)=>{
+                    const road = destiny.road;
+                     return <Surface style={{marginBottom:5,elevation:1}} key={index}>
+                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                            <View style={{flexDirection:'row',display:'flex',justifyContent:'center',padding:10}}>
+                                   <View>
+                                    <View style={{flexDirection:'row'}}>
+                                        <Paragraph style={{position:'relative',top:-2,marginRight:2}}>To {destiny.city.name}</Paragraph>
+                                        <Caption >{(destiny.length/1000).toFixed(1)}km</Caption>
+                                    </View>
+                                    <View style={{flexDirection:'row'}}>
+                                        <Caption>{i18n.t("ui.manage.road.type."+road.type+".name")} </Caption>
+                                    </View>
+                                    <View style={{maxWidth:300}}>
+                                        {road.type=='mountain'?<Caption>{i18n.t("ui.manage.road.type.mountain.description")} </Caption>:null}
+                                        {road.type=='desert'?<>
+                                            <Caption>{i18n.t("ui.manage.road.type.desert.description")} </Caption>
+                                        </>:null}
+                                    </View>
+
+                                </View>
+                            </View>
+
+                        </View>
+                    </Surface>
+
+             })}
+
+            <View style={{height:20}}/>
+        </ScrollView>
+      );
+}))
+
+
+export const TradeScreen = (observer((props) => {
+
+    const city= mainStore.selectedCity;
+
+    const remove = (key,onAction)=>{
+        city.removeTrade(key)
+        onAction();
+    }
+
+    const action = (key,onAction)=>{
+        return <>
+             <Menu.Item onPress={() =>remove(key,onAction)} title="Remove"/>
+        </>
+    }
+
+      return (
+        <View style={{padding:10}}>
+            <View style={{flexDirection:'row'}}>
+                 <Caption>{i18n.t("ui.manage.resource.selling")} </Caption>
+                 <Caption>{city.buildings.trade?
+                        <>{city.trade.length}/(1+{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)})*5</>
+                     :city.trade.length+'/5'}
+                 </Caption>
+            </View>
+        <FlatGrid
+           itemDimension={mainStore.unitSize}
+           data={city.trade.slice()}
+
+           spacing={1}
+           renderItem={({ item }) => {
+                const key = item;
+                const resource = mainStore.data.resources[key];
+
+               return   <Unit data={resource} action={(onAction)=>action(item,onAction)}
+
+               />
+           }}
+         />
+
+
+        </View>
+      );
+}))
+
+export const InfoContent =  (observer((props) => {
+
+    const city= mainStore.selectedCity;
+
+    const change = ()=>{
+        props.navigation.navigate('HeroList', {city:city});
+    }
+
+    const changeChancellor = ()=>{
+        props.navigation.navigate('SelectChancellor', {city:city});
+    }
+
+   return (
+     <ScrollView style={{padding:10}}>
+
+
+        <View style={{flexDirection:'row'}}>
+             <Icon icon="bank"  />
+            <Paragraph  style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.governor")} </Paragraph>
+            <Caption>{city.governor==undefined?'None':city.governor.name}</Caption>
+            {props.type!='info'?<Button icon="playlist-edit" onPress={()=>change()} />:null}
+        </View>
+        <View style={{flexDirection:'row'}}>
+             <Icon icon="bank"  />
+            <Paragraph  style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.chancellor")} </Paragraph>
+            <Caption>{city.chancellor==undefined?'None':city.chancellor.name}</Caption>
+            {props.type!='info'?<Button icon="playlist-edit" onPress={()=>changeChancellor()} />:null}
+        </View>
+
+        {city?.factionData?.capital?.id == city.id?
+            <View style={{flexDirection:'row'}}>
+                <Icon icon="star"  />
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.capital")} </Paragraph>
+            </View>
+        :null}
+        <View style={{flexDirection:'row'}}>
+            <Icon icon="account-multiple"  />
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.population")} </Paragraph><Caption>{Util.number(city?.population)}</Caption>
+        </View>
+        {props.type!='info'? <>
+            <View style={{flexDirection:'row'}}>
+                <Icon icon="barley"  />
+                <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.food consumption")} </Paragraph>
+                <Caption> {Util.number(city?.getFoodConsumption())}/{i18n.t("ui.manage.info.day")} {Util.number(city?.getFoodConsumption()*365)}/{i18n.t("ui.manage.info.year")}</Caption>
+            </View>
+            <View style={{flexDirection:'row'}}>
+                <Caption style={{marginLeft:22}}>{i18n.t("ui.manage.info.consumption rate")} </Caption>
+
+            </View>
+            <View style={{flexDirection:'row'}}>
+                <Button style={{position:'relative',top:-7}} labelStyle={{fontSize:20,margin:0,position:'relative',top:-3}} onPress={()=>city.addFoodConsumptionRate(-0.5)}>-</Button>
+                <Paragraph>{city.foodConsumptionRate}</Paragraph>
+                <Button style={{position:'relative',top:-7}} labelStyle={{fontSize:20,margin:0,position:'relative',top:-3}} onPress={()=>city.addFoodConsumptionRate(0.5)}>+</Button>
+                <Caption style={{marginLeft:15}}>{city.getHappinessGrowthText()} {i18n.t("ui.manage.info.happiness")}/{i18n.t("ui.manage.info.month")}</Caption>
+            </View>
+
+            <View style={{flexDirection:'row'}}>
+                <Icon icon="heart"  />
+                <Paragraph style={{position:'relative',top:-2}}>{i18n.t("resource.happiness.name")} </Paragraph>
+                <Caption>{city.happiness.toFixed(2)}/{city.maxHappiness}</Caption>
+            </View>
+            <View style={{flexDirection:'row'}}>
+                <Icon icon="hospital-box"  />
+                <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.hygiene")} </Paragraph>
+                <Caption>{city.getHygiene()}/65</Caption>
+            </View>
+
+            <View style={{flexDirection:'row'}}>
+                <Icon icon="account-multiple-plus"  />
+                <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.population growth rate")} </Paragraph>
+                <Caption>{city.getGrowthRate()}%/{i18n.t("ui.manage.info.year")}</Caption>
+            </View>
+        </>:null}
+        <Divider/>
+        <View style={{flexDirection:'row'}}>
+            <Icon icon="knife-military"  />
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.military units")} </Paragraph>
+            <Caption>{Math.floor(city.getMilitaryUnits())} </Caption>
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.armed")} </Paragraph>
+            <Caption>{Math.floor(city.getMilitaryUnits('armed'))} </Caption>
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.unarmed")} </Paragraph>
+            <Caption>{Math.floor(city.getMilitaryUnits('unarmed'))} </Caption>
+
+        </View>
+
+        <View style={{flexDirection:'row'}}>
+            <Icon icon="chess-rook"  />
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.city defense")} </Paragraph>
+            <Caption> {Math.floor(city.getDefense())}/{city.getDefenseMax()}</Caption>
+        </View>
+        {city.snapshotSub?.resource?
+        <>
+            <Divider/>
+            <Paragraph>{i18n.t("ui.manage.info.natural resources")} </Paragraph>
+            {
+                Object.keys(city.snapshotSub.resource).map(key=>{
+                    const resource = city.snapshotSub.resource[key]
+                    return <ResourceRow key={key} resource={key} suffix={mainStore.data.resources[key].name} lv={resource}/>
+                })
+            }
+        </>:null}
+        <View style={{height:20}}/>
+     </ScrollView>
+   );
+}))
 
 export const UnitScreen  = (observer((props) => {
 
@@ -72,7 +276,9 @@ export const UnitScreen  = (observer((props) => {
 
     const equip = (unit,onAction)=>{
         mainStore.pause();
-        props.navigation.navigate('Equip', {unit:unit});
+        mainStore.selectedUnit = unit
+
+        props.navigation.navigate('Equip');
 
         onAction();
     }
@@ -80,13 +286,14 @@ export const UnitScreen  = (observer((props) => {
     const move = (unit,onAction)=>{
         mainStore.move(unit);
         props.navigation.navigate('Home', {unit:unit});
-
+        mainStore.scene.current.rendered = false
         onAction();
     }
 
     const group = (unit,onAction)=>{
+        mainStore.selectedUnit = unit
 
-          props.navigation.navigate('Group', {city:city,unit:unit});
+          props.navigation.navigate('Group');
 
           onAction();
     }
@@ -104,21 +311,21 @@ export const UnitScreen  = (observer((props) => {
             {unit.state=='deploy'?
             null
             :<>
-                {unit.data.action.manage?<Menu.Item onPress={() => group(unit,onAction)} title="Manage"/>:null}
-               {unit.data.action.build&&props.type!='group'?<Menu.Item onPress={()=>build(unit,onAction)} title="Build"/>:null}
-                {unit.data.action.assign&&props.type!='group'?<Menu.Item onPress={() => assign(unit,onAction)} title="Assign"/>:null}
-                {unit.data.action.equip?<Menu.Item onPress={() => equip(unit,onAction)} title="Inventory"/>:null}
+                {unit.data.action.manage?<Menu.Item onPress={() => group(unit,onAction)} title={i18n.t("ui.action.manage")}/>:null}
+               {unit.data.action.build&&props.type!='group'?<Menu.Item onPress={()=>build(unit,onAction)} title={i18n.t("ui.action.build")}/>:null}
+                {unit.data.action.assign&&props.type!='group'?<Menu.Item onPress={() => assign(unit,onAction)} title={i18n.t("ui.action.assign")}/>:null}
+                {unit.data.action.equip?<Menu.Item onPress={() => equip(unit,onAction)} title={i18n.t("ui.action.inventory")}/>:null}
                 {unit.data.action.deploy&&props.type!='group'?
                     unit.type!='group'||unit.units.length>0?
                         city.happiness<=0&&unit.hasArmy()?
                         null
-                        :<Menu.Item onPress={() => move(unit,onAction)} title="Move"/>
+                        :<Menu.Item onPress={() => move(unit,onAction)} title={i18n.t("ui.action.move")}/>
                     :null
                  :null
                 }
-                {props.type=='group'&&props.unit.state==''?<Menu.Item onPress={() => leave(unit,onAction)} title="Leave Group"/>:null}
+                {props.type=='group'&&props.unit.state==''?<Menu.Item onPress={() => leave(unit,onAction)} title={i18n.t("ui.action.leave group")}/>:null}
 
-                {props.type!='group'?<Menu.Item onPress={() =>disband(unit,onAction)} title="Disband"/>:null}
+                {props.type!='group'?<Menu.Item onPress={() =>disband(unit,onAction)} title={i18n.t("ui.action.disband")}/>:null}
             </>
             }
         </>
@@ -129,62 +336,64 @@ export const UnitScreen  = (observer((props) => {
     }
 
   return (
-    <View style={{padding:10}}>
-        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-        {props.type=='group'?
-            <>
-                 <View style={{flexDirection:'row'}}>
-                </View>
-                 <View style={{flexDirection:'row'}}>
-                    {props.unit.state==''?
-                    <Button dark={true} style={{marginRight:2}}   onPress={()=>props.navigation.navigate('SelectUnit', {city:city,unit:unit})} icon="account-plus" contentStyle={{marginLeft:16}} />
-                    :null}
-                </View>
-            </>:<>
-                 <View style={{flexDirection:'row'}}>
-                    <Icon icon="account" />
-                    <Paragraph>Available Manpower {Util.number(Math.floor(city?.manpower))} / {Util.number(city?.getMaxManpower())}</Paragraph>
-                </View>
-                 <View style={{flexDirection:'row'}}>
-                    <Button  style={{marginRight:2}} onPress={()=>props.navigation.navigate('Employ', {city:city})} icon="account-plus" mode="contained"  labelStyle={{color:'white'}} contentStyle={{marginLeft:16}} />
-                </View>
-            </>
-        }
-        </View>
-            <View style={{padding:5}}>
-                {props.type=='group'?<>
-                    <Caption>Units {unit.units.length}/10</Caption>
-                </>:<Caption>Idle Units</Caption>
-                }
-                 <FlatGrid
-                      itemDimension={mainStore.unitSize}
-                      data={units}
+    <ScrollView style={{paddingTop:10}}>
+        <SafeAreaView style={{padding:10}}>
+            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+            {props.type=='group'?
+                <>
+                     <View style={{flexDirection:'row'}}>
+                    </View>
+                     <View style={{flexDirection:'row'}}>
+                        {props.unit.state==''?
+                        <Button dark={true} style={{marginRight:2}}   onPress={()=>props.navigation.navigate('SelectUnit', {city:city,unit:unit})} icon="account-plus" contentStyle={{marginLeft:16}} />
+                        :null}
+                    </View>
+                </>:<>
+                     <View style={{flexDirection:'row'}}>
+                        <Icon icon="account" />
+                        <Paragraph>{i18n.t("ui.manage.unit.available manpower")} {Util.number(Math.floor(city?.manpower))} / {Util.number(city?.getMaxManpower())}</Paragraph>
+                    </View>
+                     <View style={{flexDirection:'row'}}>
+                        <Button  style={{marginRight:2}} onPress={()=>props.navigation.navigate('Employ', {city:city})} icon="account-plus" mode="contained"  labelStyle={{color:'white'}} contentStyle={{marginLeft:16}} />
+                    </View>
+                </>
+            }
+            </View>
+                <View style={{padding:5}}>
+                    {props.type=='group'?<>
+                        <Caption>Units {unit.units.length}/10</Caption>
+                    </>:<Caption>{i18n.t("ui.manage.unit.idle units")}</Caption>
+                    }
+                     <FlatGrid
+                          itemDimension={mainStore.unitSize}
+                          data={units}
 
-                      spacing={1}
-                      renderItem={({ item }) => (
-                        <Unit data={item}  action={(onAction)=>action(item,onAction)} />
-                      )}
-                    />
-             </View>
+                          spacing={1}
+                          renderItem={({ item }) => (
+                            <Unit data={item}  action={(onAction)=>action(item,onAction)} />
+                          )}
+                        />
+                 </View>
 
-            <View style={{padding:5}}>
-                {heroes&&heroes.length>0?<>
-                    <Caption>Idle Heroes</Caption>
-                </>:null
-                }
-                 <FlatGrid
-                      itemDimension={mainStore.unitSize}
-                      data={heroes}
+                <View style={{padding:5}}>
+                    {heroes&&heroes.length>0?<>
+                        <Caption>{i18n.t("ui.manage.unit.idle heroes")}</Caption>
+                    </>:null
+                    }
+                     <FlatGrid
+                          itemDimension={mainStore.unitSize}
+                          data={heroes}
 
-                      spacing={1}
-                      renderItem={({ item }) => (
-                        <Hero data={item} assign={assignHero} navigation={props.navigation}/>
-                      )}
-                    />
+                          spacing={1}
+                          renderItem={({ item }) => (
+                            <Hero data={item} assign={assignHero} navigation={props.navigation}/>
+                          )}
+                        />
 
-             </View>
+                 </View>
 
-    </View>
+        </SafeAreaView>
+    </ScrollView>
   );
 }))
 
@@ -266,29 +475,29 @@ export class Resources extends Component {
             {deploy==true?<>
                <Divider/>
                  <View style={{flexDirection:'row',display:'flex',justifyContent:'space-between'}}>
-                   <Caption>Resources</Caption>
+                   <Caption>{i18n.t("ui.common.resources")}</Caption>
                    {condition?<View style={{flexDirection:'row'}}>
-                       <Caption style={{    position: 'relative',top: 5}}> Transfer</Caption>
+                       <Caption style={{    position: 'relative',top: 5}}> {i18n.t("ui.common.transfer")}</Caption>
                        <Button onPress={()=>this.changeAmount()}>{this.state.amount}</Button>
-                       <Caption style={{    position: 'relative',top: 5}}>unit{this.state.amount>1?'s':null} per click</Caption>
+                       <Caption style={{    position: 'relative',top: 5}}>unit{this.state.amount>1?'s':null} {i18n.t("ui.common.per click")}</Caption>
                    </View>:null}
                </View>
                  <View style={{flexDirection:'row',display:'flex',justifyContent:'space-between'}}>
                    <Caption></Caption>
                    <View style={{flexDirection:'row'}}>
-                       <Caption > Can survive {unit.survivableDays} days with {unit.resources.food?Math.floor(unit.resources.food):0} foods</Caption>
+                       <Caption > {i18n.t("ui.common.can survive")} {unit.survivableDays} {i18n.t("ui.common.days with")} {unit.resources.food?Math.floor(unit.resources.food):0} {i18n.t("ui.common.foods")}</Caption>
                    </View>
                </View>
 
                <FlatGrid
                   itemDimension={mainStore.unitSize}
                   data={Object.keys(unit.resources)}
-
+                    scrollEnabled={false}
                   spacing={1}
                   renderItem={({ item }) => {
                        const key = item;
                        const quantity = unit.resources[key];
-                       const resource = resources[key];
+                       const resource = mainStore.data.resources[key];
 
                       return   <Unit data={resource} onPress={()=>this.transferToCity(key)}
                            quantity={
@@ -303,8 +512,8 @@ export class Resources extends Component {
                        <Icon icon="arrow-down"/>
                    </View>
                    {this.props.target == undefined?
-                   <Caption>City Resources</Caption>
-                   :<Caption>Target Resources</Caption>
+                   <Caption>{i18n.t("ui.common.city")} {i18n.t("ui.common.resources")}</Caption>
+                   :<Caption>{i18n.t("ui.common.target")} {i18n.t("ui.common.resources")}</Caption>
                    }
                    <FlatGrid
                       itemDimension={mainStore.unitSize}
@@ -314,7 +523,7 @@ export class Resources extends Component {
                       renderItem={({ item }) => {
                            const key = item;
                            const quantity = city.resources[key];
-                           const resource = resources[key];
+                           const resource = mainStore.data.resources[key];
 
                           return   <Unit data={resource} onPress={()=>this.transferToUnit(key)}
                                quantity={
@@ -344,7 +553,7 @@ export class Moral extends Component {
                <Icon icon="heart"  />
                <Caption>{unit.moral.toFixed(2)}/100</Caption>
 
-               <Paragraph> Origin </Paragraph>
+               <Paragraph> {i18n.t("ui.deployed.origin")} </Paragraph>
                <Caption>{unit.city.name}</Caption>
                </>
                :null}

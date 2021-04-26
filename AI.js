@@ -1,5 +1,3 @@
-import buildings from "./json/building.json"
-import unitProto from "./json/unit.json"
 
 import Util from './Util.js';
 
@@ -10,9 +8,11 @@ export class CityAI{
 
     needs = {};
     needSource = {};
+    buildings = mainStore.data.buildings
 
     constructor(city) {
         this.city = city;
+
     }
 
     dailyJob(diff){
@@ -36,7 +36,7 @@ export class CityAI{
                 if(key=="stone tool") building ='toolsmith';
 
                 if(this.city.buildings[building] != undefined){
-                    const production  =buildings[building]?.production;
+                    const production  =mainStore.data.buildings[building]?.production;
                     if(production!=undefined){
                         let p = production;
                         if(Array.isArray(production)){
@@ -58,7 +58,7 @@ export class CityAI{
                         }
 
                         this.city.buildings[building].units.forEach(unit=>{
-                            city.equipUnit(unit,'Main Hand','stone tool')
+                            city.equipUnit(unit,'main hand','stone tool')
                         })
                     }
                 }
@@ -67,69 +67,69 @@ export class CityAI{
 
                 switch(key){
                     case 'mud':
-                        this.orderUnitToBuild('worker',buildings.mud,need)
+                        this.orderUnitToBuild('worker',this.buildings.mud,need)
                     break;
                     case 'clay':
-                        this.orderUnitToBuild('worker',buildings.clay,need)
+                        this.orderUnitToBuild('worker',this.buildings.clay,need)
                     break;
                     case 'brick':
-                        this.orderUnitToBuild('artisan',buildings.brick,need)
+                        this.orderUnitToBuild('artisan',this.buildings.brick,need)
                     break;
                     case 'pottery':
-                        this.orderUnitToBuild('artisan',buildings.pottery,need)
+                        this.orderUnitToBuild('artisan',this.buildings.pottery,need)
                     break;
                     case 'copper':
-                        this.orderUnitToBuild('worker',buildings.copper,need)
+                        this.orderUnitToBuild('worker',this.buildings.copper,need)
                     break;
                     case 'wood':
-                        this.orderUnitToBuild('worker',buildings.wood,need)
+                        this.orderUnitToBuild('worker',this.buildings.wood,need)
                     break;
                     case 'stone':
-                        this.orderUnitToBuild('worker',buildings.stone)
+                        this.orderUnitToBuild('worker',this.buildings.stone)
                     break;
                     case 'polished stone':
-                        this.orderUnitToBuild('artisan',buildings['polished stone'])
+                        this.orderUnitToBuild('artisan',this.buildings['polished stone'])
                     break;
                     case 'cloth':
-                        this.orderUnitToBuild('artisan',buildings.cloth,need)
+                        this.orderUnitToBuild('artisan',this.buildings.cloth,need)
                     break;
                     case 'wool':
-                        this.orderUnitToBuild('worker',buildings.wool,need)
+                        this.orderUnitToBuild('worker',this.buildings.wool,need)
                     break;
                     case 'livestock':
-                        this.orderUnitToBuild('worker',buildings.livestock,need)
+                        this.orderUnitToBuild('worker',this.buildings.livestock,need)
                     break;
                     case 'beer':
-                        this.orderUnitToBuild('artisan',buildings.beer)
+                        this.orderUnitToBuild('artisan',this.buildings.beer)
                     break;
                     case 'tablet':
-                        this.orderUnitToBuild('artisan',buildings.tablet)
+                        this.orderUnitToBuild('artisan',this.buildings.tablet)
                     break;
                     case 'sling':
                     {
                         if(city.buildings[building]==undefined){
                            // console.log(city.name+" " +building + " " + city.buildings[building])
-                            this.orderUnitToBuild('artisan',buildings.ranged)
+                            this.orderUnitToBuild('artisan',this.buildings.ranged)
                         }
                     break;
                     }
 
                     case "stone tool":
-                        this.orderUnitToBuild('artisan',buildings.toolsmith)
+                        this.orderUnitToBuild('artisan',this.buildings.toolsmith)
                     break;
 
                     case 'mace':
-                        this.orderUnitToBuild('artisan',buildings.melee)
+                        this.orderUnitToBuild('artisan',this.buildings.melee)
                     break;
                     case 'warehouse':
-                        this.orderUnitToBuild('worker',buildings.warehouse)
+                        this.orderUnitToBuild('worker',this.buildings.warehouse)
                     break;
                     case 'armoury':
                          if(this.city.buildings.armoury==undefined || this.city.buildings.armoury.quantity<2)
-                            this.orderUnitToBuild('worker',buildings.armoury)
+                            this.orderUnitToBuild('worker',this.buildings.armoury)
                     break;
                     case 'wall':
-                        this.orderUnitToBuild('worker',buildings.wall)
+                        this.orderUnitToBuild('worker',this.buildings.wall)
                     break;
                     case 'manpower':
 //                        this.checkManpower();
@@ -173,9 +173,9 @@ export class CityAI{
             const building = this.city.buildings[key];
             if(building.data.production !=undefined){
                 if(building.completedQuantity >building.units.length){
-                    const type = buildings[key].worker
+                    const type = this.buildings[key].worker
                     if(type!=''){
-                        this.city.employ(unitProto[type],(unit)=>{
+                        this.city.employ(mainStore.data.units[type],(unit)=>{
                             this.city.assign(unit,building)
                         });
                     }
@@ -189,14 +189,14 @@ export class CityAI{
             if((this.city.buildings.library || this.city.population<3000) && this.city.getMaxManpower()<800){
                 this.checkResidence();
             }else{
-                    this.orderUnitToBuild('artisan',buildings.library)
+                    this.orderUnitToBuild('artisan',this.buildings.library)
             }
         }
     }
 
     checkResidence(){
-        if(this.city.population>=((this.city.buildings.residence.completedQuantity*buildings.residence.storage.quantity)-450) ){
-            this.orderUnitToBuild('worker',buildings.residence)
+        if(this.city.population>=((this.city.buildings.residence.completedQuantity*this.buildings.residence.storage.quantity)-450) ){
+            this.orderUnitToBuild('worker',this.buildings.residence)
         }
     }
 
@@ -204,12 +204,12 @@ export class CityAI{
         if(this.city.manpower>400){
             const market= this.city.buildings.market;
             if((market==undefined || market.quantity < this.city.population/10000) && this.city.population>1500){
-                this.orderUnitToBuild('worker',buildings.market)
+                this.orderUnitToBuild('worker',this.buildings.market)
             }
 
             const tavern= this.city.buildings.tavern;
             if((tavern==undefined || tavern.quantity < this.city.population/10000) && this.city.population>5000){
-                this.orderUnitToBuild('artisan',buildings.tavern)
+                this.orderUnitToBuild('artisan',this.buildings.tavern)
             }
         }
 
@@ -247,9 +247,9 @@ export class CityAI{
         const farm = this.city.buildings.farm;
         const granary = this.city.buildings.granary;
 
-        if(granary.quantity*buildings.granary.storage.quantity<farm.quantity*buildings.farm.production.quantity){
+        if(granary.quantity*this.buildings.granary.storage.quantity<farm.quantity*this.buildings.farm.production.quantity){
 
-            this.orderUnitToBuild('worker',buildings.granary)
+            this.orderUnitToBuild('worker',this.buildings.granary)
 
         }
     }
@@ -261,14 +261,14 @@ export class CityAI{
         let extra = this.city.resourceConsume?.food;
         extra = extra==undefined?0:extra;
 
-        if(farm.getResultQuantity(buildings.farm.production.quantity)<=(consumption+extra)*365){
+        if(farm.getResultQuantity(this.buildings.farm.production.quantity)<=(consumption+extra)*365){
 
-            if(city.checkBuildingAvailability(buildings.irrigation)){
-                this.orderUnitToBuild('worker',buildings.irrigation)
+            if(city.checkBuildingAvailability(this.buildings.irrigation)){
+                this.orderUnitToBuild('worker',this.buildings.irrigation)
             }else{
 
-                this.city.employ(unitProto.farmer,(unit)=>{
-                    this.city.build(unit,buildings.farm)
+                this.city.employ(mainStore.data.units.farmer,(unit)=>{
+                    this.city.build(unit,this.buildings.farm)
                 });
             }
             ret = false;
@@ -324,8 +324,8 @@ export class CityAI{
                 this.build(worker,building,need)
 
             }else{
-                if(this.city.manpower >= unitProto[type].manpower){
-                    this.city.employ(unitProto[type],(unit)=>{
+                if(this.city.manpower >= mainStore.data.units[type].manpower){
+                    this.city.employ(mainStore.data.units[type],(unit)=>{
                         this.build(unit,building,need)
 
                     });
@@ -418,7 +418,7 @@ export class CityAI{
         if(this.city.getMilitaryUnits('unarmed')>0){
 
         }else{
-             this.city.employ(unitProto[type]);
+             this.city.employ(mainStore.data.units[type]);
         }
     }
 
@@ -427,7 +427,7 @@ export class CityAI{
         if(this.militaryGroup == undefined){
             this.militaryGroup = city.getUnit('group')
             if(this.militaryGroup == undefined){
-                city.employ(unitProto.group,(group)=>{
+                city.employ(mainStore.data.units.group,(group)=>{
                     group.aiType= 'army'
                     this.militaryGroup = group;
                 });

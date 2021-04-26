@@ -7,7 +7,6 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 import ResourceRow from './ResourceRow.js';
 
 
@@ -15,7 +14,6 @@ import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
 import buildings from "./json/building.json"
-import resources from './json/resource.json';
 
 import mainStore from './MainContext.js';
 
@@ -221,7 +219,7 @@ const Equipment = (props)=>{
                Object.keys(e.require).map(key=>{
                    return <>
                        <Paragraph style={{marginLeft:5}}> </Paragraph>
-                       <ResourceRow prefix={resources[key].name} resource={key} suffix={e.require[key]}/>
+                       <ResourceRow prefix={mainStore.data.resources[key].name} resource={key} suffix={e.require[key]}/>
                    </>
 
                })

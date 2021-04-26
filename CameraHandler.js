@@ -1,26 +1,37 @@
 export default class CameraHandler{
 
-	constructor(container,camera,mesh){
+	constructor(container,camera,mesh,options){
 		
 		this.camera = camera;
 		this.mesh = mesh;
 		this.container = container;
+		this.options = options
 		
 		this.distance = 200;
 		this.distanceTarget = 200;
 		
 		this.camera.position.z = this.distance;
-		
+
 	  this.mouse = { x: 0, y: 0 };
 	  this.touch = { x: 0, y: 0 };
-	  
+
 	  this.mouseOnDown = { x: 0, y: 0 };
-	  this.rotation = { x: 0, y: 0 };
+
+	  this.rotation = { x: 0, y: 0};
+
+
+
 	  this.target = { x: Math.PI*3/2, y: Math.PI / 6.0 };
-	  this.targetOnDown = { x: 0, y: 0 };
-	  
+	  this.targetOnDown =  { x: 0, y: 0 };
+
 	  this.zoomMin = 105
-	  this.zoomMax = 300
+	  this.zoomMax = 200
+
+      if(options?.initialPoint){
+        this.rotation = {x:(270 + options.initialPoint.long) * Math.PI / 180,y: options.initialPoint.lat/180 * Math.PI}
+        this.moveCameraTo(options.initialPoint.lat,options.initialPoint.long,options.initialPoint.distance);
+	  }
+
 
 	  //  this.container.addEventListener('mousedown', this.onMouseDown, false);
 	  //  this.container.addEventListener('mousewheel', this.onMouseWheel, false);
@@ -196,16 +207,35 @@ export default class CameraHandler{
   
   render(){
   
-  	
 	this.rotation.x += (this.target.x - this.rotation.x) * 0.1;
 	this.rotation.y += (this.target.y - this.rotation.y) * 0.1;
     this.distance += (this.distanceTarget - this.distance) * 0.3;
 
-    this.camera.position.x = this.distance * Math.sin(this.rotation.x) * Math.cos(this.rotation.y);
-    this.camera.position.y = this.distance * Math.sin(this.rotation.y);
-    this.camera.position.z = this.distance * Math.cos(this.rotation.x) * Math.cos(this.rotation.y);
+    if(this.options?.boundary){
+        if(this.rotation.x>this.options.boundary.right) this.rotation.x = this.options.boundary.right
+        if(this.rotation.x<this.options.boundary.left) this.rotation.x = this.options.boundary.left
+        if(this.rotation.y>this.options.boundary.top) this.rotation.y = this.options.boundary.top
+        if(this.rotation.y<this.options.boundary.bottom) this.rotation.y = this.options.boundary.bottom
+    }
+
+   // console.log(this.rotation.x+","+this.rotation.y)
+
+    const position = this.camera.position
+
+    const prev = {x:position.x,y:position.y,z:position.z}
+
+    position.x = this.distance * Math.sin(this.rotation.x) * Math.cos(this.rotation.y);
+    position.y = this.distance * Math.sin(this.rotation.y);
+    position.z = this.distance * Math.cos(this.rotation.x) * Math.cos(this.rotation.y);
+
+    //console.log(this.camera.position.x+","+this.camera.position.y+","+this.camera.position.z)
 
     this.camera.lookAt(this.mesh.position);
-  
+
+    if(prev.x != position.x) return true
+    if(prev.y != position.y) return true
+    if(prev.z != position.z) return true
+
+    return false
   }
 }

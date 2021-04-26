@@ -1,17 +1,16 @@
 AI - trade,  hero, multi army
 
 
-Units - extra food wage
-Unit moral decrease when attacked
-Unit moral critical chance
+//Production by happiness
 
-Max happiness penalty by distance from capital
 
-Hero birth
+Multi language
 
-Hide unexplored city
+Wonder project
 
 Civilization differance override
+
+Sea level patch
 
 Half screen UI
 

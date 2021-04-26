@@ -10,7 +10,7 @@ import { observer} from "mobx-react"
 
 
 import mainStore from './MainContext.js';
-
+import i18n from 'i18n-js';
 
 const styles = StyleSheet.create({
 
@@ -152,11 +152,11 @@ export default class Hero extends Component {
 		    <Portal>
 		    <Dialog visible={this.state.visible} onDismiss={()=>this.setState({visible:false})}>
               <Dialog.Content>
-                 <Menu.Item  onPress={() => this.info()} title="Info"/>
-                 {removable?<Menu.Item  onPress={() => this.remove()} title="Remove"/>
+                 <Menu.Item  onPress={() => this.info()} title={i18n.t("ui.action.info")}/>
+                 {removable?<Menu.Item  onPress={() => this.remove()} title={i18n.t("ui.action.remove")}/>
                  :null
                  }
-                 {type=='group'?null:<Menu.Item  onPress={() => this.assign()} title="Assign"/>}
+                 {type=='group'?null:<Menu.Item  onPress={() => this.assign()} title={i18n.t("ui.action.assign")}/>}
               </Dialog.Content>
 
             </Dialog>

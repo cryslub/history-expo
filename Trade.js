@@ -7,7 +7,6 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 import ResourceRow from './ResourceRow.js';
 
 
@@ -15,8 +14,6 @@ import ResourceRow from './ResourceRow.js';
 import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
-import unitProto from "./json/unit.json"
-import resources from './json/resource.json';
 
 import { observer,inject } from "mobx-react"
 
@@ -86,7 +83,7 @@ export const Trade = ((props) => {
         setAmount(b)
 	}
 	const plus = (a,key) =>{
-	    const c = unit.capacity-unit.carrying();
+	    const c = unit.capacity-unit.carrying;
         const b = Math.min(city.resources[key],amount+a)
         setAmount(b)
 
@@ -94,8 +91,8 @@ export const Trade = ((props) => {
 
 
     const checkTrade = (source,target)=>{
-        const sourceResource = resources[source];
-        const targetResource = resources[target];
+        const sourceResource = mainStore.data.resources[source];
+        const targetResource = mainStore.data.resources[target];
         const sourcePrice = sourceResource.price;
         const targetPrice = targetResource.price;
 
@@ -109,7 +106,7 @@ export const Trade = ((props) => {
         if(unit.resources[target]<targetAmount){
             if(amount) return {message:"Not enough resource to trade"};
         }
-        if(unit.capacity < unit.carrying() - targetAmount+amount){
+        if(unit.capacity < unit.carrying - targetAmount+amount){
             return {message:"Not enough capacity to hold"};
         }
 
@@ -135,12 +132,12 @@ export const Trade = ((props) => {
     const action = (key,onAction)=>{
 
 
-         if(unit.resources.length ==0 || unit.carrying()==0){
+         if(unit.resources.length ==0 || unit.carrying==0){
 
             return <Paragraph>You are not holding any resources to trade with</Paragraph>
         }
 
-        const resource = resources[key];
+        const resource = mainStore.data.resources[key];
 
         return <>
             <Paragraph>Trade amount</Paragraph>
@@ -158,7 +155,7 @@ export const Trade = ((props) => {
 
                     const result = checkTrade(key,k);
                     return <View style={{flexDirection:'row'}}>
-                        <ResourceRow prefix={Util.intDivide(resource.price*amount*(11/10),resources[k].price)} resource={k}/>
+                        <ResourceRow prefix={Util.intDivide(resource.price*amount*(11/10),mainStore.data.resources[k].price)} resource={k}/>
                         {result.message=='succeed'?<Button onPress={()=>trade(key,k,onAction)}>Trade</Button>
                         :<Caption>{result.message}</Caption>}
                     </View>
@@ -178,7 +175,7 @@ export const Trade = ((props) => {
            spacing={1}
            renderItem={({ item }) => {
                 const key = item;
-                const resource = resources[key];
+                const resource = mainStore.data.resources[key];
                 const quantity = city.resources[key]
                return   <Unit data={resource} action={(onAction)=>action(item,onAction)}
                     quantity = { ()=>(<Caption>{Util.number(quantity)}</Caption>)}

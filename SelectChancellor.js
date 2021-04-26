@@ -14,11 +14,9 @@ import { observer} from "mobx-react"
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 
 
 import Unit from './Unit.js';
-import ResourceRow from './ResourceRow.js';
 
 
 import {MainContext} from './MainContext.js'
@@ -26,7 +24,7 @@ import {CityContext} from './CityContext.js'
 import cityStore from './CityContext.js';
 import mainStore from './MainContext.js';
 
-import resources from './json/resource.json';
+import i18n from 'i18n-js';
 
 
 const styles = StyleSheet.create({
@@ -117,11 +115,12 @@ export  const  SelectChancellor =  (props) => {
         <View style={{padding:10}}>
              {city.heroes[value-1]==undefined?null
             :<>
-                <Paragraph>Chancellor effect</Paragraph>
+                <Paragraph>{i18n.t("ui.hero.chancellor")} {i18n.t("ui.hero.effect")} </Paragraph>
 
-                 <Caption >-{(city.heroes[value-1]?.valor/4).toFixed(1)}% happiness cost of employing military unit </Caption>
-                 <Caption >-{(city.heroes[value-1]?.wisdom/4).toFixed(1)}% happiness cost of employing non-military unit </Caption>
-                 <Caption >+{(city.heroes[value-1]?.authority/400).toFixed(2)} happiness/month</Caption>
+                 <Caption >-{(city.heroes[value-1]?.valor/4).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing military unit")} </Caption>
+                 <Caption >-{(city.heroes[value-1]?.wisdom/4).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing non-military unit")} </Caption>
+                 <Caption >+{Math.floor(city.heroes[value-1]?.authority/4)} {i18n.t("ui.hero.max happiness")}</Caption>
+                 <Caption >+{(city.heroes[value-1]?.authority/800).toFixed(2)} {i18n.t("ui.hero.happiness")}/{i18n.t("ui.hero.month")}</Caption>
             </>
             }
 

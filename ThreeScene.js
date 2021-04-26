@@ -156,13 +156,16 @@ export default class ThreeScene extends Component{
 	    //ADD SCENE
 	    this.scene = new THREE.Scene()
 	    //ADD CAMERA
-	    this.camera = new THREE.PerspectiveCamera(30, width / height, 1, 10000);
+	    this.camera = new THREE.PerspectiveCamera(30, width / height, 3, 150);
 	    
 	    this.globe = new Globe(this.scene);
 	    this.globe.init();
 	    this.mesh = this.globe.mesh;
 	
-		this.cameraHandler = new CameraHandler(this.container,this.camera,this.mesh);
+		this.cameraHandler = new CameraHandler(this.container,this.camera,this.mesh,{
+		    initialPoint:{lat:30,long:39,distance:200},
+		    boundary:{top:0.65,bottom:0.4,left:5.2,right:5.6}
+		});
 		this.objects = new VariableObjects(this.scene,this.mesh,this.globe,this.container);
 		mainStore.objects = this.objects;
 	//	console.log(this.objects)
@@ -170,7 +173,7 @@ export default class ThreeScene extends Component{
 		
 		this.props.onLoad(this.objects);
 
-	      this.cameraHandler.moveCameraTo(30,39,200);
+
 	};
 
 	onResize = ({ width, height, scale }) => {
@@ -181,13 +184,19 @@ export default class ThreeScene extends Component{
   	};
 
   	onRender = delta => {
-	  this.cameraHandler.render();
-	    
-	    const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.height );
-	    
-	  //  console.log(this.state.textlabels)
-	    this.setState({textlabels:ret.textlabels,detail:ret.detail})
-	    this.renderer.render(this.scene, this.camera);
+
+  	    let changed = this.cameraHandler.render();
+
+        const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.width,this.height );
+
+        this.setState({textlabels:ret.textlabels,detail:ret.detail})
+
+	    if(changed ||  this.rendered!=true){
+	       // console.log("render")
+
+            this.renderer.render(this.scene, this.camera);
+            this.rendered = true
+	    }
   	};
   
 	 
@@ -200,6 +209,7 @@ export default class ThreeScene extends Component{
       }
 
     remove = (unit)=>{
+        this.rendered = false
         const array = this.state.textlabels;
         for (var i = array.length - 1; i > -1; i--) {
             if(array[i].city == unit){
@@ -211,6 +221,7 @@ export default class ThreeScene extends Component{
 
      onLayout = (event)=>{
          var {x, y, width, height} = event.nativeEvent.layout;
+         this.width = width
          this.height = height
      }
 
@@ -261,7 +272,7 @@ export default class ThreeScene extends Component{
 		    				        <View  style={{flexDirection:'row'}}>
 		    				        {
 		    				            icons.map((icon,index)=>{
-                                            return  <View style={[{padding:0}]}>
+                                            return  <View key={index} style={[{padding:0}]}>
                                                <Button icon={icon} color="#fc8b8b" style={[styles.text,{paddingRight:0,marginTop:2,marginLeft:-22-(index*14),minWidth:24,width:24,height:22}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
                                             </View>
 		    				            })

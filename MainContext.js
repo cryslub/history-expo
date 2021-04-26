@@ -14,7 +14,7 @@ class MainStore{
     @observable year=0;
     @observable date=0;
     @observable speed=0;
-    @observable  stage="main";
+    @observable  stage="load";
     gameStarted = false
 
 
@@ -74,9 +74,16 @@ class MainStore{
      }
 
      move = (unit)=>{
+
         this.movingUnit= unit;
         this.pause();
         this.stage="choose";
+        this.scene.current.rendered = false
+
+     }
+
+     redraw = ()=>{
+        this.scene.current.rendered = false
      }
 
      removeUnit = (unit)=>{
@@ -88,7 +95,7 @@ class MainStore{
          const city = unit.currentLocation;
          unit.initMoral();
          city.population-=unit.manpower;
-
+         unit.explored = city.explored
          this.scene.current.addUnit(city.latitude,city.longitude,city.factionData.color,unit)
          this.units.push(unit);
      }
@@ -116,6 +123,18 @@ class MainStore{
             const city = u.city
             this.scene.current.addUnitWithPosition(unit.position,city.factionData.color,u)
         })
+     }
+
+     checkHeroMaturity = ()=>{
+        this.data.checkHeroMaturity(this.date)
+
+     }
+
+     moveObject = (p,o,s) =>{
+        console.log("move")
+
+        this.objects.move(p,o,s)
+        this.scene.current.rendered = false
      }
 }
 

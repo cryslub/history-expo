@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
+import i18n from 'i18n-js';
 
-
-import {  View,StyleSheet ,ScrollView,Platform } from 'react-native';
+import {  AppState,View,StyleSheet ,ScrollView,Platform,Image } from 'react-native';
 
 
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,RadioButton,Subheading  } from 'react-native-paper';
@@ -26,6 +26,11 @@ import getDate from 'date-fns/getDate'
 
 import * as FileSystem from 'expo-file-system';
 
+import * as Permissions from 'expo-permissions';
+import * as MediaLibrary from 'expo-media-library';
+
+
+import UnitData from './UnitData.js';
 
 const styles = StyleSheet.create({
 	box:{
@@ -93,19 +98,28 @@ const Top =  (observer((props) => {
     const width = day*93/max;
 
     const cancel = ()=>{
-        mainStore.stage ='game';
+        mainStore.setStage('game');
         mainStore.resume();
     }
 
     const menu = ()=>{
-        mainStore.stage ='main';
+        mainStore.setStage( 'main');
         mainStore.pause();
     }
 
+    const dateString = ()=>{
+        if(i18n.locale=='en'){
+            return format(mainStore.date,'LLL yyyy GG')
+        }else if(i18n.locale=='ko-KR'){
+            return format(mainStore.date,'GG yyyy년 M월')
+        }
+    }
+
+
     return  <>
-        {mainStore.stage!="main"?
+        {mainStore.stage!="main"&&mainStore.stage!="load"?
         <View style={styles.top}>
-             {mainStore.stage=='start'?<Paragraph style={{color:'white',padding:3}}> Choose your faction</Paragraph>:null}
+             {mainStore.stage=='start'?<Paragraph style={{color:'white',padding:3}}>  {i18n.t("ui.top.choose your faction")}</Paragraph>:null}
              {mainStore.stage=='choose'?<View style={{flexDirection:'row'}}>
                 <Paragraph style={{color:'white',marginRight:3}}> Select destination</Paragraph>
                  <Button mode="outlined" onPress={()=>cancel()}
@@ -121,7 +135,7 @@ const Top =  (observer((props) => {
                         style={{backgroundColor: "white",opacity:0.5,left:3,height:4,top:24,position:'absolute',zIndex:1 }}/>
 
 
-                     <Paragraph style={{color:'white',width:95}}> {format(mainStore.date,'LLL yyyy GG')}</Paragraph>
+                     <Paragraph style={{color:'white',width:110}}> {dateString()}</Paragraph>
                      <View style={{flexDirection:'row',marginLeft:5}}>
                         {mainStore.speed==0?
                          <Button mode="contained"  icon="pause"
@@ -170,48 +184,45 @@ const Top =  (observer((props) => {
 
 const Menu =  (observer((props) => {
 
+    const saveFileUri = FileSystem.documentDirectory+"historia-save.json"
+
     const resume = ()=>{
-        mainStore.stage = 'game'
+        mainStore.setStage( 'game')
         mainStore.resume();
     }
 
     const newGame = ()=>{
-        mainStore.stage = 'start'
+        mainStore.setStage( 'start')
         if(mainStore.gameStarted){
             mainStore.data.load();
             mainStore.setSelectedFaction({});
         }
     }
 
-    const save = ()=>{
-        let json =  JSON.stringify(getCoreData())
-        if (Platform.OS === 'web') {
-            download(json,"historia-save.json",'application/json')
-        }else{
-            FileSystem.writeAsStringAsync("file://historia-save.json",json)
-        }
+    const  save =  async ()=>{
+
+        props.save()
+
+
     }
 
-     const load = ()=>{
-         if (Platform.OS === 'web') {
-            openFile()
-        }else{
-             FileSystem.readAsStringAsync("file://historia-save.json")
-             .then((json ) => {
-                 parseSaved(json)
-              })
-        }
-     }
+    const exportFile = ()=>{
+      let json =  JSON.stringify(getCoreData())
+        download(json,"historia-save.json",'application/json')
+    }
+
+    const load = ()=>{
+        props.load()
+
+    }
+
+    const importFile = ()=>{
+           openFile()
+    }
 
     const parseSaved = (contents)=>{
-          const saved = JSON.parse(contents)
-            mainStore.parseCoreData(saved.main,mainStore.data)
+        props.parseSaved(contents)
 
-            saved.cities.forEach(city=>{
-                mainStore.data.cities[city.id].parseCoreData(city,mainStore.data)
-            })
-
-            props.initGame()
     }
 
     const openFile = (func) =>{
@@ -268,38 +279,45 @@ const Menu =  (observer((props) => {
     }
 
     const getCoreData = ()=>{
-        return {
-            cities : Object.keys(mainStore.data.cities).map(key=>{
-                return mainStore.data.cities[key].getCoreData()
-            }),
-            main:mainStore.getCoreData()
-        }
+        return  props.getCoreData()
     }
 
     return <>
          {mainStore.stage=='main'?
          <View style={styles.menuContainer} >
              <View style={styles.menu} >
-                {mainStore.gameStarted?<Button mode="outlined" onPress={()=>save()}
+                {mainStore.gameStarted&&Platform.OS=='web'?<Button mode="outlined" onPress={()=>exportFile()}
                     compact={true} color="white" style={styles.menuButton}>
-                    Save
+                    {i18n.t("ui.menu.export")}
                 </Button>:null}
-                <Button mode="outlined" onPress={()=>load()}
+                {Platform.OS=='web'?<Button mode="outlined" onPress={()=>importFile()}
                     compact={true} color="white" style={styles.menuButton}>
-                    Load
-                </Button>
+                    {i18n.t("ui.menu.import")}
+                </Button>:null}
 
                 <Button mode="outlined" onPress={()=>newGame()}
                     compact={true} color="white" style={styles.menuButton}>
-                    New Game
+                    {i18n.t("ui.menu.new game")}
                 </Button>
                 {mainStore.gameStarted?<Button mode="outlined" onPress={()=>resume()}
                     compact={true} color="white" style={styles.menuButton}>
-                    Resume
+                    {i18n.t("ui.menu.resume")}
                 </Button>:null}
 
              </View>
          </View>:null}
+    </>
+}))
+
+const Load =  (observer((props) => {
+
+    return <>
+         {mainStore.stage=='load'?
+         <View style={[styles.menuContainer,{flexDirection:'row'}]} >
+             <View style={{alignItems:'center',width:'100%',alignSelf:'center'}}>
+              <Image style={{width:375,height:375}} source={require('./assets/splash-earth.png')}/>
+              </View>
+          </View>:null}
     </>
 }))
 
@@ -310,12 +328,12 @@ const Side =  (observer((props) => {
     }
 
      const onUnit = ()=>{
-        props.navigation.navigate('Deployed', {onSelect:props.onSelectUnit})
+        props.navigation.navigate('Deployed')
     }
 
 
     return <>
-        {mainStore.stage!='main'?<>
+        {mainStore.stage!='main'&&mainStore.stage!="load"?<>
             <View style={styles.box}>
                 {false?<Button mode="outlined"  onPress={()=>props.navigation.navigate('Scenario', {era: mainStore.data.era,onSelect:props.onSelect})}
                     compact={true} color="white" style={{borderColor:'white',marginRight:3}} labelStyle={{fontSize:9}}>
@@ -367,14 +385,35 @@ export  const Interface = (props) =>{
 	const [showThemeDialog, setShowThemeDialog] = React.useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
 
+	const appState = React.useRef(AppState.currentState);
 
     const scene = React.createRef();
 	const confirm = React.createRef();
+    const menu = React.createRef();
 
+    const saveFileUri = FileSystem.documentDirectory+"historia-save.json"
 
     mainStore.scene = scene;
+    mainStore.onSelectUnit = onSelectUnit
 
-    setInterval(()=>timer(mainStore.data),200)
+    setInterval(()=>timer(mainStore.data),400)
+    //console.log("timer start")
+
+     AppState.addEventListener("change", (nextAppState)=>{
+        console.log(nextAppState)
+        if( appState.current.match(/active/) && (nextAppState==='background' || nextAppState==='inactive')){
+            if(Platform.OS != 'web'){
+                save()
+            }
+        }
+
+        appState.current = nextAppState;
+     })
+
+    props.navigation.addListener('focus', () => {
+        console.log("focus")
+        setTimeout(()=>mainStore.redraw(),100)
+    });
 
 
 	const selectScenario = (scenario) => {
@@ -422,7 +461,10 @@ export  const Interface = (props) =>{
         mainStore.setDate(new Date(year,0,1))
         mainStore.setSelectedFaction(faction);
 
-        mainStore.data.init();
+
+        mainStore.data.init(faction);
+
+        mainStore.speed = 1
 
         initGame()
 
@@ -436,8 +478,9 @@ export  const Interface = (props) =>{
     }
 
     const chooseFaction = (faction)=>{
-        openConfirmDialog('Choosing Faction',
-            <Paragraph>The game will start with this faction - {faction.name} </Paragraph>,
+        scene.current.detailOff()
+        openConfirmDialog(i18n.t("ui.modal.choosing faction.title"),
+            <Paragraph>{i18n.t("ui.modal.choosing faction.message")} - {faction.name} </Paragraph>,
             ()=>gameStart(faction)
         );
     }
@@ -490,7 +533,7 @@ export  const Interface = (props) =>{
         unit.startMove(path,result.end,currentRoad==undefined?undefined:target);
 
 
-        mainStore.stage ='game';
+        mainStore.setStage( 'game')
         mainStore.resume();
     }
 
@@ -531,18 +574,86 @@ export  const Interface = (props) =>{
     const onLoad = async (objects) =>{
       mainStore.data = new DataService(objects);
       mainStore.data.load();
+        if(Platform.OS != 'web'){
+            load()
+        }else{
+            mainStore.setStage('main')
+        }
     }
 
+
+    const save = ()=>{
+        if(mainStore.gameStarted){
+            let json =  JSON.stringify(getCoreData())
+            console.log(json)
+            FileSystem.writeAsStringAsync(saveFileUri,json)
+        }
+    }
+    const load = ()=>{
+        FileSystem.getInfoAsync(saveFileUri)
+         .then((response ) => {
+            console.log(response)
+             if(response.exists){
+                 FileSystem.readAsStringAsync(saveFileUri)
+                 .then((json ) => {
+                     parseSaved(json)
+                  })
+             }else{
+                mainStore.setStage( 'main')
+             }
+          })
+
+    }
+
+
+    const getCoreData = ()=>{
+        return {
+            cities : Object.keys(mainStore.data.cities).map(key=>{
+                return mainStore.data.cities[key].getCoreData()
+            }),
+            main:mainStore.getCoreData()
+        }
+    }
+
+    const parseSaved = (contents)=>{
+          const saved = JSON.parse(contents)
+            parseCoreData(saved.main,mainStore.data)
+
+
+            saved.cities.forEach(city=>{
+                mainStore.data.cities[city.id].parseCoreData(city,mainStore.data)
+            })
+
+            mainStore.data.checkExplored()
+            initGame()
+    }
+
+    const parseCoreData = (saved,data)=>{
+        mainStore.setDate(new Date(saved.date))
+        mainStore.setSelectedFaction(data.factions[saved.selectedFaction]);
+
+        mainStore.units = [];
+
+        saved.units.forEach(unit=>{
+            const u = new UnitData()
+            u.parseCoreData(unit,data)
+            mainStore.units.push(u)
+            const city = u.city
+            mainStore.scene.current.addUnitWithPosition(unit.position,city.factionData.color,u)
+        })
+     }
 
     return  <>
 
         <ThreeScene  ref={scene}  onLoad={onLoad} interface={{chooseFaction,manage,info,go,moveUnit,trade,enter,inventory,group,exchange}}/>
 
+
         <Top/>
 
 
         <Side onSelectFaction={onSelectFaction} onSelectUnit={onSelectUnit} zoom={zoom} navigation={props.navigation}/>
-		<Menu initGame={initGame}/>
+		<Menu ref={menu} initGame={initGame} parseSaved={parseSaved} getCoreData={getCoreData}/>
+        <Load/>
 
 		<Portal>
             <ThemeDialog showThemeDialog={showThemeDialog} closeThemeDialog={closeThemeDialog} theme={theme} changeTheme={changeTheme}/>

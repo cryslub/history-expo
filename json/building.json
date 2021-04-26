@@ -21,7 +21,7 @@
     "key": "irrigation",
     "type": "",
     "delay": 60,
-    "description": "Increases farm productivity. You can build 1 irrigation system per 1 farm. City needs water resource to build more than 1 irrigation system. When a hero has been assigned, farm production increases depends on the authority of the hero.",
+    "description": "Increases farm productivity and base hygiene. You can build 1 irrigation system per 1 farm. City needs water resource to build more than 1 irrigation system. When a hero has been assigned, farm production increases depends on the authority of the hero.",
     "icon": "water",
     "color": "#1ca3ec",
     "worker": "",

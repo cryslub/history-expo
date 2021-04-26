@@ -7,18 +7,18 @@ import Popover from 'react-native-popover-view';
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
+import ResourceIcon from './ResourceIcon.js';
 
 import Unit from './Unit.js';
 import UnitData from './UnitData.js';
 
-import unitProto from "./json/unit.json"
-import resources from './json/resource.json';
 
 import { observer,inject } from "mobx-react"
 
 import mainStore from './MainContext.js';
 import actionStore from './ActionContext.js';
+
+import i18n from 'i18n-js';
 
 const styles = StyleSheet.create({
 
@@ -96,32 +96,50 @@ export const Employ = ((props) => {
         props.navigation.goBack();
     }
 
-    const action   = (unit) =>{
+    const action   = (unit,disabled) =>{
         return <>
             <View style={{width:240,padding:15}}>
                 <Caption>{unit.description}</Caption>
-                {unit.manpower?<Paragraph>Require {unit.manpower} Manpower</Paragraph>:null}
-                {unit.cost?<View style={{flexDirection:'row'}}>
-                    <Paragraph>Cost {unit.cost.type} </Paragraph>
-                    <Resource icon={resources[unit.cost.type].icon} />
-                    <Paragraph>{city.getHiringCost(unit,unit.cost.quantity).toFixed(2)} </Paragraph>
+                {unit.manpower?<Paragraph>{i18n.t("ui.employ.required manpower")} : {unit.manpower}</Paragraph>:null}
+                {unit.cost?
+                <>
+                    {Array.isArray(unit.cost)?<View style={{flexDirection:'row'}}>
+                        <Paragraph style={{whiteSpace:'nowrap'}}>{i18n.t("ui.employ.cost")} : </Paragraph>
+                        {
+                            unit.cost.map(cost=>{
+                                return <>
+                                    <Paragraph> {mainStore.data.resources[cost.type].name}  </Paragraph>
+                                    <ResourceIcon icon={mainStore.data.resources[cost.type].icon} />
+                                    <Paragraph> {cost.quantity} </Paragraph>
+                                </>
+                            })
+                        }
+                        </View>:
+                        <View style={{flexDirection:'row'}}>
+                            <Paragraph>{i18n.t("ui.employ.cost")} :  {mainStore.data.resources[unit.cost.type].name}  </Paragraph>
+                            <ResourceIcon icon={mainStore.data.resources[unit.cost.type].icon} />
+                            <Paragraph> {city.getHiringCost(unit,unit.cost.quantity).toFixed(2)} </Paragraph>
+                        </View>
+                    }
+                </>:null
+                }
+                {unit.wage?<View style={{flexDirection:'row'}}>
+                    <Paragraph>{i18n.t("ui.employ.daily wage : food")}  </Paragraph>
+                    <ResourceIcon icon="barley" />
+                    <Paragraph>{unit.wage} </Paragraph>
                 </View>:null
                 }
             </View>
-            {false?<View style={{flexDirection:'row',alignItems: 'center',justifyContent: 'center',padding:15}}>
-                 <Button icon="minus" contentStyle={{marginLeft:12}} onPress={()=>this.minus()}/>{this.state.amount}
-                 <Button icon="plus" contentStyle={{marginLeft:12}} onPress={()=>this.plus()}/>
-             </View>
-             :null}
-            {city.manpower>=unit.manpower||unit.manpower==undefined?<Button  onPress={()=>add(unit,1)}>Add</Button>:null}
+
+            {disabled?null:<Button  onPress={()=>add(unit,1)}>Add</Button>}
              {unit.delay?<View style={{width:'100%'}}>
-                <Caption style={{textAlign:'center'}}>Takes {unit.delay} days</Caption>
+                <Caption style={{textAlign:'center'}}>{i18n.t("ui.employ.takes")} {unit.delay} {i18n.t("ui.employ.days")}</Caption>
             </View>:null}
         </>
     }
 
-    const arr = Object.keys(unitProto).filter(key=>{
-		    const unit = unitProto[key];
+    const arr = Object.keys(mainStore.data.units).filter(key=>{
+		    const unit = mainStore.data.units[key];
 
             if(unit.category=='army' && city.happiness<=0){
                 return false;
@@ -133,7 +151,7 @@ export const Employ = ((props) => {
     return <SafeAreaView  contentContainerStyle={{ padding: 10 }}>
          <View style={{flexDirection:'row'}}>
             <Icon icon="account" />
-            <Paragraph>Available Manpower {Util.number(Math.floor(city?.manpower))}</Paragraph>
+            <Paragraph>{i18n.t("ui.employ.available manpower")}  {Util.number(Math.floor(city?.manpower))}</Paragraph>
         </View>
          <FlatGrid
                    itemDimension={mainStore.unitSize}
@@ -142,8 +160,16 @@ export const Employ = ((props) => {
                    spacing={1}
                    renderItem={({ item }) => {
 
-                        const unit = unitProto[item];
-                          return <Unit data={unit}  action={()=>action(unit)} disabled={city.manpower<unit.manpower}/>
+                        const unit = mainStore.data.units[item];
+                        let disabled = city.manpower<unit.manpower
+                        if(Array.isArray(unit.cost)){
+                            unit.cost.forEach(cost=>{
+                                if(city.resources[cost.type]==undefined || city.resources[cost.type]<cost.quantity){
+                                    disabled = true
+                                }
+                            })
+                        }
+                        return <Unit data={unit}  action={()=>action(unit,disabled)} disabled={disabled}/>
                    }}
          />
 

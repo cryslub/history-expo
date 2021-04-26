@@ -14,11 +14,9 @@ import { observer} from "mobx-react"
 
 import Util from './Util.js';
 import Icon from './Icon.js';
-import Resource from './Resource.js';
 
 
 import Unit from './Unit.js';
-import ResourceRow from './ResourceRow.js';
 
 
 import {MainContext} from './MainContext.js'
@@ -26,8 +24,7 @@ import {CityContext} from './CityContext.js'
 import cityStore from './CityContext.js';
 import mainStore from './MainContext.js';
 
-import resources from './json/resource.json';
-
+import i18n from 'i18n-js';
 
 const styles = StyleSheet.create({
 
@@ -100,14 +97,14 @@ export  const  HeroList =  (props) => {
 
     }
 
-    return <View contentContainerStyle={{ padding: 10,height:'100%' }} style={{height:'100%'}}>
+    return <ScrollView contentContainerStyle={{ padding: 10 }} >
         <RadioButton.Group onValueChange={value => {setValue(value);changeGovernor(value)}} value={value}>
             {city.heroes.map((hero,index)=>{
                 return  <RadioButton.Item  label={
-                <><Paragraph style={{marginRight:5}}>{hero.name}</Paragraph>
-                    <Badge style={{marginRight:1,backgroundColor:'#ff1f13'}}>{hero.valor}</Badge>
-                   <Badge style={{marginRight:1,backgroundColor:'#2780E3'}}>{hero.wisdom}</Badge>
-                   <Badge style={{marginRight:1,backgroundColor:'#FF7518',color:'white'}}>{hero.authority}</Badge>
+                <><Paragraph style={{marginRight:10}}>{hero.name} </Paragraph>
+                    <Badge style={{marginRight:2,backgroundColor:'#ff1f13',fontSize:12}}> {hero.valor} </Badge>
+                   <Badge style={{marginRight:2,backgroundColor:'#2780E3',fontSize:12}}> {hero.wisdom} </Badge>
+                   <Badge style={{marginRight:2,backgroundColor:'#FF7518',fontSize:12,color:'white'}}> {hero.authority} </Badge>
                 </>
                 } value={index+1} />
             })}
@@ -117,15 +114,16 @@ export  const  HeroList =  (props) => {
         <View style={{padding:10}}>
             {city.heroes[value-1]==undefined?null
             :<>
-                <Paragraph>Governor effect</Paragraph>
+                <Paragraph>{i18n.t("ui.hero.governor")} {i18n.t("ui.hero.effect")}</Paragraph>
 
-                <Caption >-{(city.heroes[value-1]?.valor/2).toFixed(1)}% happiness cost of employing military unit </Caption>
-                <Caption >-{(city.heroes[value-1]?.wisdom/2).toFixed(1)}% happiness cost of employing non-military unit </Caption>
-                <Caption >+{(city.heroes[value-1]?.authority/200).toFixed(2)} happiness/month</Caption>
+                <Caption >-{(city.heroes[value-1]?.valor/2).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing military unit")} </Caption>
+                <Caption >-{(city.heroes[value-1]?.wisdom/2).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing non-military unit")} </Caption>
+                 <Caption >+{Math.floor(city.heroes[value-1]?.authority/4)} {i18n.t("ui.hero.max happiness")}</Caption>
+                <Caption >+{(city.heroes[value-1]?.authority/200).toFixed(2)} {i18n.t("ui.hero.happiness")}/{i18n.t("ui.hero.month")}</Caption>
             </>
             }
 
         </View>
-     </View>
+     </ScrollView>
 
 }
