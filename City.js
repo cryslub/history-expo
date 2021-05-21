@@ -24,7 +24,7 @@ export default class City extends SubUnits{
     @observable chancellor = undefined;
 
     @observable heroes = [];
-
+    @observable factionData={}
 
 
     consumedManpower = 0;
@@ -42,7 +42,7 @@ export default class City extends SubUnits{
         super();
 
 		this.scope = $scope;
-
+        this.unitIndex = 1
 
 		this.id = city.id;
 		this.yn = city.yn;
@@ -53,6 +53,7 @@ export default class City extends SubUnits{
 		this.scenario = city.scenario;
 		this.scenarioCity = city.scenarioCity;
         this.traits = city.traits;
+        this.civilization = $scope.civilizations[city.civilization]
 
 		this.color = city.color;
 		this.faction = city.faction;
@@ -176,30 +177,32 @@ export default class City extends SubUnits{
     }
 
     addFarmsAndFood(){
-         const annualFood = (this.population*365/100 );
 
-         const farms = Util.intDivide(annualFood,3000)
+        const annualFood = (this.population*365/100 );
 
-         const farm = this.initBuilding("farm",farms);
+        const farms = Util.intDivide(annualFood,3000)
 
-            for(var i = 0;i<farms;i++){
-                const farmer = new UnitData(mainStore.data.units.farmer,this,'unit');
-                farmer.state=''
-                 farmer.remain = 0;
+        const farm = this.initBuilding("farm",farms);
 
-
-                 farm.units.push(farmer);
-            }
+        for(var i = 0;i<farms;i++){
+            const farmer = new UnitData(mainStore.data.units.farmer,this,'unit',this.unitIndex);
+            this.unitIndex++
+            farmer.state=''
+             farmer.remain = 0;
 
 
+             farm.units.push(farmer);
+        }
 
-            this.resources.food=annualFood;
 
-            const granaries = Util.intDivide(annualFood,5000);
-            const building = this.initBuilding("granary",granaries);
-            building.goods = annualFood;
 
-            this.addManpower(-farms*mainStore.data.units.farmer.manpower);
+        this.resources.food=annualFood;
+
+        const granaries = Util.intDivide(annualFood,5000);
+        const building = this.initBuilding("granary",granaries);
+        building.goods = annualFood;
+
+        this.addManpower(-farms*mainStore.data.units.farmer.manpower);
 
             /*
             if(this.manpower <0){
@@ -244,7 +247,9 @@ export default class City extends SubUnits{
         if(this.manpower<unit.manpower) return;
 
         const city = this;
-        const unitData = new UnitData(unit,this,'unit');
+        const unitData = new UnitData(unit,this,'unit',this.unitIndex);
+//        unitData.unitIndex = this.unitIndex;
+        this.unitIndex++
         city.addUnit(unitData)
         if(unit.manpower)
             city.addManpower(-unit.manpower);
@@ -333,16 +338,17 @@ export default class City extends SubUnits{
         }
 
 
-        const unitData = new BuildingData(building,city,'building');
-        unitData.units.push(unit);
+        unit.mission = 'building'
+        const buildingData = new BuildingData(building,city,'building');
+        buildingData.units.push(unit);
 
-        const b = city.addBuilding(unitData);
+        const b = city.addBuilding(buildingData);
 
 
 //        b.units.push(unit);
 
 
-        mainStore.jobs.push(unitData);
+        mainStore.jobs.push(buildingData);
 
         city.removeUnit(unit);
 
@@ -354,7 +360,7 @@ export default class City extends SubUnits{
             })
         }
 
-        return unitData;
+        return buildingData;
     }
 
 
@@ -411,6 +417,11 @@ export default class City extends SubUnits{
 	    this.trade = this.trade.splice(0);
 	}
 
+     @action
+	setFactionData(faction){
+	    this.factionData = faction;
+	}
+
 
 
     consumeResource(key,quantity){
@@ -438,7 +449,15 @@ export default class City extends SubUnits{
              this.governor.assigned = undefined;
         }
         this.governor = hero;
-        this.governor.assigned = 'governor'
+        if(hero.assigned){
+            hero.assigned.removeHero()
+        }
+        if(hero!=undefined){
+            this.governor.assigned = 'governor'
+        }
+        if(this.governor==this.chancellor){
+            this.setChancellor(undefined)
+        }
         this.refreshHeroes();
     }
 
@@ -448,8 +467,9 @@ export default class City extends SubUnits{
              this.chancellor.assigned = undefined;
         }
         this.chancellor = hero;
-        this.chancellor.assigned = 'chancellor'
-
+        if(hero!=undefined){
+            this.chancellor.assigned = 'chancellor'
+        }
         this.refreshHeroes();
     }
 
@@ -486,7 +506,8 @@ export default class City extends SubUnits{
     assign(unit,building){
         if(unit.type=='hero'){
             if(building.hero){
-                building.hero.assigned = undefined;
+                building.removeHero()
+
             }
             const hero = unit.data
            building.setHero(hero);
@@ -529,6 +550,10 @@ export default class City extends SubUnits{
                 b.completedQuantity++;
                 b.subs.shift();
 //                b.remain += (b.delay-b.remain)/b.quantity;
+
+                building.units.forEach(unit=>{
+                    unit.mission = ''
+                })
 
                 if(b.type!='production'){
                     this.units = this.units.concat(b.units);
@@ -808,10 +833,10 @@ export default class City extends SubUnits{
             }
 
         }
-
+        this.happiness -= 10
         this.governor = undefined
         this.chancellor = undefined
-        this.factionData = faction;
+        this.setFactionData(faction)
         this.factionData.cities.push(this);
         this.changeColor(faction.color)
     }
@@ -903,8 +928,8 @@ export default class City extends SubUnits{
                 if(worker == undefined){
                     this.addWorkerToGroup(group);
                 }else{
-                    if(worker.equipments['Livestock']==undefined){
-                        this.equipUnit(worker,'Livestock','donkey1')
+                    if(worker.equipments['livestock']==undefined){
+                        this.equipUnit(worker,'livestock','donkey')
                     }else{
                         const quantity = Math.min(500,        group.capacity - group.carrying)
                         let consume = this.consumeResource('food',quantity)
@@ -973,6 +998,16 @@ export default class City extends SubUnits{
                 if(this.snapshotSub?.resource == undefined) return false;
                 if(this.buildings[key]?.quantity>=this.snapshotSub?.resource[k]) return false;
             }
+        }
+
+        if(building.unique){
+            if(this.buildings[key] != undefined) return false
+        }
+
+
+        if(building.prerequisite){
+            if(this.buildings[building.prerequisite]==undefined) return false
+            if(this.buildings[building.prerequisite]?.completedQuantity<1 ) return false
         }
 
         return true;
@@ -1080,7 +1115,8 @@ export default class City extends SubUnits{
     }
 
     hide(){
-        this.object.visible = false
+        if(!mainStore.debug)
+            this.object.visible = false
     }
 
     show(){

@@ -100,7 +100,7 @@
     "speed": 25,
     "capacity": 50,
     "food consume": 1.5,
-    "wage": 3,
+    "wage": 1,
     "action": {
       "build": ["residence","irrigation","mud","clay","stone","wood","tin","copper","livestock","wool","granary","warehouse","armoury","trade","market","wall"],
       "assign": true,
@@ -192,7 +192,7 @@
     "manpower": 10,
     "wage": 1,
     "action": {
-      "build": ["brick","pottery","cloth","furnace","beer","tavern","tablet","library","toolsmith","leather","polished stone","workshop","melee","ranged","armoursmith"],
+      "build": ["brick","pottery","cloth","furnace","beer","tavern","tablet","library","toolsmith","leather","polished stone","workshop","melee","ranged","armoursmith","palace"],
       "assign": true,
       "equip": {
         "main hand": [
@@ -248,7 +248,7 @@
     "description": "Can serve in a temple or beer places",
     "delay": 10,
     "manpower": 10,
-    "wage": 3,
+    "wage": 1,
     "action": {
       "assign": true
     }
@@ -263,7 +263,7 @@
     "speed": 20,
     "capacity": 0,
     "manpower": 5,
-    "wage": 3,
+    "wage": 1,
     "action": {
       "assign": true,
       "deploy": true
@@ -275,12 +275,15 @@
     "type": "merchant",
     "icon": "cached",
     "icon priority": 1,
-    "description": "Can sell resource from your trade post or buy it form foreign lands",
+    "description": "Can trade resource from foreign lands.",
     "delay": 6,
     "manpower": 10,
     "speed": 30,
     "capacity": 10,
-    "wage": 2,
+    "wage": 1,
+    "trait": {
+      "moral decrease rate" : 0.5
+    },
     "action": {
       "assign": true,
       "deploy": true,
@@ -361,7 +364,7 @@
     "description": "Basic fighters.  +100% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
-    "wage": 10,
+    "wage": 5,
     "speed": 25,
     "food consume": 2,
     "capacity": 100,
@@ -370,6 +373,17 @@
       "assign": true,
       "equip":{
         "main hand":[ {
+          "key": "club",
+          "name": "Club",
+          "description": "5 blunt damage, 15 weight",
+          "require": {
+            "club": 100
+          },
+          "effect": {
+            "bluntDamage":5,
+            "weight": 15
+          }
+        },{
           "key": "mace",
           "name": "Mace",
           "description": "10 blunt damage, 30 weight",
@@ -388,7 +402,18 @@
             "copper axe": 100
           },
           "effect": {
-            "slashDamage":15,
+            "slashDamage":20,
+            "weight": 30
+          }
+        },{
+          "key": "bronze axe",
+          "name": "Bronze Axe",
+          "description": "30 slash damage, 30 weight",
+          "require": {
+            "bronze axe": 100
+          },
+          "effect": {
+            "slashDamage":30,
             "weight": 30
           }
         }
@@ -398,7 +423,7 @@
           {
             "key": "cloak",
             "name": "Leather cloak",
-            "description": "+1 moral, +2 slash defense, -1 piercing defense",
+            "description": "+2 slash defense, -1 piercing defense",
             "require": {
               "cloak": 100
             },
@@ -413,7 +438,7 @@
           {
             "key": "Helmet",
             "name": "Copper Helmet",
-            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "description": "+2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
             "require": {
               "helmet": 100
             },
@@ -441,9 +466,9 @@
     "category": "army",
     "icon": "zodiac-sagittarius",
     "description": "Main tankers. +100% extra food consumption when traveling",
-    "delay": 35,
+    "delay": 40,
     "manpower": 100,
-    "wage": 10,
+    "wage": 5,
     "capacity": 100,
     "speed": 25,
     "food consume": 2,
@@ -460,7 +485,19 @@
               "copper spear": 100
             },
             "effect": {
-              "piercingDamage": 10,
+              "piercingDamage": 15,
+              "weight": 30
+            }
+          },
+          {
+            "key": "bronze spear",
+            "name": "Bronze Spear",
+            "description": "20 piercing damage, 30 weight",
+            "require": {
+              "bronze spear": 100
+            },
+            "effect": {
+              "piercingDamage": 20,
               "weight": 30
             }
           }
@@ -469,7 +506,7 @@
           {
             "key": "cloak",
             "name": "Leather cloak",
-            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "description": "+2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 100
             },
@@ -484,7 +521,7 @@
           {
             "key": "Helmet",
             "name": "Copper Helmet",
-            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "description": "+2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
             "require": {
               "helmet": 100
             },
@@ -497,11 +534,11 @@
             }
           }
         ],
-        "Off Hand": [
+        "off hand": [
           {
             "key": "shield",
             "name": "Tower Shield",
-            "description": "-5 piercing damage, +1 moral, +4 slash defense, +5 piercing defense,  +2 blunt defense, -3 speed, 50 weight",
+            "description": "-5 piercing damage, +4 slash defense, +5 piercing defense,  +2 blunt defense,  50 weight",
             "require": {
               "shield": 100
             },
@@ -511,7 +548,6 @@
               "slashDefense": 4,
               "piercingDefense": 5,
               "bluntDefense": 2,
-              "speed": -3,
               "weight": 50
             }
           }
@@ -531,9 +567,9 @@
     "category": "army",
     "icon": "bullseye-arrow",
     "description": "Main range unit. +50% extra food consumption when traveling",
-    "delay": 30,
+    "delay": 60,
     "manpower": 100,
-    "wage": 10,
+    "wage": 5,
     "speed": 25,
     "food consume": 1.5,
     "capacity": 100,
@@ -557,7 +593,7 @@
             }
           }
         ],
-        "Util": [
+        "util": [
           {
             "key": "copper dagger",
             "name": "Copper Dagger",
@@ -571,7 +607,7 @@
             }
           }
         ],
-        "Back": [
+        "back": [
           {
             "key": "quiver",
             "name": "Quiver",
@@ -584,11 +620,11 @@
             }
           }
         ],
-        "Ammo": [
+        "ammo": [
           {
             "key": "copper arrow",
             "name": "Copper Arrow",
-            "description": "instant use,+2 extra piercing damage, 5 weight",
+            "description": "instant use,+4 extra piercing damage, 5 weight",
             "require": {
               "copper arrow": 10
             },
@@ -597,13 +633,26 @@
               "piercingDamageBonus": 2,
               "weight": 5
             }
+          },
+          {
+            "key": "bronze arrow",
+            "name": "Bronze Arrow",
+            "description": "instant use,+8 extra piercing damage, 5 weight",
+            "require": {
+              "bronze arrow": 10
+            },
+            "instant": true,
+            "effect": {
+              "piercingDamageBonus": 5,
+              "weight": 5
+            }
           }
         ],
         "cloak": [
           {
             "key": "cloak",
             "name": "Leather cloak",
-            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "description": "+2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 100
             },
@@ -618,7 +667,7 @@
           {
             "key": "Helmet",
             "name": "Copper Helmet",
-            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "description": "+2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
             "require": {
               "helmet": 100
             },
@@ -648,7 +697,7 @@
     "description": "Light infantry unit. +50% extra food consumption when traveling",
     "delay": 30,
     "manpower": 100,
-    "wage": 10,
+    "wage": 5,
     "speed": 25,
     "food consume": 1.5,
     "capacity": 100,
@@ -658,41 +707,57 @@
       "equip":{
         "main hand":[
           {
-          "key": "copper javelin",
-          "name": "Copper Javelin",
-          "description": "20 piercing damage,2 range, instant use, 20 weight",
-          "require": {
-            "copper javelin": 100
-          }
-          ,
-          "instant": true,
-          "effect": {
-            "piercingDamage":20,
-            "range": 2,
-            "weight": 20
-          }
-        },
+            "key": "stick",
+            "name": "Throwing Stick",
+            "description": "8 blunt damage,2 range, instant use, 10 weight",
+            "require": {
+              "stick": 100
+            },
+            "instant": true,
+            "effect": {
+              "bluntDamage": 8,
+              "range": 2,
+              "weight": 10
+            }
+          },
           {
-          "key": "stick",
-          "name": "Throwing Stick",
-          "description": "8 blunt damage,2 range, instant use, 10 weight",
-          "require": {
-            "stick": 100
+            "key": "copper javelin",
+            "name": "Copper Javelin",
+            "description": "20 piercing damage,2 range, instant use, 15 weight",
+            "require": {
+              "copper javelin": 100
+            }
+            ,
+            "instant": true,
+            "effect": {
+              "piercingDamage":20,
+              "range": 2,
+              "weight": 15
+            }
+          },
+          {
+            "key": "bronze javelin",
+            "name": "Bronze Javelin",
+            "description": "30 piercing damage,2 range, instant use, 15 weight",
+            "require": {
+              "bronze javelin": 100
+            }
+          ,
+            "instant": true,
+            "effect": {
+              "piercingDamage":30,
+              "range": 2,
+              "weight": 15
+            }
           }
-        ,
-          "instant": true,
-          "effect": {
-            "bluntDamage":8,
-            "range": 2,
-            "weight": 10
-          }
-        }
+
+
         ] ,
         "cloak": [
           {
             "key": "cloak",
             "name": "Leather cloak",
-            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "description": "+2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 100
             },
@@ -706,7 +771,7 @@
           {
             "key": "Helmet",
             "name": "Copper Helmet",
-            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
+            "description": "+2 slash defense, +2 piercing defense,  +1 blunt defense, 20 weight",
             "require": {
               "helmet": 100
             },
@@ -727,16 +792,17 @@
       "equip": true
     }
   },
-  "charioteer": {
+  "war cart": {
     "id": 2,
-    "name": "Charioteer",
-    "type": "charioteer",
+    "name": "War-cart",
+    "type": "war cart",
     "category": "army",
     "icon": "buddhism",
-    "description": "Tank of ancient era. +150% extra food consumption when traveling",
-    "delay": 50,
+    "special": true,
+    "description": "Chariot comprised of four or two-wheeled device manned by a crew of two and harnessed to four onagers. +150% extra food consumption when traveling",
+    "delay": 90,
     "manpower": 50,
-    "wage": 20,
+    "wage": 10,
     "speed": 25,
     "food consume": 2.5,
     "capacity": 25,
@@ -748,7 +814,7 @@
           {
             "key": "copper javelin",
             "name": "Copper Javelin",
-            "description": "20 piercing damage,2 range, instant use, 5 weight",
+            "description": "20 piercing damage,2 range, instant use, 15 weight",
             "instant": true,
             "require": {
               "copper javelin": 25
@@ -757,7 +823,22 @@
               "piercingDamage": 20,
               "range": 2,
               "instant": true,
-              "weight": 10
+              "weight": 15
+            }
+          },
+          {
+            "key": "bronze javelin",
+            "name": "Bronze Javelin",
+            "description": "30 piercing damage,2 range, instant use, 15 weight",
+            "require": {
+              "bronze javelin": 100
+            }
+          ,
+            "instant": true,
+            "effect": {
+              "piercingDamage":30,
+              "range": 2,
+              "weight": 15
             }
           }
         ],
@@ -768,7 +849,7 @@
             "description": "+5 moral,+4 slash defense, +3 piercing defense,  +2 blunt defense, +5 extra piercing damage, +50 capacity",
             "require": {
               "cart": 25,
-              "livestock": 50
+              "livestock": 100
             },
             "effect": {
               "moral": 5,
@@ -784,7 +865,7 @@
           {
             "key": "cloak",
             "name": "Leather cloak",
-            "description": "+1 moral, +2 slash defense, +1 piercing defense",
+            "description": "+2 slash defense, +1 piercing defense",
             "require": {
               "cloak": 50
             },
@@ -799,7 +880,7 @@
           {
             "key": "Helmet",
             "name": "Copper Helmet",
-            "description": "+1 moral, +2 slash defense, +2 piercing defense,  +1 blunt defense, 10 weight",
+            "description": "+2 slash defense, +2 piercing defense,  +1 blunt defense, 10 weight",
             "require": {
               "helmet": 50
             },
@@ -817,9 +898,6 @@
     "cost": [
       {
         "type": "happiness",
-        "quantity": 5
-      },{
-        "type": "silver",
         "quantity": 5
       }
     ]

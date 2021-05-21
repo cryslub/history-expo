@@ -12,7 +12,7 @@ export class CityAI{
 
     constructor(city) {
         this.city = city;
-
+        this.manpowerShortage = false
     }
 
     dailyJob(diff){
@@ -25,6 +25,7 @@ export class CityAI{
 
     checkNeeds(){
         Object.keys(this.needs).forEach(key=>{
+
             const need = this.needs[key];
             if(need!=undefined){
                 const city = this.city;
@@ -33,7 +34,29 @@ export class CityAI{
                 let building = key;
                 if(key=='sling') building ='ranged';
                 if(key=='mace') building ='melee';
+                if(key=='club') building ='melee';
+
                 if(key=="stone tool") building ='toolsmith';
+
+                if(city.civilization){
+                    const civ = city.civilization.key
+                    if(civ == 'egypt'){
+                        if(key=='cloth'){
+                            building = 'egyptian cloth'
+                        }
+                        if(key=='polished stone'){
+                            building = 'egyptian polished stone'
+                        }
+                    }
+                    if(civ == 'kish'){
+                        if(key=='livestock'){
+                            building = 'kishite livestock'
+                        }
+                        if(key=='wool'){
+                            building = 'kishite wool'
+                        }
+                    }
+                }
 
                 if(this.city.buildings[building] != undefined){
                     const production  =mainStore.data.buildings[building]?.production;
@@ -63,7 +86,22 @@ export class CityAI{
                     }
                 }
 
-                if(this.city.manpower<=100 && key !='tablet') return;
+                 let limit = 100
+                  if(city.civilization){
+                     if(city.civilization.key =='egypt'){
+                        limit = 200
+                     }
+                  }
+
+                if(this.city.manpower<=limit){
+                    if(key =='tablet'||key =='papyrus'||key =='papyrus sedge'||key =='mud'){
+
+                    }else return
+
+                }else{
+                    if(this.foodShortage) return
+                }
+
 
                 switch(key){
                     case 'mud':
@@ -88,16 +126,16 @@ export class CityAI{
                         this.orderUnitToBuild('worker',this.buildings.stone)
                     break;
                     case 'polished stone':
-                        this.orderUnitToBuild('artisan',this.buildings['polished stone'])
+                        this.orderUnitToBuild('artisan',this.buildings[building])
                     break;
                     case 'cloth':
-                        this.orderUnitToBuild('artisan',this.buildings.cloth,need)
+                        this.orderUnitToBuild('artisan',this.buildings[building],need)
                     break;
                     case 'wool':
-                        this.orderUnitToBuild('worker',this.buildings.wool,need)
+                        this.orderUnitToBuild('worker',this.buildings[building],need)
                     break;
                     case 'livestock':
-                        this.orderUnitToBuild('worker',this.buildings.livestock,need)
+                        this.orderUnitToBuild('worker',this.buildings[building],need)
                     break;
                     case 'beer':
                         this.orderUnitToBuild('artisan',this.buildings.beer)
@@ -105,6 +143,16 @@ export class CityAI{
                     case 'tablet':
                         this.orderUnitToBuild('artisan',this.buildings.tablet)
                     break;
+                    case 'papyrus':
+                        this.orderUnitToBuild('artisan',this.buildings.papyrus)
+                    break;
+                    case 'papyrus sedge':
+                        this.orderUnitToBuild('farmer',this.buildings['papyrus sedge'])
+                    break;
+                    case 'flax':
+                        this.orderUnitToBuild('farmer',this.buildings['flax'])
+                    break;
+
                     case 'sling':
                     {
                         if(city.buildings[building]==undefined){
@@ -121,6 +169,10 @@ export class CityAI{
                     case 'mace':
                         this.orderUnitToBuild('artisan',this.buildings.melee)
                     break;
+                    case 'club':
+                        this.orderUnitToBuild('artisan',this.buildings.melee)
+                    break;
+
                     case 'warehouse':
                         this.orderUnitToBuild('worker',this.buildings.warehouse)
                     break;
@@ -155,14 +207,14 @@ export class CityAI{
     }
 
     monthlyJob(diff){
-        this.checkManpower();
+        this.manpowerShortage = this.checkManpower();
         if(this.city.happiness<50){
             this.checkHappinessBuildings();
 
     //        this.addNeed({type:'happiness',quantity:1});
         }
 
-       // this.checkFood();
+        this.checkFood();
         this.checkRareResource();
 
         this.checkWorkers();
@@ -185,18 +237,53 @@ export class CityAI{
     }
 
     checkManpower(){
-        if(this.city.manpower <  1000){
-            if((this.city.buildings.library || this.city.population<3000) && this.city.getMaxManpower()<800){
-                this.checkResidence();
+        const city = this.city
+        if(city.manpower <  1000){
+
+
+            let building = 'library'
+
+            if(city.civilization){
+                const civ = city.civilization.key
+                if(civ =='egypt'){
+                    building = 'egyptian library'
+                }
+
+                if(civ =='sumer'){
+                    building = 'sumerian library'
+                }
+
+            }
+
+            if((city.buildings[building] || city.population<3000) && city.getMaxManpower()<800){
+                return this.checkResidence();
             }else{
-                    this.orderUnitToBuild('artisan',this.buildings.library)
+                if(city.buildings[building] !=undefined){
+                    let p = city.buildings[building].data.production
+                    if(city.buildings[building].quantity * p.quantity < Util.intDivide(city.getMaxManpower(),100) ){
+                        //if(building =='sumerian library'){
+                            //console.log(city.buildings[building].quantity * p.quantity +","+ city.getMaxManpower()/50 )
+                        //}
+                        this.orderUnitToBuild('artisan',this.buildings[building])
+                        return true
+                    }
+                }else{
+//                    console.log(building)
+                    this.orderUnitToBuild('artisan',this.buildings[building])
+                    return true
+                }
+
             }
         }
+        return false
     }
 
     checkResidence(){
         if(this.city.population>=((this.city.buildings.residence.completedQuantity*this.buildings.residence.storage.quantity)-450) ){
             this.orderUnitToBuild('worker',this.buildings.residence)
+            return true
+        }else{
+            return false
         }
     }
 
@@ -262,16 +349,20 @@ export class CityAI{
         extra = extra==undefined?0:extra;
 
         if(farm.getResultQuantity(this.buildings.farm.production.quantity)<=(consumption+extra)*365){
-
-            if(city.checkBuildingAvailability(this.buildings.irrigation)){
-                this.orderUnitToBuild('worker',this.buildings.irrigation)
-            }else{
+            this.foodShortage = true
+            if(!this.manpowerShortage){
+                if(city.checkBuildingAvailability(this.buildings.irrigation) && city.manpower>200){
+                    this.orderUnitToBuild('worker',this.buildings.irrigation)
+                }
 
                 this.city.employ(mainStore.data.units.farmer,(unit)=>{
                     this.city.build(unit,this.buildings.farm)
                 });
             }
+
             ret = false;
+        }else{
+            this.foodShortage = false
         }
 
         this.checkGranary();
@@ -281,14 +372,15 @@ export class CityAI{
 
     checkFood(){
 
+
         this.checkFarms(this.city.getFoodConsumption())
 
 
     }
 
     checkRareResource(){
-        const arr = ['copper','wood']
-        if(this.city.population>1000){
+        const arr = ['copper','tin','silver']
+        if(this.city.population>1000 && this.city.manpower>300){
 
             arr.forEach(key=>{
                 if(this.city.rareResources[key] !=undefined){
@@ -415,6 +507,7 @@ export class CityAI{
     }
 
     checkArmy(type,weapon){
+        if(this.city.manpower<=400) return;
         if(this.city.getMilitaryUnits('unarmed')>0){
 
         }else{
@@ -444,8 +537,8 @@ export class CityAI{
             if(worker == undefined){
                 city.addWorkerToGroup(group);
             }else{
-                if(worker.equipments['Livestock']==undefined){
-                    city.equipUnit(worker,'Livestock','donkey1')
+                if(worker.equipments['livestock']==undefined){
+                    city.equipUnit(worker,'livestock','donkey')
                 }else{
                     const quantity = Math.min(500,        group.capacity - group.carrying)
                     let consume = city.consumeResource('food',quantity)

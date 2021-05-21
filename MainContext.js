@@ -7,6 +7,7 @@ import Util from './Util.js';
 class MainStore{
 
     unitSize = 82;
+    debug = true
 
     @observable selectedCity={};
     @observable selectedScenario={};
@@ -15,6 +16,7 @@ class MainStore{
     @observable date=0;
     @observable speed=0;
     @observable  stage="load";
+    @observable selectionList = []
     gameStarted = false
 
 
@@ -72,6 +74,11 @@ class MainStore{
      setStage = (stage)=>{
         this.stage = stage;
      }
+
+    @action
+    setSelectionList = (selectionList)=>{
+        this.selectionList = selectionList
+    }
 
      move = (unit)=>{
 

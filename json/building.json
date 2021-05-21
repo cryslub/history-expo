@@ -21,7 +21,7 @@
     "key": "irrigation",
     "type": "",
     "delay": 60,
-    "description": "Increases farm productivity and base hygiene. You can build 1 irrigation system per 1 farm. City needs water resource to build more than 1 irrigation system. When a hero has been assigned, farm production increases depends on the authority of the hero.",
+    "description": "Increases farm productivity. You can build 1 irrigation system per 1 farm. City needs water resource to build more than 1 irrigation system. When a hero has been assigned, farm production increases depends on the authority of the hero.",
     "icon": "water",
     "color": "#1ca3ec",
     "worker": "",
@@ -172,7 +172,13 @@
     "production": {
       "delay": 300,
       "result": "livestock",
-      "quantity": 20
+      "quantity": 20,
+      "cost": [
+        {
+          "type": "food",
+          "quantity": 120
+        }
+      ]
     },
     "cost": {
       "type": "wood",
@@ -218,6 +224,71 @@
       ]
     }
   },
+  "kishite livestock": {
+    "id": 31,
+    "name": "Ranch",
+    "key": "kishite livestock",
+    "type": "production",
+    "delay": 20,
+    "description": "Workers can breed livestock from here",
+    "icon": "cow",
+    "color": "#7c4945",
+    "worker": "worker",
+    "production": {
+      "delay": 300,
+      "result": "livestock",
+      "quantity": 22,
+      "cost": [
+        {
+          "type": "food",
+          "quantity": 120
+        }
+      ]
+    },
+    "cost": {
+      "type": "wood",
+      "quantity": 30
+    },
+    "storage": {
+      "type": "livestock",
+      "quantity": 50
+    }
+  },
+  "kishite wool": {
+    "id": 31,
+    "name": "Sheep farm",
+    "key": "kishite wool",
+    "type": "production",
+    "delay": 20,
+    "description": "Workers can collect wool from sheep",
+    "icon": "sheep",
+    "color": "#bab9b1",
+    "worker": "worker",
+    "cost": {
+      "type": "wood",
+      "quantity": 30
+    },
+    "production": {
+      "delay": 30,
+      "result": [
+        {
+          "key":"wool",
+          "quantity": 25
+        },
+        {
+          "key":"food",
+          "quantity": 100
+        }
+      ],
+      "quantity": 20,
+      "cost": [
+        {
+          "type": "livestock",
+          "quantity": 1
+        }
+      ]
+    }
+  },
   "brick": {
     "id": 31,
     "name": "Brickyard",
@@ -240,7 +311,7 @@
         },
         {
           "type": "food",
-          "quantity": 10
+          "quantity": 1
         }
       ]
     },
@@ -275,6 +346,32 @@
       ]
     }
   },
+  "egyptian polished stone": {
+    "id": 31,
+    "name": "Stonemasonry",
+    "key": "egyptian polished stone",
+    "type": "production",
+    "delay": 10,
+    "description": "Artisans can polish stone from here",
+    "icon": "alpha-s-circle",
+    "color": "#6D7876",
+    "worker": "artisan",
+    "cost": {
+      "type": "brick",
+      "quantity": 50
+    },
+    "production": {
+      "delay": 50,
+      "result": "polished stone",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "stone",
+          "quantity": 10
+        }
+      ]
+    }
+  },
     "residence": {
       "id": 31,
       "name": "Residential Area",
@@ -284,10 +381,11 @@
       "description": "The place where people lives. When a hero has been assigned, population growth rate increases depends on the wisdom of hero.",
       "icon": "home-group",
       "color": "#70543e",
-      "cost": {
+      "cost": [{
         "type": "brick",
         "quantity": 100
-      },
+      }
+      ],
       "storage": {
         "type": "citizen",
         "quantity": 1000
@@ -327,10 +425,11 @@
     "description": "Artisans can make pottery from here",
     "icon": "gas-cylinder",
     "color": "#d97557",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 20
-    },
+    }
+    ],
     "worker": "artisan",
     "production": {
       "delay": 14,
@@ -353,10 +452,11 @@
     "description": "Artisans can weave wool to make clothes from here",
     "icon": "tshirt-crew",
     "color": "#bab9b1",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 30
-    },
+    }
+    ],
     "worker": "artisan",
 
     "production": {
@@ -380,10 +480,10 @@
     "description": "Merchants can distribute basic goods from here. More variety of goods will give more happiness.",
     "icon": "store",
     "color": "#e3c378",
-    "cost": {
+    "cost":[ {
       "type": "brick",
       "quantity": 40
-    },
+    }],
     "worker": "merchant",
 
     "production": {
@@ -413,10 +513,10 @@
     "description": "Various resources can be stored here",
     "icon": "cube",
     "color": "#d97557",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 50
-    },
+    }],
     "storage": {
       "type": "resource",
       "quantity": 200
@@ -434,10 +534,10 @@
     "worker": "merchant",
     "trade": {
     },
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 50
-    }
+    }]
 
   },
   "beer": {
@@ -449,10 +549,11 @@
     "description": "Priests can make beer from here",
     "icon": "glass-mug",
     "color": "#F6C101",
-    "cost": {
-      "type": "brick",
-      "quantity": 40
-    },
+    "cost": [
+      {
+        "type": "brick",
+        "quantity": 40
+      }],
     "worker": "priest",
 
     "production": {
@@ -462,7 +563,7 @@
       "cost": [
         {
           "type": "food",
-          "quantity": 100
+          "quantity": 30
         },
         {
           "type": "pottery",
@@ -480,10 +581,10 @@
       "description": "Priests can serve beer to the people from here",
       "icon": "glass-mug",
       "color": "#F6C101",
-      "cost": {
+      "cost": [{
         "type": "brick",
-        "quantity": 20
-      },
+        "quantity": 50
+      }],
       "worker": "priest",
 
       "production": {
@@ -507,10 +608,17 @@
     "description": "Artisans can make clay tablet from here",
     "icon": "file-document-box",
     "color": "#d97557",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 50
     },
+      {
+        "type": "clay",
+        "quantity": 5},
+      {
+        "type": "mud",
+        "quantity": 5
+      }],
     "worker": "artisan",
 
     "production": {
@@ -525,6 +633,7 @@
       ]
     }
   },
+
   "library": {
     "id": 31,
     "name": "Library",
@@ -551,6 +660,145 @@
       ]
     }
   },
+  "sumerian library": {
+    "id": 31,
+    "name": "Library",
+    "key": "sumerian library",
+    "type": "production",
+    "delay": 60,
+    "description": "Scribe can manage manpower from here. From 3,000 population, city needs libraries to increase its manpower. +10 available manpower per month until 1/3 of city population",
+    "icon": "book",
+    "color": "#d97557",
+    "cost": [{
+      "type": "brick",
+      "quantity": 100
+    }],
+    "worker": "scribe",
+    "production": {
+      "delay": 30,
+      "result": "manpower",
+      "quantity": 11,
+      "cost": [
+        {
+          "type": "tablet",
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  "flax": {
+    "id": 31,
+    "name": "Flax farm",
+    "key": "flax",
+    "type": "production",
+    "delay": 10,
+    "description": "Farmers can grow flax from here",
+    "icon": "barley",
+    "color": "#0b6e0b",
+    "worker": "farmer",
+    "production": {
+      "delay": 300,
+      "result": "flax",
+      "quantity": 200
+    }
+  },
+  "egyptian cloth": {
+    "id": 31,
+    "name": "Weaver",
+    "key": "egyptian cloth",
+    "type": "production",
+    "delay": 20,
+    "description": "Artisans can weave flax fibers to make clothes from here",
+    "icon": "tshirt-crew",
+    "color": "#bab9b1",
+    "cost": [{
+      "type": "brick",
+      "quantity": 30
+    }
+    ],
+    "worker": "artisan",
+
+    "production": {
+      "delay": 40,
+      "result": "cloth",
+      "quantity": 50,
+      "cost": [
+        {
+          "type": "flax",
+          "quantity": 10
+        }
+      ]
+    }
+  },
+  "papyrus sedge": {
+    "id": 31,
+    "name": "Papyrus farm",
+    "key": "papyrus sedge",
+    "type": "production",
+    "delay": 10,
+    "description": "Farmers can grow papyrus sedge from here",
+    "icon": "svg",
+    "color": "#0b6e0b",
+    "worker": "farmer",
+    "production": {
+      "delay": 300,
+      "result": "papyrus sedge",
+      "quantity": 200
+    }
+  },
+  "papyrus": {
+    "id": 31,
+    "name": "Papyrus maker",
+    "key": "papyrus",
+    "type": "production",
+    "delay": 10,
+    "description": "Artisans can make papyrus from here",
+    "icon": "file-powerpoint",
+    "color": "#ba894a",
+    "worker": "artisan",
+    "cost": [{
+      "type": "brick",
+      "quantity": 50
+    }],
+    "production": {
+      "delay": 30,
+      "result": "papyrus",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "papyrus sedge",
+          "quantity": 10
+        }
+      ]
+    }
+  },
+  "egyptian library": {
+    "id": 31,
+    "name": "Library",
+    "key": "egyptian library",
+    "type": "production",
+    "delay": 60,
+    "description": "Scribe can manage manpower from here. From 3,000 population, city needs libraries to increase its manpower. +10 available manpower per month until 1/3 of city population",
+    "icon": "book",
+    "color": "#ba894a",
+    "cost": [{
+      "type": "brick",
+      "quantity": 100
+    }],
+    "worker": "scribe",
+    "production": {
+      "delay": 30,
+      "result": "manpower",
+      "quantity": 10,
+      "cost": [
+        {
+          "type": "papyrus",
+          "quantity": 1
+        }
+      ]
+    }
+  },
+
   "wall": {
     "id": 31,
     "name": "City wall",
@@ -560,10 +808,10 @@
     "description": "Increase city defense. When a hero has been assigned, wall defense increases depends on the valor of the hero.",
     "icon": "chess-rook",
     "color": "#70543e",
-    "cost": {
+    "cost":[ {
       "type": "brick",
       "quantity":200
-    },
+    }],
     "defense": 1,
     "hero effect": {
       "defense" : 0.01,
@@ -579,10 +827,10 @@
     "description": "Artisans can produce leather from here",
     "icon": "firebase",
     "color": "#501b00",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 40
-    },
+    }],
     "worker": "artisan",
     "production": {
       "delay": 50,
@@ -605,10 +853,10 @@
     "description": "Artisan can combine copper and tin to make bronze from here",
     "icon": "weight",
     "color": "#8f8b96",
-    "cost": {
+    "cost":[ {
       "type": "brick",
       "quantity": 40
-    },
+    }],
     "worker": "artisan",
 
     "production": {
@@ -640,10 +888,11 @@
     "description": "Artisan can make tool from here",
     "icon": "hammer",
     "color": "#b87333",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 40
-    },
+    }
+    ],
     "worker": "artisan",
 
     "production": [
@@ -701,12 +950,23 @@
     "description": "Artisan can make melee weapons from here",
     "icon": "sword-cross",
     "color": "#b87333",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 60
-    },
+    }],
     "worker": "artisan",
     "production": [
+      {
+        "delay": 20,
+        "result": "club",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          }
+        ]
+      },
       {
         "delay": 30,
         "result": "mace",
@@ -732,11 +992,25 @@
         },
         {
           "type": "copper",
-          "quantity": 4
+          "quantity": 2
         }
       ]
     },
-
+      {
+        "delay": 40,
+        "result": "bronze axe",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 2
+          }
+        ]
+      },
       {
         "delay": 30,
         "result": "copper spear",
@@ -748,7 +1022,22 @@
           },
           {
             "type": "copper",
-            "quantity": 2
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 40,
+        "result": "bronze spear",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
           }
         ]
       },
@@ -759,7 +1048,7 @@
         "cost": [
           {
             "type": "copper",
-            "quantity": 10
+            "quantity": 2
           }
         ]
       }]
@@ -773,10 +1062,10 @@
     "description": "Artisan can make ranged weapons from here",
     "icon": "bullseye-arrow",
       "color": "#8D6142",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 60
-    },
+    }],
     "worker": "artisan",
     "production": [
       {
@@ -801,7 +1090,22 @@
           },
           {
             "type": "copper",
-            "quantity": 2
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 40,
+        "result": "bronze javelin",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
           }
         ]
       },
@@ -838,7 +1142,22 @@
           },
           {
             "type": "copper",
-            "quantity": 2
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 40,
+        "result": "bronze arrow",
+        "quantity": 60,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
           }
         ]
       }]
@@ -852,10 +1171,10 @@
     "description": "Artisan can make armours from here",
     "icon": "tshirt-v-outline",
     "color": "#501b00",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 60
-    },
+    }],
     "worker": "artisan",
     "production": [{
       "delay": 30,
@@ -901,7 +1220,7 @@
           },
           {
             "type": "food",
-            "quantity": 100
+            "quantity": 30
           }
         ]
       }]
@@ -915,10 +1234,10 @@
     "description": "Weapons and armours can be stored at here",
     "icon": "axe",
     "color": "#b87333",
-    "cost": {
+    "cost":[ {
       "type": "brick",
       "quantity": 100
-    },
+    }],
     "storage": {
       "type": "resource",
       "quantity": 200
@@ -933,10 +1252,10 @@
     "description": "Artisan can make cart from here",
     "icon": "buddhism",
     "color": "#8D6142",
-    "cost": {
+    "cost": [{
       "type": "brick",
       "quantity": 80
-    },
+    }],
     "worker": "artisan",
     "production": {
       "delay": 90,
@@ -948,6 +1267,72 @@
           "quantity": 20
         }
       ]
+    }
+  },
+  "palace": {
+    "id": 31,
+    "name": "Palace",
+    "key": "palace",
+    "type": "",
+    "delay": 2000,
+    "unique": true,
+    "description": "Activates chancellor function. +1 max happiness faction wide when the city is capital",
+    "icon": "crown",
+    "color": "#8D6142",
+
+    "cost": [
+      {
+        "type": "brick",
+        "quantity": 1000
+      },{
+      "type": "wood",
+      "quantity": 100
+      },
+
+      {
+        "type": "polished stone",
+        "quantity": 100
+      }
+    ],
+    "build": {
+      "worker": 5
+    },
+    "effect": {
+      "faction max happiness" : 1
+    }
+  },
+  "hospital": {
+    "name": "Hospital",
+    "key": "hospital",
+    "type": "production",
+    "delay": 1000,
+    "unique": true,
+    "description": "+2 base hygiene",
+    "icon": "hospital-box",
+    "color": "#70543e",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 100
+      },
+      {
+        "type": "clay",
+        "quantity": 100
+      },
+      {
+        "type": "mud",
+        "quantity": 100
+      },
+      {
+        "type": "polished stone",
+        "quantity": 500
+      }
+    ],
+    "build": {
+      "worker": 5
+    },
+    "effect": {
+      "hygiene" : 2
     }
   },
   "anu ziggurat": {
@@ -968,6 +1353,50 @@
     "effect": {
       "faction max happiness" : 2,
       "max happiness" : 3
+    },
+
+    "production": {
+      "delay": 7,
+      "result": "happiness",
+      "quantity": 0.1,
+      "cost": [{
+        "type": "beer",
+        "quantity": 1
+      }]
+    }
+  },
+  "ziggurat": {
+    "id": 31,
+    "name": "Ziggurat",
+    "originalName":"\uD808\uDC2D",
+    "key": "ziggurat",
+    "type": "production",
+    "delay": 3000,
+    "unique": true,
+    "description": "Massive structure for worship of gods. +2 max happiness,  +1 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "priest",
+    "cost": [
+      {
+        "type": "brick",
+        "quantity": 5000
+      },
+      {
+        "type": "wood",
+        "quantity": 500
+      },
+      {
+        "type": "polished stone",
+        "quantity": 500
+      }
+    ],
+    "build": {
+      "worker": 20
+    },
+    "effect": {
+      "faction max happiness" : 1,
+      "max happiness" : 2
     },
 
     "production": {
@@ -1047,7 +1476,7 @@
     "key": "abzu",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god of water Enki. +5 hygiene",
+    "description": "Temple dedicated to god of water Enki. +5 base hygiene",
     "icon": "bank",
     "color": "#00b573",
     "worker": "priest",
@@ -1337,7 +1766,7 @@
     "key": "sikil",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god Ninazu. +2 hygiene",
+    "description": "Temple dedicated to god Ninazu. +2 base hygiene",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -1671,7 +2100,7 @@
     "key": "inpu",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god Inpu. +3 hygiene, +10% moral decrease rate of the invaders",
+    "description": "Temple dedicated to god Inpu. +3 base hygiene, +10% moral decrease rate of the invaders",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -1830,6 +2259,292 @@
     },
     "effect": {
       "faction max happiness" : 1
+    }
+  },
+
+  "meidum pyramid": {
+    "id": 31,
+    "name": "Pyramid of Meidum",
+    "key": "meidum pyramid",
+    "type": "effect",
+    "delay": 3000,
+    "description": "Pyramid built for pharaoh Huni. +1 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": {
+      "type": "brick",
+      "quantity": 800
+    },
+    "effect": {
+      "faction max happiness" : 1
+    }
+  },
+  "bent pyramid": {
+    "id": 31,
+    "name": "Bent Pyramid",
+    "originalName":"\uD80C\uDF79\uD80C\uDEF4\uD80C\uDD24\uD80C\uDC8B\uD80C\uDD71\uD80C\uDF7A\uD80C\uDE0D\uD80C\uDE74\uD80C\uDE74",
+    "key": "bent pyramid",
+    "type": "effect",
+    "unique": true,
+    "delay": 9000,
+    "description": "Bent Pyramid built by pharaoh Sneferu. +1 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 200
+      },
+      {
+        "type": "clay",
+        "quantity": 200
+      },
+      {
+        "type": "mud",
+        "quantity": 200
+      },
+      {
+        "type": "polished stone",
+        "quantity": 2500
+      }
+    ],
+    "build": {
+      "worker": 20
+    },
+
+    "effect": {
+      "faction max happiness" : 1
+    }
+  },
+  "red pyramid": {
+    "id": 31,
+    "name": "Red Pyramid",
+    "originalName":"\uD80C\uDF79\uD80C\uDEF4\uD80C\uDD24\uD80C\uDC8B\uD80C\uDD71\uD80C\uDF7A\uD80C\uDE0D\uD80C\uDE74",
+    "key": "red pyramid",
+    "type": "effect",
+    "unique": true,
+    "prerequisite": "bent pyramid",
+    "delay": 9000,
+    "description": "Third Pyramid built by pharaoh Sneferu. +1 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 200
+      },
+      {
+        "type": "clay",
+        "quantity": 200
+      },
+      {
+        "type": "mud",
+        "quantity": 200
+      },
+      {
+        "type": "polished stone",
+        "quantity": 2500
+      }
+    ],
+    "build": {
+      "worker": 20
+    },
+
+    "effect": {
+      "faction max happiness" : 1
+    }
+  },
+  "great pyramid": {
+    "id": 31,
+    "name": "Great Pyramid of Giza",
+    "originalName":"\uD80C\uDF79\uD80D\uDC0D\uD80C\uDD71\uD80C\uDD91\uD80C\uDD71 \uD80C\uDF7A\uD80C\uDD5C\uD80C\uDFD4\uD80C\uDFCF\uD80C\uDE74",
+    "key": "great pyramid",
+    "type": "effect",
+    "unique": true,
+    "prerequisite": "red pyramid",
+    "delay": 15000,
+    "description": "Great Pyramid built by pharaoh Khufu. +2 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 500
+      },
+      {
+        "type": "clay",
+        "quantity": 500
+      },
+      {
+        "type": "mud",
+        "quantity": 500
+      },
+      {
+        "type": "polished stone",
+        "quantity": 5000
+      }
+    ],
+    "build": {
+      "worker": 30
+    },
+
+    "effect": {
+      "faction max happiness" : 2
+    }
+  },
+  "djedefre": {
+    "id": 31,
+    "name": "Pyramid of Djedefre",
+    "originalName":"\uD80C\uDF79\uD80C\uDDF3\uD80C\uDEBD\uD80C\uDD91\uD80C\uDF7A\uD80C\uDEF4\uD80C\uDF9B\uD80C\uDCA7\uD80C\uDD11\uD80C\uDDFC\uD80C\uDD71\uD80C\uDE74",
+    "key": "djedefre",
+    "type": "effect",
+    "unique": true,
+    "prerequisite": "great pyramid",
+    "delay": 9000,
+    "description": "Pyramid built by pharaoh Djedefre. +2 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 500
+      },
+      {
+        "type": "clay",
+        "quantity": 500
+      },
+      {
+        "type": "mud",
+        "quantity": 500
+      },
+      {
+        "type": "polished stone",
+        "quantity": 5000
+      }
+    ],
+    "build": {
+      "worker": 20
+    },
+
+    "effect": {
+      "faction max happiness" : 2
+    }
+  },
+  "khafre": {
+    "id": 31,
+    "name": "Pyramid of Khafre",
+    "originalName":"\uD80C\uDF79\uD80C\uDDF3\uD80C\uDE0D\uD80C\uDD91\uD80C\uDF7A\uD80C\uDEF4\uD80C\uDD68\uD80C\uDE74",
+    "key": "khafre",
+    "type": "effect",
+    "unique": true,
+    "prerequisite": "djedefre",
+    "delay": 9000,
+    "description": "Pyramid built by pharaoh Khafre. +2 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 400
+      },
+      {
+        "type": "clay",
+        "quantity": 500
+      },
+      {
+        "type": "mud",
+        "quantity": 500
+      },
+      {
+        "type": "polished stone",
+        "quantity": 5000
+      }
+    ],
+    "build": {
+      "worker": 30
+    },
+
+    "effect": {
+      "faction max happiness" : 2
+    }
+  },
+  "baka": {
+    "id": 31,
+    "name": "Pyramid of Baka",
+    "originalName":"\uD80C\uDF79\uD80C\uDC93\uD80C\uDF7A\uD80C\uDEF4\uD80C\uDCC0\uD80C\uDDFC",
+    "key": "baka",
+    "type": "effect",
+    "unique": true,
+    "prerequisite": "djedefre",
+    "delay": 9000,
+    "description": "Pyramid built by pharaoh Baka. +1 max happiness faction wide when the city is capital",
+    "icon": "triangle",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 200
+      },
+      {
+        "type": "clay",
+        "quantity": 200
+      },
+      {
+        "type": "mud",
+        "quantity": 500
+      },
+      {
+        "type": "polished stone",
+        "quantity": 2500
+      }
+    ],
+    "build": {
+      "worker": 20
+    },
+
+    "effect": {
+      "faction max happiness" : 1
+    }
+  },
+  "great sphinx": {
+    "id": 31,
+    "name": "Great Sphinx",
+    "key": "great sphinx",
+    "type": "effect",
+    "unique": true,
+    "prerequisite": "khafre",
+    "delay": 9000,
+    "description": "Limestone statue of a reclining sphinx. +0.01 happiness/month",
+    "icon": "led-off",
+    "color": "#70543e",
+    "worker": "",
+    "cost": [
+      {
+        "type": "wood",
+        "quantity": 20
+      },
+      {
+        "type": "clay",
+        "quantity": 20
+      },
+      {
+        "type": "polished stone",
+        "quantity": 250
+      }
+    ],
+    "build": {
+      "worker": 4
+    },
+
+    "effect": {
+      "happiness" : 0.01
     }
   }
 }

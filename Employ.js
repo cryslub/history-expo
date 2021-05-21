@@ -20,58 +20,6 @@ import actionStore from './ActionContext.js';
 
 import i18n from 'i18n-js';
 
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
-
-
 
 export const Employ = ((props) => {
 
@@ -131,22 +79,31 @@ export const Employ = ((props) => {
                 }
             </View>
 
-            {disabled?null:<Button  onPress={()=>add(unit,1)}>Add</Button>}
+            {disabled?null:<Button  onPress={()=>add(unit,1)}>{i18n.t("ui.button.add")}</Button>}
              {unit.delay?<View style={{width:'100%'}}>
                 <Caption style={{textAlign:'center'}}>{i18n.t("ui.employ.takes")} {unit.delay} {i18n.t("ui.employ.days")}</Caption>
             </View>:null}
         </>
     }
 
-    const arr = Object.keys(mainStore.data.units).filter(key=>{
+    let arr = Object.keys(mainStore.data.units).filter(key=>{
 		    const unit = mainStore.data.units[key];
 
             if(unit.category=='army' && city.happiness<=0){
                 return false;
-            }else{
-                return true;
             }
+            if(unit.special == true) return false;
+
+            return true;
+
 		});
+
+    if(city.civilization){
+        if(city.civilization.add?.unit){
+            arr = arr.concat(city.civilization.add?.unit)
+
+        }
+    }
 
     return <SafeAreaView  contentContainerStyle={{ padding: 10 }}>
          <View style={{flexDirection:'row'}}>

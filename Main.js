@@ -76,9 +76,9 @@ export default class Main extends Component{
          };
          // Set the locale once at the beginning of your app.
          //console.log( Localization.locale)
-         i18n.locale = 'en'
+        // i18n.locale = 'en'
 
-         //i18n.locale = Localization.locale;
+         i18n.locale = Localization.locale;
 	}
 	
 	componentDidMount(){
@@ -143,8 +143,8 @@ export default class Main extends Component{
                                     />
                                   )})
                             }  />
-                        <Stack.Screen name="ChangeEquip" component={ChangeEquip} options={{ title:'Change Equipment'}}/>
-                        <Stack.Screen name="Exchange" component={Exchange} options={{ title:'Exchange'}}/>
+                        <Stack.Screen name="ChangeEquip" component={ChangeEquip} options={{ title:i18n.t("ui.title.change equip")}}/>
+                        <Stack.Screen name="Exchange" component={Exchange} options={{ title:i18n.t("ui.title.exchange")}}/>
                         <Stack.Screen name="BuildingDetail" component={Building}
                             options={({ route }) => ({
                                 headerTitle: props =>
@@ -156,7 +156,7 @@ export default class Main extends Component{
                         />
                         <Stack.Screen name="Trade" component={Trade}
                                 options={({ navigation, route }) => ({
-                                     title:'Trade',
+                                     title:i18n.t("ui.title.trade"),
                                     headerLeft: (props) => (
                                         <HeaderBackButton
                                           {...props}
@@ -170,7 +170,7 @@ export default class Main extends Component{
                         />
                         <Stack.Screen name="Group" component={Group}
                             options={({ navigation, route }) => ({
-                                 title:'Group',
+                                 title:i18n.t("ui.title.group"),
                                 headerLeft: (props) => (
                                     <HeaderBackButton
                                       {...props}
@@ -182,7 +182,7 @@ export default class Main extends Component{
                                   )})
                             }
                         />
-                        <Stack.Screen name="SelectUnit" component={SelectUnit} options={{ title:'Select Unit'}} />
+                        <Stack.Screen name="SelectUnit" component={SelectUnit} options={{ title:i18n.t("ui.title.select unit")}} />
 
                      </Stack.Navigator>
                 </NavigationContainer>

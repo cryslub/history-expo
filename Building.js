@@ -8,10 +8,13 @@ import { FlatGrid } from 'react-native-super-grid';
 import Util from './Util.js';
 import Icon from './Icon.js';
 import ResourceIcon from './ResourceIcon.js';
+import ResourceRow from './ResourceRow.js';
+
 
 import mainStore from './MainContext.js';
 import Hero from './Hero.js';
 
+import i18n from 'i18n-js';
 
 const Unit = (props) =>{
 
@@ -25,9 +28,12 @@ const Unit = (props) =>{
                </View>
                <View style={{flexDirection:'row'}}>
                     <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="hammer" color="grey" onPress={()=>props.equip(unit)}/>
-                    <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="account-minus" color="grey" onPress={()=>props.unassign(unit)}/>
-                    <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="account-remove" color="grey" onPress={()=>props.disband(unit)}/>
-
+                    {unit.mission=='building'?null:
+                    <>
+                        <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="account-minus" color="grey" onPress={()=>props.unassign(unit)}/>
+                        <Button  style={{minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="account-remove" color="grey" onPress={()=>props.disband(unit)}/>
+                    </>
+                    }
                </View>
 
            </View>
@@ -90,27 +96,31 @@ export  const  Building =  (observer((props) => {
     const removeHero = ()=>{
        // city.addHero(building.hero);
 
-        building.hero.assigned = undefined;
-        building.setHero(undefined);
-        this.refreshHeroes();
+        building.removeHero()
+    }
+
+    const getMaxAssigned = ()=>{
+        let ret =  building.quantity
+
+        if(building.data.build!=undefined && building.state=='deploy'){
+            ret += building.data.build?.worker
+        }
+
+        return ret
     }
 
     return <ScrollView style={{padding:10,paddingBottom:30}}>
         <Caption>{building.data.description}</Caption>
         {building.hero!=undefined?<>
-            <Caption>Leader</Caption>
+            <Caption>{i18n.t("ui.build.leader")}</Caption>
             <Hero data={building.hero}  {...props} type='group' remove={removeHero} removable={true}/>
         </>:null
         }
 
         {storage?<>
             {storage.type=='resource'?
-             <Paragraph>Resource storage capacity {Util.number(storage.quantity*building.completedQuantity)} </Paragraph>
-             :<View style={{flexDirection:'row'}}>
-                <Paragraph>Can hold {storage.type}</Paragraph>
-                <ResourceIcon icon={mainStore.data.resources[storage.type].icon} />
-                <Paragraph>{Util.number(storage.quantity*building.completedQuantity)}</Paragraph>
-             </View>
+             <Paragraph>{i18n.t("ui.build.resource storage capacity")} {Util.number(storage.quantity*building.completedQuantity)} </Paragraph>
+             :<ResourceRow prefix={i18n.t("ui.build.can hold")} resource={storage.type} suffix={Util.number(storage.quantity*building.completedQuantity)}/>
              }
         </>:null
         }
@@ -127,74 +137,86 @@ export  const  Building =  (observer((props) => {
            :null}
 
            {production.cost?<>
-               <Paragraph>Production consumes</Paragraph>
+               <Paragraph>{i18n.t("ui.build.production consumes")}</Paragraph>
                {
                    production.cost.map((cost,index)=>{
-                       return <View style={{flexDirection:'row'}} key={index}>
-                       {cost.optional==true&&index!=0?<Paragraph>or </Paragraph>:null}
-                        <Paragraph>{cost.type}  </Paragraph>
-                        <ResourceIcon icon={mainStore.data.resources[cost.type].icon} />
-                        <Paragraph>{Util.number(cost.quantity)}</Paragraph>
-                      </View>
+                       return <ResourceRow prefix={cost.optional==true&&index!=0?<Paragraph>{i18n.t("ui.build.or")} </Paragraph>:null} resource={cost.type} suffix={Util.number(cost.quantity)}/>
+
                    })
                }
            </>:null
            }
+         </>:null
+         }
+
+        {production||building.state=='deploy'?<>
            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-            <Paragraph style={{marginRight:5}}>Working Progress</Paragraph>
-            <Caption >{Math.floor(building.remain)} days to complete</Caption>
+            <Paragraph style={{marginRight:5}}>{i18n.t("ui.build.working progress")}</Paragraph>
+            <Caption >{Math.floor(building.remain)} {i18n.t("ui.build.days to complete")}</Caption>
           </View>
           <ProgressBar progress={(building.delay-building.remain)/building.delay}  />
-           <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-            <Paragraph style={{marginRight:5}}>Dedicated efforts</Paragraph>
-            <Caption >{building.effort}/{building.getMaxEffort()}</Caption>
-          </View>
-          <ProgressBar progress={building.effort/building.getMaxEffort()}  />
-           {production.result=='happiness'?
-            <View style={{flexDirection:'row'}}>
-                <Paragraph>Increase happiness </Paragraph>
-                <ResourceIcon icon={mainStore.data.resources[production.result].icon}/>
-                <Paragraph>{(building.getResultQuantity(production.quantity)/(city.population/1000)).toFixed(3)}/{production.delay} days</Paragraph>
-            </View>
+         </>:null
+         }
+
+         {production?<>
+            {building.state=='deploy'?null
            :<>
-           {
-               Array.isArray(production.result)?<>
-               <View style={{flexDirection:'row'}}>
-               {
-                production.result.map(result=>{
-                    return <>
-                         <Paragraph>{result.key} </Paragraph>
-                         <ResourceIcon icon={mainStore.data.resources[result.key].icon}/>
-                         <Paragraph>{Util.number(building.getResultQuantity(result.quantity))} </Paragraph>
+               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                <Paragraph style={{marginRight:5}}>{i18n.t("ui.build.dedicated efforts")}</Paragraph>
+                <Caption >{building.effort}/{building.getMaxEffort()}</Caption>
+              </View>
+              <ProgressBar progress={building.effort/building.getMaxEffort()}  />
+               {production.result=='happiness'?
+                    <View style={{flexDirection:'row'}}>
+                        <Paragraph>{i18n.t("ui.build.increase happiness")} </Paragraph>
+                        <ResourceIcon icon={mainStore.data.resources[production.result].icon}/>
+                        <Paragraph>{(building.getResultQuantity(production.quantity)/(city.population/1000)).toFixed(3)}/{production.delay} {i18n.t("ui.build.days")}</Paragraph>
+                    </View>
+                   :<>
+                   {
+                       Array.isArray(production.result)?<>
+                       <View style={{flexDirection:'row'}}>
+                       {
+                        production.result.map(result=>{
+                            return <>
+                                 <Paragraph>{result.key} </Paragraph>
+                                 <ResourceIcon icon={mainStore.data.resources[result.key].icon}/>
+                                 <Paragraph>{Util.number(building.getResultQuantity(result.quantity))} </Paragraph>
+                            </>
+                        })
+                       }
+                       </View>
+                       <View style={{flexDirection:'row'}}>
+                           <Paragraph> {i18n.t("ui.build.will be produced with max effort")}</Paragraph>
+                       </View>
+                       </>
+                       :<ResourceRow resource={production.result} suffix={Util.number(building.getResultQuantity(production.quantity)) + i18n.t("ui.build.will be produced with max effort")}/>
+
+                   }
                     </>
-                })
-               }
-               </View>
-               <View style={{flexDirection:'row'}}>
-                   <Paragraph>will be produced with max effort</Paragraph>
-               </View>
-               </>
-               :<View style={{flexDirection:'row'}}>
-                 <Paragraph>{production.result} </Paragraph>
-                 <ResourceIcon icon={mainStore.data.resources[production.result].icon}/>
-                 <Paragraph>{Util.number(building.getResultQuantity(production.quantity))}  will be produced with max effort</Paragraph>
-               </View>
-           }
+                }
             </>
             }
          </>
         :null}
-        {building.state!='deploy'&&(building.data.production!=undefined||building.type=='trade')?<>
-            <Divider/>
-          {building.units.length>0?<Caption>Assigned Units
-            {building.units.length}/{building.quantity}
-           </Caption>:null}
+
+          <Divider/>
+          {building.units.length>0?
+            <Caption>{i18n.t("ui.build.assigned units")}
+                {building.units.length}/{getMaxAssigned()}
+            </Caption>:null
+           }
+           {building.state=='deploy'&&building.data.build!=undefined?
+           <Caption>{i18n.t("ui.build.assigning workers to this building project will boost the speed")}</Caption>
+           :null
+           }
             {
                 building.units.map((unit,index)=>{
                     return <Unit key={index} unit={unit} index={index} disband={disband} unassign={unassign} equip={equip}/>
                 })
             }
-           </>:null}
+
+
 
         <View style={{height:20}}>
         </View>

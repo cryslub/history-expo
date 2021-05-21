@@ -1,0 +1,90 @@
+{
+  "sumer": {
+    "name": "Sumer",
+    "key": "sumer",
+    "add": {
+      "build": {
+        "artisan": [
+          "sumerian library",
+          "ziggurat"
+        ]
+      },
+      "unit": ["war cart"]
+    },
+
+    "remove": {
+      "build": {
+        "artisan": [
+          "library"
+        ]
+      }
+    }
+  },
+  "kish": {
+    "name": "Kish",
+    "key": "kish",
+    "add": {
+      "build": {
+        "worker": [
+          "kishite livestock",
+          "kishite wool"
+        ],
+        "artisan": [
+          "ziggurat"
+        ]
+      },
+      "unit": ["war cart"]
+    },
+
+    "remove": {
+      "build": {
+        "worker": [
+          "livestock",
+          "wool"
+        ]
+      }
+    }
+  },
+  "elam": {
+    "name": "Elam",
+    "key": "elam",
+    "add": {
+      "build": {
+        "artisan": [
+          "ziggurat"
+        ]
+      }
+    }
+  },
+  "egypt": {
+    "name": "Egypt",
+    "key": "egypt",
+    "add": {
+      "build": {
+        "farmer": [
+          "flax",
+          "papyrus sedge"
+        ],
+        "artisan": [
+          "egyptian polished stone",
+          "egyptian cloth",
+          "papyrus",
+          "egyptian library"
+        ]
+      }
+    },
+    "remove": {
+      "build": {
+        "worker": [
+          "wool"
+        ],
+        "artisan": [
+          "polished stone",
+          "cloth",
+          "tablet",
+          "library"
+        ]
+      }
+    }
+  }
+}

@@ -39,6 +39,9 @@ export default class BuildingData extends UnitData{
             if(this.onBuild != undefined){
                 this.onBuild();
             }
+            this.units.forEach(unit=>{
+                unit.mission = ''
+            })
             this.completedQuantity++;
             this.units.forEach((unit)=>{
                 if(this.data.worker != unit.data.type){
@@ -130,6 +133,9 @@ export default class BuildingData extends UnitData{
             if( this.units.length==0 )
                 check = false;
 
+          //  const unit = this.units.find(unit=>unit.mission=='building')
+          //  if(unit==undefined) check = false
+
         }
         if(this.state == 'produce'){
             if(this.data.key!='farm' && this.units.length==0){
@@ -139,9 +145,24 @@ export default class BuildingData extends UnitData{
             }
         }
 
-        if(check)
-            this.setRemain(this.remain-0.25*mainStore.speed);
+        if(check){
+            let bonus = this.city.effect['construction speed']
+            if(bonus==undefined) bonus = 0
+            if(this.hero){
+                bonus += this.hero.wisdom/5
+            }
 
+            let progress =0.25*(1+bonus/100)*mainStore.speed
+            if(this.data.build){
+                const workers = Math.min(this.units.filter(unit=>unit.type=='worker').length,this.data.build.worker)
+                if(workers>0){
+                    progress += 0.25*(1+bonus/100)*(1+Math.log(mainStore.speed*workers))
+                }
+            }
+
+            this.setRemain(this.remain-progress);
+
+        }
 
          if(diff>0 && this.state == 'produce'){
             if(this.checkResource()){
@@ -169,14 +190,25 @@ export default class BuildingData extends UnitData{
          if(this.state == 'deploy'){
                this.completedQuantity++;
                this.setState('')
+               this.removeHero()
                if(this.city){
                     const city = this.city;
+                    this.units.forEach(unit=>{
+                        unit.mission = ''
+                    })
                     city.units =  city.units.concat(this.units);
                     this.units = [];
                     this.addEffect();
 
                 }
          }
+    }
+
+    removeHero = ()=>{
+        if(this.hero){
+            this.hero.assigned = undefined;
+        }
+        this.setHero(undefined);
     }
 
     addEffect = ()=>{

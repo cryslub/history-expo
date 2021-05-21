@@ -95,7 +95,7 @@ const ResourceScreen = (observer((props) => {
 
         if(city.trade.includes(key)){
 
-            return <Paragraph>This resource is already on trade</Paragraph>
+            return <Paragraph>{i18n.t("ui.manage.resource.this resource is already on trade")}</Paragraph>
         }
 
         let limitExceeded = false;
@@ -122,6 +122,8 @@ const ResourceScreen = (observer((props) => {
         </>
     }
 
+    const arr = Object.keys(city.resources).filter(key=> key!='undefined')
+
       return (
         <ScrollView  >
             <View style={{padding:10}}>
@@ -129,7 +131,7 @@ const ResourceScreen = (observer((props) => {
 
                 <FlatGrid
                    itemDimension={mainStore.unitSize}
-                   data={Object.keys(city.resources)}
+                   data={arr}
 
                    spacing={1}
                    renderItem={({ item }) => {
@@ -187,7 +189,7 @@ export  const  Manage =  (observer((props) => {
                       showLabel: false
                     }}
          >
-          <Tab.Screen name="Info" component={InfoScreen}  options={{ tabBarIcon: (tabInfo)=>(<TabBar icon="information-outline" tabInfo={tabInfo}/>)}}/>
+          <Tab.Screen name="InfoScreen" component={InfoScreen}  options={{ tabBarIcon: (tabInfo)=>(<TabBar icon="information-outline" tabInfo={tabInfo}/>)}}/>
           <Tab.Screen name="Unit" component={UnitScreen}  options={{ tabBarIcon: (tabInfo)=>(<TabBar icon="account" tabInfo={tabInfo}/>)}}/>
           <Tab.Screen name="Building" component={BuildingScreen}  options={{ tabBarIcon: (tabInfo)=>(<TabBar icon="home" tabInfo={tabInfo}/>)}}/>
           <Tab.Screen name="Resource" component={ResourceScreen}  options={{ tabBarIcon: (tabInfo)=>(<TabBar icon="barley" tabInfo={tabInfo}/>)}}/>

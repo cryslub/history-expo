@@ -178,14 +178,12 @@ export default class Hero extends Component {
                 <Surface style={styles.unit}>
                    {selected==true?<Icon icon="check-bold" style={{right: -24,position: 'absolute',top:1}} />:null}
 
-                   <View style={{height:40,display:'flex'}}>
+                   <View style={{height:60,display:'flex'}}>
                        <Paragraph style={{fontSize:12,textAlign:'center',lineHeight:13}}>{data.name}</Paragraph>
                    </View>
-                   <View style={{flexDirection:'row'}}>
-                       <Badge style={{marginRight:1,backgroundColor:'#ff1f13'}}>{data.valor}</Badge>
-                       <Badge style={{marginRight:1,backgroundColor:'#2780E3'}}>{data.wisdom}</Badge>
-                       <Badge style={{marginRight:1,backgroundColor:'#FF7518',color:'white'}}>{data.authority}</Badge>
-                   </View>
+                    <View style={{backgroundColor: '#ff1f13',width:60*(data.valor/100),bottom:40,left:10,position:'absolute',height:4,zIndex:1,margin:1 }}/>
+                    <View style={{backgroundColor: '#2780E3',width:60*(data.wisdom/100),bottom:30,left:10,position:'absolute',height:4,zIndex:1 ,margin:1}}/>
+                    <View style={{backgroundColor: '#FF7518',width:60*(data.authority/100),bottom:20,left:10,position:'absolute',height:4,zIndex:1 ,margin:1}}/>
                 </Surface>
 
               </TouchableOpacity>

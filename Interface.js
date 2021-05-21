@@ -3,11 +3,12 @@ import i18n from 'i18n-js';
 
 import {  AppState,View,StyleSheet ,ScrollView,Platform,Image } from 'react-native';
 
-
 import { Button ,Dialog,Modal,Portal ,Paragraph,List,RadioButton,Subheading  } from 'react-native-paper';
 
 import ThemeDialog from './ThemeDialog';
 import ConfirmDialog from './ConfirmDialog';
+import SelectDialog from './SelectDialog';
+
 
 import ResponsiveDrawer from './ResponsiveDrawer.js';
 import ThreeScene from './ThreeScene';
@@ -121,10 +122,10 @@ const Top =  (observer((props) => {
         <View style={styles.top}>
              {mainStore.stage=='start'?<Paragraph style={{color:'white',padding:3}}>  {i18n.t("ui.top.choose your faction")}</Paragraph>:null}
              {mainStore.stage=='choose'?<View style={{flexDirection:'row'}}>
-                <Paragraph style={{color:'white',marginRight:3}}> Select destination</Paragraph>
+                <Paragraph style={{color:'white',marginRight:3}}>  {i18n.t("ui.top.select destination")}</Paragraph>
                  <Button mode="outlined" onPress={()=>cancel()}
                     compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                    Cancel
+                    {i18n.t("ui.button.cancel")}
                 </Button>
               </View>:null}
              {mainStore.stage=='game'?<View style={{flexDirection:'row',alignItems:'center',display:'flex'}}>
@@ -384,6 +385,8 @@ export  const Interface = (props) =>{
 	const [theme, setTheme] = React.useState('natural');
 	const [showThemeDialog, setShowThemeDialog] = React.useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
+	const [showSelectDialog, setShowSelectDialog] = React.useState(false);
+
 
 	const appState = React.useRef(AppState.currentState);
 
@@ -396,11 +399,11 @@ export  const Interface = (props) =>{
     mainStore.scene = scene;
     mainStore.onSelectUnit = onSelectUnit
 
-    setInterval(()=>timer(mainStore.data),400)
+    setInterval(()=>timer(mainStore.data),200)
     //console.log("timer start")
 
      AppState.addEventListener("change", (nextAppState)=>{
-        console.log(nextAppState)
+       // console.log(nextAppState)
         if( appState.current.match(/active/) && (nextAppState==='background' || nextAppState==='inactive')){
             if(Platform.OS != 'web'){
                 save()
@@ -411,7 +414,7 @@ export  const Interface = (props) =>{
      })
 
     props.navigation.addListener('focus', () => {
-        console.log("focus")
+       // console.log("focus")
         setTimeout(()=>mainStore.redraw(),100)
     });
 
@@ -448,6 +451,15 @@ export  const Interface = (props) =>{
     const closeConfirmDialog = ()=>{
       setShowConfirmDialog(false )
     }
+
+  const openSelectDialog = ()=>{
+    setShowSelectDialog( true)
+  }
+
+  const closeSelectDialog = ()=>{
+    setShowSelectDialog( false )
+  }
+
 
     const openConfirmDialog = (title,text,onOK)=>{
         confirm.current.open(title,text,onOK);
@@ -494,6 +506,7 @@ export  const Interface = (props) =>{
 
     const go = (target)=>{
 
+        if(target == undefined) return
 
         const unit = mainStore.movingUnit;
 
@@ -501,8 +514,8 @@ export  const Interface = (props) =>{
 
         const result = Util.aStar(unit,target);
 
-        openConfirmDialog('Moving',
-            <Paragraph>This will take {Util.intDivide((result.length/1000),unit.speed)} days</Paragraph>,
+        openConfirmDialog(i18n.t("ui.modal.moving.title"),
+            <Paragraph>{i18n.t("ui.modal.moving.this will take")} {Util.intDivide((result.length/1000),unit.speed)} {i18n.t("ui.common.days")}</Paragraph>,
             ()=>move(target,result)
         );
     }
@@ -575,7 +588,8 @@ export  const Interface = (props) =>{
       mainStore.data = new DataService(objects);
       mainStore.data.load();
         if(Platform.OS != 'web'){
-            load()
+//            load()
+            mainStore.setStage('main')
         }else{
             mainStore.setStage('main')
         }
@@ -585,14 +599,14 @@ export  const Interface = (props) =>{
     const save = ()=>{
         if(mainStore.gameStarted){
             let json =  JSON.stringify(getCoreData())
-            console.log(json)
+            //console.log(json)
             FileSystem.writeAsStringAsync(saveFileUri,json)
         }
     }
     const load = ()=>{
         FileSystem.getInfoAsync(saveFileUri)
          .then((response ) => {
-            console.log(response)
+           // console.log(response)
              if(response.exists){
                  FileSystem.readAsStringAsync(saveFileUri)
                  .then((json ) => {
@@ -645,7 +659,7 @@ export  const Interface = (props) =>{
 
     return  <>
 
-        <ThreeScene  ref={scene}  onLoad={onLoad} interface={{chooseFaction,manage,info,go,moveUnit,trade,enter,inventory,group,exchange}}/>
+        <ThreeScene  ref={scene}  onLoad={onLoad} interface={{chooseFaction,manage,info,go,moveUnit,trade,enter,inventory,group,exchange,openSelectDialog}}/>
 
 
         <Top/>
@@ -658,6 +672,7 @@ export  const Interface = (props) =>{
 		<Portal>
             <ThemeDialog showThemeDialog={showThemeDialog} closeThemeDialog={closeThemeDialog} theme={theme} changeTheme={changeTheme}/>
             <ConfirmDialog ref={confirm}/>
+            <SelectDialog showDialog={showSelectDialog} closeDialog={closeSelectDialog}/>
 
 	      </Portal>
       

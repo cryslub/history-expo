@@ -5,6 +5,7 @@ import ExpoGraphics from 'expo-graphics'; // 0.0.3
 
 
 import {  View,Animated,PanResponder,TouchableOpacity,Text,StyleSheet  } from 'react-native';
+import PinchZoomResponder from 'react-native-pinch-zoom-responder'
 import { PinchGestureHandler, RotationGestureHandler,State,PanGestureHandler,TapGestureHandler } from 'react-native-gesture-handler';
 import { Subheading,Paragraph,Button,Caption  } from 'react-native-paper';
 
@@ -35,27 +36,6 @@ const styles = StyleSheet.create({
 	},
 	textLabel:{
 		position:'absolute'
-	},
-	battle:{
-        color: "white",
-         textShadowColor: 'rgba(0, 0, 0, 0.7)',
-          textShadowOffset: {width: -1, height: 1},
-          textShadowRadius: 1,
-
-        lineHeight:13,
-        textAlign:'center',
-        padding:5,
-        borderRadius:5
-    },
-	detail:{
-		position:'absolute',
-		zIndex:10,
-		marginTop:-50,
-		marginLeft:15,	
-		padding:10,
-		borderWidth:1,
-		borderColor:'#111111',
-		opacity: 1
 	}
 });
 
@@ -67,7 +47,24 @@ export default class ThreeScene extends Component{
 		
 		this.state={
 			textlabels :[],
-			detail:{}
+			detail:{},
+			 zoom: null,
+             minZoom: null,
+             layoutKnown: false,
+             isZooming: false,
+             isMoving: false,
+             initialDistance: null,
+             initialX: null,
+             initalY: null,
+             offsetTop: 0,
+             offsetLeft: 0,
+             initialTop: 0,
+             initialLeft: 0,
+             initialTopWithoutZoom: 0,
+             initialLeftWithoutZoom: 0,
+             initialZoom: 1,
+             top: 0,
+             left: 0
 		}
 		
 		
@@ -80,9 +77,25 @@ export default class ThreeScene extends Component{
 		});
 		
 	}
-  
+
+
 	detail = (label)=>{
-		this.objects.detail(label.city)
+	    let multiSelected = false;
+	    if(label.city.sort=='unit'){
+	        const nearByUnits = label.city.nearByUnits
+
+
+	        if(nearByUnits.length>0){
+	            multiSelected = true
+                const list = nearByUnits.concat([label.city])
+                mainStore.setSelectionList( list)
+
+                this.props.interface.openSelectDialog()
+	        }
+	    }
+
+	    if(!multiSelected)
+    		this.objects.detail(label.city)
 	}
 
 	detailOff = ()=>{
@@ -99,18 +112,34 @@ export default class ThreeScene extends Component{
 	  // We were granted responder status! Let's update the UI
 	  handlePanResponderGrant = (e, gestureState) => {
 		  const event = this._transformEvent({ ...e, gestureState });
-//		  console.log(event)
+
 		  this.cameraHandler.handlePanResponderGrant(event.nativeEvent)
 		  this.objects.onMouseover(this.cameraHandler.touch,this.camera);
-		  
+
 	  };
 
 	  // Every time the touch/mouse moves
 	  handlePanResponderMove = (e, gestureState) => {
 	    // Keep track of how far we've moved in total (dx and dy)
+	     const touches = e.nativeEvent.touches;
+
+        if (touches.length >= 2) {
+            // We have a pinch-to-zoom movement
+            // Track locationX/locationY to know by how much the user moved their fingers
+             let touch1 = touches[0];
+            let touch2 = touches[1];
+
+            this.processPinch(touches[0].pageX, touches[0].pageY,
+                touches[1].pageX, touches[1].pageY);
+
+        } else {
+            // We have a regular scroll movement
+
 		  const event = this._transformEvent({ ...e, gestureState });
 		//  console.log(event)
 		  this.cameraHandler.handlePanResponderMove(event.nativeEvent)
+
+        }
 
 	  };
 
@@ -120,8 +149,39 @@ export default class ThreeScene extends Component{
 		  const event = this._transformEvent({ ...e, gestureState });
 //		  console.log(event)
 		    this.cameraHandler.handlePanResponderEnd(event.nativeEvent)
+            this.setState({
+                isZooming: false
+            });
 	  };
-	  
+
+     calcDistance(x1, y1, x2, y2) {
+        let dx = Math.abs(x1 - x2)
+        let dy = Math.abs(y1 - y2)
+        return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    }
+
+
+	  processPinch(x1, y1, x2, y2) {
+          let distance = this.calcDistance(x1, y1, x2, y2);
+
+          if (!this.state.isZooming) {
+              this.setState({
+                  isZooming: true,
+                  initialDistance: distance,
+                  initialZoom: this.state.zoom
+              });
+
+          } else {
+              let touchZoom = distance / this.state.initialDistance;
+              let zoom = touchZoom * this.state.initialZoom ;
+              console.log(zoom)
+
+              this.setState({
+                  zoom: zoom
+              });
+          }
+      }
+
 	  _transformEvent = event => {
 		    event.preventDefault = event.preventDefault || (() => {});
 		    event.stopPropagation = event.stopPropagation || (() => {});
@@ -237,7 +297,7 @@ export default class ThreeScene extends Component{
 		            onRender={this.onRender}
 		            onResize={this.onResize}
 		            arEnabled={false}
-		    		ref={(container) => { this.container = container }}	>					    		
+		    		ref={(container) => { this.container = container }}	>
 		    	</ExpoGraphics.View>
 		    	{
 		    		this.state.textlabels.map((label,i)=>{
@@ -265,7 +325,7 @@ export default class ThreeScene extends Component{
                         }
 
 
-		    			return 	<TouchableOpacity key={i} 
+		    			return 	<TouchableOpacity key={i}
 		    				style={[styles.textLabel,style]}
 		    				onPress={()=>this.detail(label)}>
 		    				    {label.type=='unit'?<>

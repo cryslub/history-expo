@@ -1,14 +1,21 @@
-AI - trade,  hero, multi army
+AI - trade,  hero, multi army,weapon
 
 
 //Production by happiness
 
 
-Multi language
+zoom gesture
 
-Wonder project
 
-Civilization differance override
+livestock food consumption
+
+trade commission
+
+unit happiness condition
+
+road roughness
+
+festivals
 
 Sea level patch
 

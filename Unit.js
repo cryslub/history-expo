@@ -14,42 +14,6 @@ import mainStore from './MainContext.js';
 
 const styles = StyleSheet.create({
 
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
 	 unit: {
         padding: 8,
         height: 100,
@@ -58,16 +22,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         elevation: 1,
         margin:2
-     },
-     deploy:{
-        backgroundColor: "black",
-        opacity:0.3,
-        right:0,
-        height:60,
-        position:'absolute',
-        zIndex:1
      }
-
 });
 
 const containerStyle = {backgroundColor: 'white', padding: 20};
@@ -174,8 +129,11 @@ export default class Unit extends Component {
                    {selected==true?<Icon icon="check-bold" style={{right: -24,position: 'absolute',top:1}} />:null}
 
                     {this.icon(data)}
-                   <View style={{height:40,display:'flex',justifyContent:'center'}}>
-                       <Paragraph style={{fontSize:data.name.length>20?10:12,textAlign:'center',lineHeight:13}}>{data.name}</Paragraph>
+                   <View style={{height:40,display:'flex',justifyContent:'center',flexDirection:'row'}}>
+                        {data.hero?
+                        <Button icon="star" color='grey' style={ { alignItems: 'center',justifyContent: 'center',marginTop:2,marginLeft:-9,minWidth:24,width:24,height:18}} contentStyle={{marginLeft:13,marginRight:-6,width:12}} />
+                        :null}
+                       <Paragraph style={{marginTop:7,fontSize:data.name.length>20?10:12,textAlign:'center',lineHeight:13}}>{data.name}</Paragraph>
                    </View>
                    {this.props.quantity?this.props.quantity():null}
                 </Surface>

@@ -19,6 +19,7 @@ import heroes from "./json/hero.json"
 import buildings from "./json/building.json"
 import resources from "./json/resource.json"
 import units from "./json/unit.json"
+import civilizations from "./json/civilization.json"
 
 export default class DataService{
 
@@ -33,7 +34,7 @@ export default class DataService{
 		
 		self.cities ={};
 		self.showUnuse = false;
-		self.factions = {0:{name:'None',id:0}};
+		self.factions = {0:{name:i18n.t("ui.common.none"),id:0}};
 		self.heroes = {};
 
 		self.activeFactions = {};
@@ -53,7 +54,7 @@ export default class DataService{
 		 self.lineCoord = [];
 	 
 		self.data = [];
-		
+		self.civilizations = {}
 	//	self.database = new DataBase();
 		
 	}
@@ -68,6 +69,7 @@ export default class DataService{
 		self.initBuildings()
 		self.initResources()
 		self.initUnits()
+		self.initCivilizations()
 
 		self.selectScenario(scenarios[0]);			
 		self.makeEra();
@@ -102,6 +104,17 @@ export default class DataService{
            const unit = this.units[key]
            unit.name = i18n.t('unit.'+key+'.name')
            unit.description = i18n.t('unit.'+key+'.description')
+
+        })
+    }
+
+    initCivilizations(){
+       this.civilizations = civilizations
+
+        Object.keys(this.civilizations).forEach(key=>{
+           const civilization = this.civilizations[key]
+           civilization.name = i18n.t('civilization.'+key+'.name')
+         //  unit.description = i18n.t('unit.'+key+'.description')
 
         })
     }
@@ -270,7 +283,7 @@ export default class DataService{
         var self = this;
 
         self.selectedScenario=scenario;
-        console.log(self.selectedScenario)
+     //   console.log(self.selectedScenario)
 
         self.cities = {};
 
@@ -308,6 +321,7 @@ export default class DataService{
                     }
                     city.snapshot = snapshot.id;
                     city.faction = snapshot.faction;
+                    city.civilization = snapshot.civilization
                     city.color = self.factions[city.faction].color;
                     city.traits = snapshot.traits==null?'':snapshot.traits;
                     city.snapshotSub = snapshotSubs[snapshot.id];

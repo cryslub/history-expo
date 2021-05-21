@@ -18,58 +18,9 @@ import { observer,inject } from "mobx-react"
 
 import mainStore from './MainContext.js';
 
-import {UnitScreen,Resources,Moral} from './Common.js'
+import {UnitScreen,Resources,Moral,NearByUnit} from './Common.js'
 
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
+import i18n from 'i18n-js';
 
 
 
@@ -79,8 +30,14 @@ export const Group =  (observer((props) => {
 
     const removeHero = ()=>{
         const city = unit.currentLocation;
-        city.addHero(unit.hero);
-        unit.setHero(undefined);
+        //city.addHero(unit.hero);
+        unit.removeHero()
+    }
+
+    const onExchange = (target)=>{
+         const unit = mainStore.selectedUnit
+
+        props.navigation.navigate('Exchange', {unit:unit,target:target});
     }
 
     const removable = unit.state=='' || (unit.currentRoad == undefined && unit.currentLocation.factionData.id==unit.city.factionData.id)
@@ -91,14 +48,14 @@ export const Group =  (observer((props) => {
                 <Moral unit={unit}/>
 
                 <View style={{flexDirection:'row'}}>
-                   <Paragraph >Capacity </Paragraph>
-                   <Caption>{Math.floor(unit.carrying)}/{unit.capacity} units</Caption>
-                   <Paragraph style={{marginLeft:5}}>Speed </Paragraph>
-                   <Caption>{unit.speed}km/day</Caption>
+                   <Paragraph>{i18n.t("ui.equip.capacity")} </Paragraph>
+                   <Caption>{Math.floor(unit.carrying)}/{unit.capacity} {i18n.t("ui.equip.units")}</Caption>
+                   <Paragraph style={{marginLeft:5}}>{i18n.t("ui.equip.speed")} </Paragraph>
+                   <Caption>{unit.speed}km/{i18n.t("ui.common.day")}</Caption>
                 </View>
                 <Divider/>
             {unit.hero!=undefined?<>
-                <Caption>Leader</Caption>
+                <Caption>{i18n.t("ui.equip.leader")}</Caption>
                 <Hero data={unit.hero}  {...props} type='group' remove={removeHero} removable={removable}/>
             </>:null
             }
@@ -108,6 +65,17 @@ export const Group =  (observer((props) => {
              <View style={{padding:10}}>
                  <Resources unit={unit} />
              </View>
+
+             {unit.nearByUnits.length>0?
+             <>
+                 <Caption>{i18n.t("ui.equip.near by units")}</Caption>
+                 {
+                     unit.nearByUnits.map((u,index)=>{
+                         return <NearByUnit key={index} unit={u} onExchange={onExchange}/>
+                     })
+                 }
+             </>:null
+             }
         </ScrollView>
       );
 

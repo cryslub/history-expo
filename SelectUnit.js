@@ -18,57 +18,7 @@ import { observer,inject } from "mobx-react"
 
 import mainStore from './MainContext.js';
 
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
-
+import i18n from 'i18n-js';
 
 
 export const SelectUnit = ((props) => {
@@ -80,7 +30,7 @@ export const SelectUnit = ((props) => {
       React.useLayoutEffect(() => {
         navigation.setOptions({
           headerRight: () => (
-            <Button onPress={() => select()} >Select</Button>
+            <Button onPress={() => select()} >{i18n.t("ui.button.select")}</Button>
           ),
         });
       }, [navigation]);
@@ -105,8 +55,8 @@ export const SelectUnit = ((props) => {
 
 
       return (
-        <SafeAreaView style={{padding:10}}>
-             <Caption>You can select {10-unit.units.length} units</Caption>
+        <View style={{padding:10}}>
+             <Caption>{i18n.t("ui.select.you can select")} {10-unit.units.length} {i18n.t("ui.select.units")}</Caption>
              <FlatGrid
                 itemDimension={mainStore.unitSize}
                 data={units}
@@ -118,7 +68,7 @@ export const SelectUnit = ((props) => {
               />
 
 
-        </SafeAreaView>
+        </View>
       );
 
 	

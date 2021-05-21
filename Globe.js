@@ -460,7 +460,7 @@ export default class Globe{
   	
   	vertex(point,radius) {
 		if(point === undefined){
-			console.log("point undefined");
+			//console.log("point undefined");
 			return null;
 		}
 	    var phi = (90 - point[1]) * Math.PI / 180;

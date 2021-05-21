@@ -113,13 +113,12 @@ export default class Detail extends Component{
                     :null
                 }
                 </View>
-                {mainStore.stage=='start'&&detail.factionName!='None'?<Button mode="outlined"  onPress={()=>inf.chooseFaction(detail.faction)}
+                {mainStore.stage=='start'&&detail.factionName!=i18n.t("ui.common.none")?<Button mode="outlined"  onPress={()=>inf.chooseFaction(detail.faction)}
                     compact={true} color="white" style={{borderColor:'white',marginRight:3}} labelStyle={{fontSize:9}}>
                     {i18n.t("ui.button.choose")}
                 </Button>:null}
                 {mainStore.stage=='game'?<>
-
-                    {detail.manageable?<Button mode="outlined"  onPress={()=>this.manage(detail)}
+                    {detail.manageable||mainStore.debug?<Button mode="outlined"  onPress={()=>this.manage(detail)}
                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
                         {i18n.t("ui.button.manage")}
                     </Button>
@@ -149,7 +148,7 @@ export default class Detail extends Component{
                     }
                     {city.type=='group'&&detail.manageable?<Button mode="outlined" onPress={()=>inf.group(city)}
                         compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                        {i18n.t("ui.button.mange")}
+                        {i18n.t("ui.button.manage")}
                     </Button>:null}
                     {city.type!='group'&&detail.manageable?<Button mode="outlined" onPress={()=>inf.inventory(city)}
                          compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>

@@ -39,9 +39,12 @@ export default class UnitData extends SubUnits{
     moral = 0;
     explored = true
 
-    constructor(unit,city,sort) {
+    constructor(unit,city,sort,unitIndex) {
 
        super();
+
+
+       this.unitIndex = unitIndex
 
        if(unit){
             this.setBaseData(unit)
@@ -49,6 +52,30 @@ export default class UnitData extends SubUnits{
         if(city){
             this.setCity(city)
         }
+
+        if(city.snapshotSub?.add?.build!=undefined){
+            const u = city.snapshotSub?.add?.build[unit.type]
+            if(u!=undefined)
+                this.data.action.build = this.data.action.build.concat(u)
+        }
+
+        if(city.civilization){
+            const civilization = city.civilization
+            if(civilization?.add?.build != undefined){
+                const u = civilization.add?.build[unit.type]
+                if(u!=undefined)
+                    this.data.action.build = this.data.action.build.concat(u)
+            }
+            if(civilization?.remove?.build != undefined){
+                const u = civilization.remove?.build[unit.type]
+                if(u!=undefined){
+                    this.data.action.build = this.data.action.build.filter(function(item) {
+                        return u.find(i=>i==item) == undefined
+                    })
+                }
+            }
+        }
+
         this.sort = sort;
     }
 
@@ -64,7 +91,7 @@ export default class UnitData extends SubUnits{
     }
 
     setBaseData = (unit)=>{
-        this.name = unit.name;
+        this.name = unit.name+(this.unitIndex==undefined?'':this.unitIndex)
         this.originalName = unit.originalName;
         this.fontSize = unit.fontSize;
 
@@ -74,7 +101,8 @@ export default class UnitData extends SubUnits{
         this.type = unit.type;
         this.delay = unit.delay;
         this.remain = this.delay;
-        this.data = unit;
+        this.data = JSON.parse(JSON.stringify(unit))
+
         this.category = unit.category;
         this.men = unit.manpower;
 
@@ -210,6 +238,11 @@ export default class UnitData extends SubUnits{
         }
 
         return true;
+    }
+
+    getDistance(city){
+        return this.currentLocation.getDistance(city)
+
     }
 
     getDamage = () =>{
@@ -409,7 +442,11 @@ export default class UnitData extends SubUnits{
 
     dailyJob = (diff)=>{
       this.consumeFood(diff);
-      this.moral-=0.5
+      let bonus = 1
+      if(this.data.trait){
+        bonus = this.data.trait['moral decrease rate']
+      }
+      this.moral-=0.5 * bonus
       if(this.currentRoad?.road.type=='desert'){
         this.moral-=0.25
       }
@@ -517,6 +554,15 @@ export default class UnitData extends SubUnits{
        this.initPath()
 
         mainStore.removeUnit(unit);
+
+        const detail = mainStore.scene.current.detail.city
+       if(detail == this){
+        mainStore.scene.current.detailOff()
+       }
+
+       if(this.hero){
+        city.addHero(this.hero)
+       }
     }
 
     getMaxEffort = ()=>{
@@ -547,6 +593,8 @@ export default class UnitData extends SubUnits{
     @computed get width(){
         return this.remain*maxWidth/this.delay;
     }
+
+
 
     @action
     refreshEquipment(){
@@ -779,7 +827,19 @@ export default class UnitData extends SubUnits{
 
     @action
     setHero(hero){
+        if(this.type=='group'){
+            this.name = hero.name
+        }
         this.hero = hero;
+    }
+
+    @action
+    removeHero(hero){
+        if(this.type=='group'){
+            this.name = this.data.name+this.unitIndex
+        }
+        this.hero.assigned = undefined
+        this.hero = undefined
     }
 
     startMove(path,destination,targetUnit){
@@ -989,7 +1049,7 @@ export default class UnitData extends SubUnits{
         const object = this.object;
         const ret = mainStore.objects.move(position,object,speed);
         mainStore.scene.current.rendered = false
-        console.log("move")
+        //console.log("move")
         return ret
     }
 

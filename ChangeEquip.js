@@ -21,12 +21,8 @@ import {Resources,Moral} from './Common.js';
 
 import { observer} from "mobx-react"
 
-const styles = StyleSheet.create({
 
-});
-
-
-
+import i18n from 'i18n-js';
 
 const Equipment = (props)=>{
 
@@ -34,22 +30,25 @@ const Equipment = (props)=>{
     const unit = props.unit;
     const index = props.index
     const city = props.city;
+    const path = props.path
 
     const onSelect = ()=>{
         if(!props.disabled)
             props.onSelect()
     }
 
+
+
     return  <Surface style={{marginBottom:10,padding:10,width:'100%',minHeight:80,opacity:props.disabled?0.5:1}} >
         <TouchableOpacity onPress={onSelect}>
            <View style={{flexDirection:'row'}}>
-               <Subheading style={{marginLeft:5,top: -3,position: 'relative'}}>{e.name} </Subheading>
+               <Subheading style={{marginLeft:5,top: -3,position: 'relative'}}> {e.name} </Subheading>
                 {props.equipped?<Icon icon="check-bold" style={{right: -24,position: 'absolute'}} />:null}
            </View>
            <Caption>{e.description} </Caption>
            {e.require?
            <View style={{flexDirection:'row'}}>
-               <Paragraph >Require</Paragraph>
+               <Paragraph>{i18n.t("ui.equip.require")}</Paragraph>
                {
                    Object.keys(e.require).map(key=>{
 
@@ -57,7 +56,7 @@ const Equipment = (props)=>{
 
                        return <>
                            <Paragraph style={{marginLeft:2}}> </Paragraph>
-                           <ResourceRow prefix={mainStore.data.resources[key].name} resource={key} suffix={e.require[key]} color={availability?'white':'red'}/>
+                           <ResourceRow resource={key} suffix={e.require[key]} color={availability?'white':'red'}/>
                        </>
 
                    })
@@ -73,21 +72,21 @@ const Equipment = (props)=>{
 export const ChangeEquip = (props)=>{
 
 
-         const unit = mainStore.selectedUnit
+    const unit = mainStore.selectedUnit
 
-		 const city = unit.currentLocation;
-		const { key } = props.route.params;
-		const equipment = unit.equipments[key];
+	const city = unit.currentLocation;
+	const { key } = props.route.params;
+	const equipment = unit.equipments[key];
 
-        let equipIndex = 0;
-        if(unit.equipments[key]){
-            unit.data.action.equip[key].forEach((equipment,index)=>{
-                if(equipment == unit.equipments[key].data)   equipIndex = index+2;
-            })
-        }
+    let equipIndex = 0;
+    if(unit.equipments[key]){
+        unit.data.action.equip[key].forEach((equipment,index)=>{
+             if(equipment == unit.equipments[key].data)   equipIndex = index+2;
+        })
+    }
 
-        const [value, setValue] = React.useState(equipIndex);
-      const [amount, setAmount] = React.useState(unit.equipments[key]?unit.equipments[key].amount:0);
+     const [value, setValue] = React.useState(equipIndex);
+     const [amount, setAmount] = React.useState(unit.equipments[key]?unit.equipments[key].amount:0);
 
         const bringResource = (eqd,e,amount)=>{
             Object.keys(e.require).forEach(key=>{
@@ -147,16 +146,18 @@ export const ChangeEquip = (props)=>{
             change(value)
         }
 
+        const path = "unit."+unit.data.type+".equip."+key
+
 		return <ScrollView contentContainerStyle={{ padding: 10 }}>
-            <Equipment data={{name:'None'}} unit={unit}  equipped={value==0} onSelect={()=>onSelect(0)}/>
+            <Equipment data={{name:i18n.t("ui.equip.none")}} unit={unit}  path={path} equipped={value==0} onSelect={()=>onSelect(0)}/>
             {unit.data.action.equip[key].map((equipment,index)=>{
-                    return <Equipment data={equipment} unit={unit} city={city} index={index+1} key={index} equipped={(index+1)==value}
+                    return <Equipment data={{name:i18n.t(path+"."+index+".name"),description:i18n.t(path+"."+index+".description")}}  unit={unit} path={path} city={city} index={index+1} key={index} equipped={(index+1)==value}
                         disabled={!unit.isEquipmentAvailable(equipment)} onSelect={()=>onSelect(index+1)}/>
                 })
             }
              {equipment?.data.instant==true?
                 <View style={{flexDirection:'row'}}>
-                    <Paragraph>Quantity </Paragraph>
+                    <Paragraph>{i18n.t("ui.equip.quantity")} </Paragraph>
                     <Button  style={{minWidth:0,width:28}} disabled={amount<=1} icon="minus" contentStyle={{marginLeft:12}} onPress={()=>minus(1)}/>
                     <Paragraph style={{marginTop:-1}}>{amount}</Paragraph>
                     <Button  style={{minWidth:0,width:28}}  disabled={!unit.isEquipmentAvailable(equipment.data)}  icon="plus" contentStyle={{marginLeft:12}} onPress={()=>plus(1)}/>

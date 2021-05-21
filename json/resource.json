@@ -161,12 +161,60 @@
     "storage": "warehouse",
     "price": 20
   },
+  "tablet": {
+    "name": "Clay tablet",
+    "icon": "file-document-box",
+    "color": "#d97557",
+    "storage": "warehouse",
+    "price": 5
+  },
+  "flax": {
+    "name": "Flax",
+    "icon": "barley",
+    "color": "#0b6e0b",
+    "storage": "warehouse",
+    "price": 1
+  },
+  "papyrus sedge": {
+    "name": "Papyrus sedge",
+    "icon": "svg",
+    "color": "#0b6e0b",
+    "storage": "warehouse",
+    "price": 1
+  },
+  "papyrus": {
+    "name": "Papyrus",
+    "icon": "file-powerpoint",
+    "color": "#ba894a",
+    "storage": "warehouse",
+    "price": 5
+  },
+  "stone": {
+    "name": "Stone",
+    "icon": "alpha-s-box",
+    "color": "#6D7876",
+    "price": 2
+  },
+  "polished stone": {
+    "name": "Polished Stone",
+    "icon": "alpha-s-circle",
+    "color": "#6D7876",
+    "storage": "warehouse",
+    "price": 10
+  },
   "copper axe": {
     "name": "Copper Axe",
     "icon": "axe",
     "color": "#b87333",
     "storage": "armoury",
     "price": 300
+  },
+  "bronze axe": {
+    "name": "Bronze Axe",
+    "icon": "axe",
+    "color": "#794909",
+    "storage": "armoury",
+    "price": 500
   },
   "cloak": {
     "name": "Leather Cloak",
@@ -210,6 +258,13 @@
     "storage": "armoury",
     "price": 40
   },
+  "bronze arrow": {
+    "name": "Bronze Arrow",
+    "icon": "arrow-bottom-right",
+    "color": "#794909",
+    "storage": "armoury",
+    "price": 70
+  },
   "copper javelin": {
     "name": "Copper Javelin",
     "icon": "format-horizontal-align-right",
@@ -217,12 +272,26 @@
     "storage": "armoury",
     "price": 100
   },
+  "bronze javelin": {
+    "name": "Bronze Javelin",
+    "icon": "format-horizontal-align-right",
+    "color": "#794909",
+    "storage": "armoury",
+    "price": 180
+  },
   "copper spear": {
     "name": "Copper Spear",
     "icon": "zodiac-sagittarius",
     "color": "#b87333",
     "storage": "armoury",
     "price": 250
+  },
+  "bronze spear": {
+    "name": "Bronze Spear",
+    "icon": "zodiac-sagittarius",
+    "color": "#794909",
+    "storage": "armoury",
+    "price": 400
   },
   "shield": {
     "name": "Tower Shield",
@@ -245,33 +314,19 @@
     "storage": "armoury",
     "price": 20
   },
+  "club": {
+    "name": "Club",
+    "icon": "wrench",
+    "color": "#8D6142",
+    "storage": "armoury",
+    "price": 10
+  },
   "stick": {
     "name": "Throwing Stick",
     "icon": "loading",
     "color": "#8D6142",
     "storage": "armoury",
     "price": 5
-  },
-  "tablet": {
-    "name": "Clay tablet",
-    "icon": "file-document-box",
-    "color": "#d97557",
-    "storage": "warehouse",
-    "price": 5
-  },
-  "stone": {
-    "name": "Stone",
-    "icon": "alpha-s-box",
-    "color": "#6D7876",
-    "price": 2
-  },
-  "polished stone": {
-    "name": "Polished Stone",
-    "icon": "alpha-s-circle",
-    "color": "#6D7876",
-    "storage": "warehouse",
-    "price": 10
   }
-
 
 }

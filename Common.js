@@ -92,7 +92,7 @@ export const TradeScreen = (observer((props) => {
 
     const action = (key,onAction)=>{
         return <>
-             <Menu.Item onPress={() =>remove(key,onAction)} title="Remove"/>
+             <Menu.Item onPress={() =>remove(key,onAction)} title={i18n.t("ui.action.remove")}/>
         </>
     }
 
@@ -125,6 +125,30 @@ export const TradeScreen = (observer((props) => {
       );
 }))
 
+export const UnitIcon = (props =>{
+
+    const data = props.data
+
+   if(data.type=='group'){
+       const units = data.units;
+       if(units){
+           if(units.length>0){
+               const ret = []
+               for(var i = 0;i<Math.min(units.length,4);i++){
+                   const unit = units[i];
+                   ret.push(<Icon icon={unit.icon}  color={unit.color} style={{alignItems: 'center',justifyContent: 'center',marginTop:2,minWidth:18,width:18,height:16}} contentStyle={{marginLeft:14}}/>)
+               }
+               return <View style={{flexDirection:'row'}}>
+                   {ret}
+               </View>
+           }
+       }
+   }
+   return   <Icon icon={data.icon}  color={data.color}/>
+
+
+})
+
 export const InfoContent =  (observer((props) => {
 
     const city= mainStore.selectedCity;
@@ -137,32 +161,51 @@ export const InfoContent =  (observer((props) => {
         props.navigation.navigate('SelectChancellor', {city:city});
     }
 
+   const setCapital = ()=>{
+        const factionData =city.factionData
+        factionData.capital = city
+        city.setFactionData({})
+        city.setFactionData(factionData)
+   }
+
    return (
      <ScrollView style={{padding:10}}>
-
-
-        <View style={{flexDirection:'row'}}>
-             <Icon icon="bank"  />
-            <Paragraph  style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.governor")} </Paragraph>
-            <Caption>{city.governor==undefined?'None':city.governor.name}</Caption>
-            {props.type!='info'?<Button icon="playlist-edit" onPress={()=>change()} />:null}
-        </View>
-        <View style={{flexDirection:'row'}}>
-             <Icon icon="bank"  />
-            <Paragraph  style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.chancellor")} </Paragraph>
-            <Caption>{city.chancellor==undefined?'None':city.chancellor.name}</Caption>
-            {props.type!='info'?<Button icon="playlist-edit" onPress={()=>changeChancellor()} />:null}
-        </View>
-
         {city?.factionData?.capital?.id == city.id?
             <View style={{flexDirection:'row'}}>
                 <Icon icon="star"  />
             <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.capital")} </Paragraph>
             </View>
         :null}
+
+
+        <View style={{flexDirection:'row'}}>
+             <Icon icon="bank"  />
+            <Paragraph  style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.governor")} </Paragraph>
+            <Caption>{city.governor==undefined?i18n.t("ui.common.none"):city.governor.name}</Caption>
+            {props.type!='info'?<Button icon="playlist-edit" onPress={()=>change()} />:null}
+        </View>
+        {city.buildings.palace?.completedQuantity>0?
+        <View style={{flexDirection:'row'}}>
+             <Icon icon="bank"  />
+            <Paragraph  style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.chancellor")} </Paragraph>
+            <Caption>{city.chancellor==undefined?i18n.t("ui.common.none"):city.chancellor.name}</Caption>
+            {props.type!='info'?<Button icon="playlist-edit" onPress={()=>changeChancellor()} />:null}
+        </View>
+        :null}
+
+
+        {city.civilization?
+            <View style={{flexDirection:'row'}}>
+                <Icon icon="pillar"  />
+                <Paragraph>{i18n.t("ui.manage.info.civilization")} </Paragraph>
+                <Caption >{city.civilization.name} </Caption>
+            </View>
+        :null}
+
         <View style={{flexDirection:'row'}}>
             <Icon icon="account-multiple"  />
-            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.population")} </Paragraph><Caption>{Util.number(city?.population)}</Caption>
+            <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.population")} </Paragraph>
+            <Caption>{Util.number(city?.population)}</Caption>
         </View>
         {props.type!='info'? <>
             <View style={{flexDirection:'row'}}>
@@ -222,10 +265,13 @@ export const InfoContent =  (observer((props) => {
             {
                 Object.keys(city.snapshotSub.resource).map(key=>{
                     const resource = city.snapshotSub.resource[key]
-                    return <ResourceRow key={key} resource={key} suffix={mainStore.data.resources[key].name} lv={resource}/>
+                    return <ResourceRow key={key} resource={key}   lv={resource}/>
                 })
             }
         </>:null}
+        {city?.factionData?.capital?.id == city.id || props.type=='info'?null
+        :<Button onPress={()=>setCapital()}>{i18n.t("ui.manage.info.set as capital")}</Button>
+        }
         <View style={{height:20}}/>
      </ScrollView>
    );
@@ -361,7 +407,7 @@ export const UnitScreen  = (observer((props) => {
             </View>
                 <View style={{padding:5}}>
                     {props.type=='group'?<>
-                        <Caption>Units {unit.units.length}/10</Caption>
+                        <Caption>{i18n.t("ui.manage.unit.units")} {unit.units.length}/10</Caption>
                     </>:<Caption>{i18n.t("ui.manage.unit.idle units")}</Caption>
                     }
                      <FlatGrid
@@ -470,22 +516,24 @@ export class Resources extends Component {
             condition = true;
         }
 
+        var arr = Object.keys(city.resources).map(key=>{
+            return key
+        })
 
         return <>
             {deploy==true?<>
-               <Divider/>
                  <View style={{flexDirection:'row',display:'flex',justifyContent:'space-between'}}>
                    <Caption>{i18n.t("ui.common.resources")}</Caption>
                    {condition?<View style={{flexDirection:'row'}}>
                        <Caption style={{    position: 'relative',top: 5}}> {i18n.t("ui.common.transfer")}</Caption>
                        <Button onPress={()=>this.changeAmount()}>{this.state.amount}</Button>
-                       <Caption style={{    position: 'relative',top: 5}}>unit{this.state.amount>1?'s':null} {i18n.t("ui.common.per click")}</Caption>
+                       <Caption style={{    position: 'relative',top: 5}}>{i18n.t("ui.common.unit")}{this.state.amount>1?i18n.t("ui.common.s"):null} {i18n.t("ui.common.per click")}</Caption>
                    </View>:null}
                </View>
                  <View style={{flexDirection:'row',display:'flex',justifyContent:'space-between'}}>
                    <Caption></Caption>
                    <View style={{flexDirection:'row'}}>
-                       <Caption > {i18n.t("ui.common.can survive")} {unit.survivableDays} {i18n.t("ui.common.days with")} {unit.resources.food?Math.floor(unit.resources.food):0} {i18n.t("ui.common.foods")}</Caption>
+                       <Caption > {i18n.t("ui.common.can survive")} {unit.survivableDays} {i18n.t("ui.common.days")} </Caption>
                    </View>
                </View>
 
@@ -517,7 +565,7 @@ export class Resources extends Component {
                    }
                    <FlatGrid
                       itemDimension={mainStore.unitSize}
-                      data={Object.keys(city.resources)}
+                      data={arr}
 
                       spacing={1}
                       renderItem={({ item }) => {
@@ -547,7 +595,6 @@ export class Moral extends Component {
         return <View style={{flexDirection:'row'}}>
                <Icon icon="account"  />
                <Caption>{Math.floor(unit.manpower)} </Caption>
-               <Caption> {unit.state} </Caption>
                {unit.state=='traveling'||unit.state=='fighting'||unit.state=='waiting'?
                 <>
                <Icon icon="heart"  />
@@ -604,4 +651,48 @@ export class SubUnits {
     refreshUnits(){
         this.units = this.units.splice(0);
     }
+}
+
+
+export const NearByUnit = (props) =>{
+
+    const unit = props.unit;
+
+    let currentPosition = unit.currentLocation?.name;
+    if(unit.currentRoad!=undefined){
+        const destinies = unit.currentRoad.destinies
+        currentPosition = destinies[0].city.name +" - "+destinies[1].city.name
+    }
+
+    return <Surface >
+           <View style={{flexDirection:'row',justifyContent:'space-between',height:28}} key={props.index}>
+               <View style={{flexDirection:'row',height:50,display:'flex',justifyContent:'center'}}>
+                   <Icon  icon={unit.icon} contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
+                   <Paragraph style={{position:'relative',top:7}}>{unit.name}</Paragraph>
+                   {unit.resources.food==undefined||unit.resources.food<=0?
+                    <Icon  icon="barley" color="#fc8b8b" contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
+                   :null}
+                   {unit.moral<=0?
+                    <Icon  icon="heart" color="#fc8b8b" contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
+                   :null}
+                   {unit.state=='fighting'?
+                   <Icon  icon="sword-cross" color="#fc8b8b" contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
+                   :null}
+               </View>
+               <View style={{flexDirection:'row'}}>
+                    <Button  style={{position:'relative',top:8,minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="swap-horizontal" color="grey" onPress={()=>props.onExchange(unit)}/>
+               </View>
+
+           </View>
+           <View style={{flexDirection:'row',justifyContent:'space-between',height:28,margin:9}} >
+                <View style={{flexDirection:'row'}}>
+                    <Paragraph>{i18n.t("ui.deployed.location")} </Paragraph>
+                   <Caption >{currentPosition}</Caption>
+               </View>
+                <View style={{flexDirection:'row'}}>
+                    <Paragraph>{i18n.t("ui.deployed.origin")} </Paragraph>
+                   <Caption >{unit.city.name}</Caption>
+               </View>
+           </View>
+       </Surface>
 }

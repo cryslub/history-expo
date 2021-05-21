@@ -6,86 +6,103 @@
       "export": "내보내기",
       "resume": "재개"
     },
-    "top":{
-      "choose your faction": "플레이할 세력을 선택하세요"
+    "top": {
+      "choose your faction": "플레이할 세력을 선택하세요",
+      "select destination": "목적지를 선택하세요"
     },
     "modal": {
       "choosing faction": {
         "title": "세력 선택",
         "message": "다음 세력으로 시작합니다"
+      },
+      "moving": {
+        "title": "이동",
+        "this will take": "소요시간 : ",
+        "days": "일 소요"
       }
     },
     "button": {
       "ok": "확인",
-      "cancel" : "취소",
-      "choose" : "선택",
-      "manage" : "관리",
-      "info" : "정보",
-      "go" : "이동",
-      "move" : "이동",
-      "inventory" : "소지품",
-      "trade" : "거래",
-      "enter" : "입성"
+      "cancel": "취소",
+      "choose": "선택",
+      "manage": "관리",
+      "info": "정보",
+      "go": "이동",
+      "move": "이동",
+      "inventory": "소지품",
+      "trade": "거래",
+      "enter": "입성",
+      "add": "고용",
+      "select": "선택",
+      "build": "건설"
     },
     "title": {
-      "faction list" : "세력목록",
+      "faction list": "세력목록",
       "deployed": "이동중인 유닛",
       "hero list": "통치자 선택",
       "select chancellor": "참모 선택",
-      "employ" : "유닛 고용",
-      "build" : "건설",
-      "assign" : "배정",
-      "equip" : "소지품"
+      "employ": "유닛 고용",
+      "build": "건설",
+      "assign": "배정",
+      "equip": "소지품",
+      "group": "그룹",
+      "select unit": "유닛선택",
+      "trade": "거래",
+      "change equip": "장비",
+      "exchange": "교환"
     },
     "manage": {
       "info": {
         "governor": "통치자",
         "chancellor": "참모",
-        "capital":"수도",
-        "population":"인구",
-        "food consumption":"식량소모",
-        "consumption rate":"소모율",
-        "happiness":"행복",
-        "day":"일",
-        "month":"월",
-        "year":"년",
-        "hygiene":"위생",
-        "population growth rate":"인구 증가율",
-        "military units":"전투 유닛",
-        "armed":"무장",
-        "unarmed":"비무장",
-        "city defense":"성벽",
-        "natural resources":"자원"
-
+        "capital": "수도",
+        "civilization": "문명",
+        "population": "인구",
+        "food consumption": "식량소모",
+        "consumption rate": "소모율",
+        "happiness": "행복",
+        "day": "일",
+        "month": "월",
+        "year": "년",
+        "hygiene": "위생",
+        "population growth rate": "인구 증가율",
+        "military units": "전투 유닛",
+        "armed": "무장",
+        "unarmed": "비무장",
+        "city defense": "성벽",
+        "natural resources": "자원",
+        "set as capital": "수도로 지정"
       },
-      "building" : {
+      "building": {
         "buildings": "건물"
       },
-      "resource" : {
+      "resource": {
         "resources": "자원",
         "selling": "판매중",
-        "is worth for" : "는 다음과 거래가능"
+        "is worth for": "는 다음과 거래가능",
+        "this resource is already on trade": "이미 거래중인 자원입니다"
       },
       "road": {
         "roads": "도로",
         "type": {
           "normal": {
-            "name":"평지"
+            "name": "평지"
           },
           "mountain": {
-            "name":"산악",
+            "name": "산악",
             "description": "이동시간 50% 증가"
           },
-          "desert":  {
-            "name":"사막",
+          "desert": {
+            "name": "사막",
             "description": "유닛 사기 50% 추가 감소"
           }
         }
       },
       "unit": {
         "available manpower": "유휴 인력",
-        "idle units" : "임무가 없는 유닛",
-        "idle heroes" : "임무가 없는 영웅"
+        "idle units": "임무가 없는 유닛",
+        "idle heroes": "임무가 없는 영웅",
+        "units": "유닛"
       }
     },
     "deployed": {
@@ -96,7 +113,7 @@
       "governor": "통치자",
       "chancellor": "참모",
       "effect": "효과",
-      "happiness cost of employing military unit" : "전투유닛 행복비용",
+      "happiness cost of employing military unit": "전투유닛 행복비용",
       "happiness cost of employing non-military unit": "비전투유닛 행복비용",
       "max happiness": "최대행복",
       "happiness": "행복",
@@ -109,32 +126,79 @@
         "happiness cost of employing military unit when assigned as a governor": "전투유닛 행복비용 통치자일때",
         "traveling unit food consumption when assigned to a group": "이동중 식량소모 그룹배정시",
         "trading commission when assigned to a group": "거래수수료 그룹배정시",
+        "building speed when assigned to a building project": "건설속도 건설작업 배정시",
         "happiness cost of employing non-military unit when assigned as a governor": "비전투유닛 행복비용 통치자일때",
         "production result when assigned to a production building": "생산량 생산건물에 배정시",
         "moral when assigned to a group": "사기 그룹배정시",
         "max happiness when assigned as a governor": "최대행복 통치자일때",
         "happiness/month when assigned as a governor": "행복/월 통치자일때"
       }
-
     },
     "employ": {
       "available manpower": "유휴 인력",
-      "required manpower" : "필요 인력",
-      "cost" : "비용",
-      "daily wage : food" : "임금 : 식량",
-      "takes" : "모집",
+      "required manpower": "필요 인력",
+      "cost": "비용",
+      "daily wage : food": "임금 : 식량",
+      "takes": "모집",
       "days": "일 소요"
     },
     "build": {
       "increase resource storage capacity by": "자원수용량 증가",
-      "can hold": "수용량증가 : ",
+      "can hold": "수용 : ",
+      "leader": "영웅",
       "increase defense": "도시방어 증가",
       "require": "건설에 필요한 자원 : ",
       "increase happiness": "행복증가 ",
-      "produce": "생산 : " ,
+      "produce": "생산 : ",
+      "takes": "",
       "days": " 일",
-      "production consumes" : "생산에 필요한 자원 : ",
-      "or": "혹은"
+      "taking days": "일 소요",
+      "production consumes": "생산에 필요한 자원 : ",
+      "or": "혹은",
+      "working progress": "작업 진행도",
+      "days to complete": "일후 작업완료",
+      "dedicated efforts": "성과",
+      "will be produced with max effort": " : 최대 성과로 생산될 수량",
+      "assigned units": "배정된 유닛",
+      "resource storage capacity": "자원 수용력 : ",
+      "assigning workers to this building project will boost the speed": "건설속도를 높이기 위해 일꾼들을 추가로 배정할수 있습니다."
+    },
+    "equip": {
+      "capacity": "수용력",
+      "units": "개",
+      "speed": "속도",
+      "leader": "영웅",
+      "equipments": "장비",
+      "near by units": "인근 유닛",
+      "none": "없음",
+      "require": "필요자원",
+      "quantity": "수량",
+      "type": {
+        "main hand": "주도구",
+        "livestock": "가축",
+        "cart": "수레",
+        "cloak": "망토",
+        "head": "투구",
+        "util": "보조도구",
+        "off hand": "보조도구",
+        "ammo": "화살",
+        "back": "메는도구"
+      }
+    },
+    "select": {
+      "you can select": "추가로 ",
+      "units": "유닛 더 선택 가능"
+    },
+    "trade": {
+      "you are not holding any resources to trade with": "보유중인 자원이 없습니다",
+      "trade amount": "거래량",
+      "trade": "거래",
+      "the city will get": "해당도시는 ",
+      "commission": "수수료를 가져갑니다",
+      "not enough resource to trade": "보유중인 자원이 충분하지 않습니다",
+      "not enough capacity to hold": "수용력 초과입니다",
+      "succeed": "성공",
+      "with": "다음의 자원과 거래"
     },
     "action": {
       "manage": "관리",
@@ -146,6 +210,22 @@
       "disband": "해산",
       "info": "정보",
       "remove": "해제"
+    },
+    "common": {
+      "day": "일",
+      "days": "일",
+      "resources": "자원",
+      "transfer": "클릭당",
+      "per click": "이전",
+      "can survive": "이동시 생존가능",
+      "days with": "일 ",
+      "foods": "식량",
+      "city": "도시",
+      "target": "대상",
+      "unit": "개",
+      "units": "",
+      "s": "",
+      "none": "없음"
     }
   },
   "building": {
@@ -170,7 +250,7 @@
       "description": "일꾼들은 이곳에서 나무를 모을수 있다. 도시의 나무자원 수치만큼 건설 가능하다. 나무자원이 없는 도시는 1개의 벌목장만 건설 가능하다."
     },
     "stone": {
-      "name": "돌 채굴장",
+      "name": "채석장",
       "description": "일꾼들은 이곳에서 돌을 채굴할수 있다"
     },
     "tin": {
@@ -238,7 +318,7 @@
       "description": "장인들은 이곳에서 점토판을 제조한다"
     },
     "library": {
-      "name": "서재",
+      "name": "도서관",
       "description": "학자들은 이곳에서 인력을 관리한다.인구 3,000명이상 도시는 유휴인력을 증가시키기위해 서재를 건설해야한다. 한달에 10의 유휴인력을 증가시킨다. 유휴인력은 도시 전체인구의 1/3까지 증가한다."
     },
     "wall": {
@@ -286,19 +366,19 @@
       "description": "여신 이난나의 구역. +5% 기본 인구증가율, +0.05 행복/월"
     },
     "nanna": {
-      "name": "에키쉬누갈",
+      "name": "에 키쉬누갈",
       "description": "달의신 난나의 신전. +5% 기본 인구증가율, 도시 통치자의 지혜수치에 따라 행복보너스."
     },
     "abzu": {
-      "name": "에압주",
-      "description": "물의신 엔키의 신전. +5 위생"
+      "name": "에 압주",
+      "description": "물의신 엔키의 신전. +5 기본 위생"
     },
     "babbar": {
-      "name": "에바빠르",
+      "name": "에 바빠르",
       "description": "태양신 우투의 신전. +0.05 행복/월"
     },
     "shara": {
-      "name": "에마흐",
+      "name": "에 마흐",
       "description": "소 전쟁의신 샤라의 신전. -5% 전투유닛 행복비용"
     },
     "ninlil": {
@@ -306,7 +386,7 @@
       "description": "닌릴여신을 위한 신전. +5% 농가 생산량"
     },
     "dumuzid": {
-      "name": "에두미지압주",
+      "name": "에 두미지 압주",
       "description": "목동의신 두무짓의 신전. +5% 양모 생산량"
     },
     "nisaba": {
@@ -314,24 +394,24 @@
       "description": "니사바 여신을 위한 신전. +2% 농가 생산량"
     },
     "urash": {
-      "name": "에이베아누",
+      "name": "에 이베아누",
       "description": "땅의여신 우라쉬의 신전. +2% 농가 생산량, +2 최대 행복"
     },
     "ekur": {
-      "name": "에쿠르",
+      "name": "에 쿠르",
       "description": "신들의 정원. 도시가 수도일때 모든 세력도시 +5 최대행복."
     },
     "ninhursag": {
-      "name": "에마흐",
+      "name": "에 마흐",
       "description": "닌훌삭의 신전. +10% 기본 인구증가율"
     },
     "eshumesha": {
-      "name": "에슈메샤",
+      "name": "에 슈메샤",
       "description": "니눌타의 신전. +5% 농가 생산량"
     },
     "sikil": {
-      "name": "에시킬",
-      "description": "니나주의 신전. +2 위생"
+      "name": "에 시킬",
+      "description": "니나주의 신전. +2 기본 위생"
     },
     "pabilsag": {
       "name": "파빌삭의 신전",
@@ -379,7 +459,7 @@
     },
     "inpu": {
       "name": "인푸의 신전",
-      "description": "+3 위생, +10% 도시 침략자의 사기저하"
+      "description": "+3 기본 위생, +10% 도시 침략자의 사기저하"
     },
     "anhur": {
       "name": "안후르의 신전",
@@ -400,7 +480,84 @@
     "djoser": {
       "name": "조세르의 피라미드",
       "description": "파라오 조세르의 계단형 피라미드. 도시가 수도일때 모든 세력도시 +1 최대행복"
-    }
+    },
+    "palace": {
+      "name": "궁전",
+      "description": "참모임명 가능. 도시가 수도일때 모든 세력도시 +1 최대행복."
+    },
+    "meidum pyramid": {
+      "name": "Pyramid of Meidum",
+      "description": "Pyramid built for pharaoh Huni. +1 max happiness faction wide when the city is capital"
+    },
+    "bent pyramid": {
+      "name": "굽은 피라미드",
+      "description": "파라오 스네페루 시대 건설된 굽은 피라미드. 도시가 수도일때 모든 세력도시 +1 최대행복"
+    },
+    "red pyramid": {
+      "name": "붉은 피라미드",
+      "description": "파라오 스네페루 시대의 세번째 피라미드. 도시가 수도일때 모든 세력도시 +1 최대행복"
+    },
+    "great pyramid": {
+      "name": "기자의 대피라미드",
+      "description": "파라오 쿠푸 시대 건설된 대피라미드. 도시가 수도일때 모든 세력도시 +2 최대행복"
+    },
+    "djedefre": {
+      "name": "제데프레의 피라미드",
+      "description": "파라오 제데프레 시대 건설된 피라미드. 도시가 수도일때 모든 세력도시 +2 최대행복"
+    },
+    "khafre": {
+      "name": "카프레의 피라미드",
+      "description": "파라오 카프레 시대 건설된 피라미드. 도시가 수도일때 모든 세력도시 +2 최대행복"
+    },
+    "baka": {
+      "name": "Pyramid of Baka",
+      "description": "Pyramid built by pharaoh Baka. 도시가 수도일때 모든 세력도시 +1 최대행복"
+    },
+    "great sphinx": {
+      "name": "대 스핑크스",
+      "description": "스핑크스의 석상. +0.01 행복/월"
+    },
+    "kishite livestock": {
+      "name": "목장",
+      "description": "일꾼들은 이곳에서 가축을 기를수 있다"
+    },
+    "kishite wool": {
+      "name": "양목장",
+      "description": "일꾼들은 이곳에서 양모를 모을수 있다"
+    },
+    "egyptian polished stone": {
+      "name": "석재 가공소",
+      "description": "장인들은 이곳에서 석재를 가공할수 있다."
+    },
+    "flax": {
+      "name": "아마 농장",
+      "description": "농부들은 이곳에서 아마를 기를수 있다."
+    },
+    "egyptian cloth": {
+      "name": "의류제조장",
+      "description": "장인들은 아마로 옷을 만들수 있다."
+    },
+    "papyrus sedge": {
+      "name": "파피루스 농장",
+      "description": "농부들은 이곳에서 파피루스 사초를 기를수 있다."
+    },
+    "papyrus": {
+      "name": "파피루스 제조장",
+      "description": "장인들은 이곳에서 파피루스를 만들수 있다."
+    },
+    "egyptian library": {
+      "name": "도서관",
+      "description": "학자들은 이곳에서 인력을 관리한다.인구 3,000명이상 도시는 유휴인력을 증가시키기위해 서재를 건설해야한다. 한달에 10의 유휴인력을 증가시킨다. 유휴인력은 도시 전체인구의 1/3까지 증가한다."
+    },
+    "hospital": {
+      "name": "병원",
+      "description": "+2 기본 위생"
+    },
+    "ziggurat": {
+      "name": "지구라트",
+      "description": "신들을 경배하던 장소. +2 최대 행복, 도시가 수도일때 모든 세력도시 +1 최대행복."
+    },
+    "sumerian library":{"name":"도서관","description":"학자들은 이곳에서 인력을 관리한다.인구 3,000명이상 도시는 유휴인력을 증가시키기위해 서재를 건설해야한다. 한달에 11의 유휴인력을 증가시킨다. 유휴인력은 도시 전체인구의 1/3까지 증가한다."}
   },
   "resource": {
     "food": {
@@ -525,60 +682,377 @@
     },
     "polished stone": {
       "name": "가공석"
+    },
+    "bronze axe": {
+      "name": "청동도끼"
+    },
+    "bronze arrow": {
+      "name": "청동화살"
+    },
+    "bronze javelin": {
+      "name": "청동투창"
+    },
+    "bronze spear": {
+      "name": "청동창"
+    },
+    "club": {
+      "name": "몽둥이"
+    },
+    "flax": {
+      "name": "아마"
+    },
+    "papyrus sedge": {
+      "name": "파피루스 사초"
+    },
+    "papyrus": {
+      "name": "파피루스"
     }
   },
   "unit": {
     "group": {
       "name": "그룹",
-      "description": "타도시로 이동가능한 유닛들을 그룹으로 묶을수 있다"
+      "description": "타도시로 이동가능한 유닛들을 그룹으로 묶을수 있다",
+      "equip": {}
     },
     "farmer": {
       "name": "농부",
-      "description": "농장에서 식량을 생산할수 있다"
+      "description": "농장에서 식량을 생산할수 있다",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "돌도구",
+            "description": "+5% 생산량"
+          },
+          "1": {
+            "name": "구리 도구",
+            "description": "+10% 생산량"
+          },
+          "2": {
+            "name": "청동 도구",
+            "description": "+20% 생산량"
+          }
+        },
+        "livestock": {
+          "0": {
+            "name": "소",
+            "description": "+20% 생산량"
+          }
+        },
+        "cart": {
+          "0": {
+            "name": "수레",
+            "description": "+10% 생산량"
+          }
+        }
+      }
     },
     "worker": {
       "name": "일꾼",
-      "description": "단순노동이 필요한 작업장에서 다양한 작업을 할수 있다. 도시밖 이동시 +50% 추가 식량소모."
+      "description": "단순노동이 필요한 작업장에서 다양한 작업을 할수 있다. 도시밖 이동시 +50% 추가 식량소모.",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "돌도구",
+            "description": "+5% 생산량, +5% 건설속도"
+          },
+          "1": {
+            "name": "구리 도구",
+            "description": "+10% 생산량, +10% 건설속도"
+          },
+          "2": {
+            "name": "청동도구",
+            "description": "+20% 생산량, +20% 건설속도"
+          }
+        },
+        "livestock": {
+          "0": {
+            "name": "당나귀",
+            "description": "+200 수용량, +10% 생산량, +10% 건설속도"
+          }
+        },
+        "cart": {
+          "0": {
+            "name": "수레",
+            "description": "+200 수용량, +10% 생산량, +10% 건설속도"
+          }
+        }
+      }
     },
     "artisan": {
       "name": "장인",
-      "description": "다양한 제조작업을 할수 있다."
+      "description": "다양한 제조작업을 할수 있다.",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "Stone Tool",
+            "description": "+5% 생산량, +5% 건설속도"
+          },
+          "1": {
+            "name": "구리 도구",
+            "description": "+10% 생산량, +10% 건설속도"
+          },
+          "2": {
+            "name": "청동도구",
+            "description": "+20% 생산량, +20% 건설속도"
+          }
+        }
+      }
     },
     "priest": {
       "name": "사제",
-      "description": "신전이나 맥주관련 일을 할수 있다"
+      "description": "신전이나 맥주관련 일을 할수 있다",
+      "equip": {}
     },
     "scribe": {
       "name": "학자",
-      "description": "서재에서 인력을 관리할수 있다."
+      "description": "서재에서 인력을 관리할수 있다.",
+      "equip": {}
     },
     "merchant": {
       "name": "상인",
-      "description": "타도시와 거래를 하거나 시장에서 일할수 있다"
+      "description": "타도시와 거래를 하거나 시장에서 일할수 있다",
+      "equip": {
+        "livestock": {
+          "0": {
+            "name": "당나귀",
+            "description": "+40 수용량"
+          }
+        },
+        "cart": {
+          "0": {
+            "name": "수레",
+            "description": "+80 수용량"
+          }
+        }
+      }
     },
     "militia": {
       "name": "자경대",
-      "description": "도시방어를 할수있다.타도시로 이동불가."
+      "description": "도시방어를 할수있다.타도시로 이동불가.",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "투석구",
+            "description": "2 사거리, 10 타격 데메지"
+          }
+        }
+      }
     },
     "warrior": {
       "name": "전사",
-      "description": "기본 전투유닛. 도시밖 이동시 +100% 추가 식량소모"
+      "description": "기본 전투유닛. 도시밖 이동시 +100% 추가 식량소모",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "몽둥이",
+            "description": "5 타격 데미지, 15 무게"
+          },
+          "1": {
+            "name": "메이스",
+            "description": "10 타격 데미지, 30 무게"
+          },
+          "2": {
+            "name": "구리도끼",
+            "description": "20 참격 데미지, 30 무게"
+          },
+          "3": {
+            "name": "청동도끼",
+            "description": "30 참격 데미지, 30 무게"
+          }
+        },
+        "cloak": {
+          "0": {
+            "name": "가죽망토",
+            "description": "+1 사기, +2 참격방어, -1 관통방어"
+          }
+        },
+        "head": {
+          "0": {
+            "name": "구리투구",
+            "description": "+1 사기, +2 참격방어, +2 관통방어,  +1 타격방어, 20 무게"
+          }
+        }
+      }
     },
     "spearman": {
       "name": "창병",
-      "description": "탱커유닛. 도시밖 이동시 +100% 추가 식량소모"
+      "description": "탱커유닛. 도시밖 이동시 +100% 추가 식량소모",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "구리창",
+            "description": "15 관통 데미지, 30 무게"
+          },
+          "1": {
+            "name": "청동창",
+            "description": "20 관통데미지, 30 무게"
+          }
+        },
+        "cloak": {
+          "0": {
+            "name": "가죽망토",
+            "description": "+1 사기, +2 참격방어, +1 관통방어"
+          }
+        },
+        "head": {
+          "0": {
+            "name": "구리투구",
+            "description": "+1 사기, +2 참격방어, +2 관통방어,  +1 타격방어, 20 무게"
+          }
+        },
+        "off hand": {
+          "0": {
+            "name": "방패",
+            "description": "-5 관통 데미지, +1 사기, +4 참격방어, +5 관통방어,  +2 타격방어, 50 무게"
+          }
+        }
+      }
     },
     "bowman": {
       "name": "궁수",
-      "description": "원거리 유닛. 도시밖 이동시 +50% 추가 식량소모"
+      "description": "원거리 유닛. 도시밖 이동시 +50% 추가 식량소모",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "활",
+            "description": "8 관통 데미지,3 사정거리, 20 무게"
+          }
+        },
+        "util": {
+          "0": {
+            "name": "구리단검",
+            "description": "7 베기 대미지, 20 무게"
+          }
+        },
+        "back": {
+          "0": {
+            "name": "활통",
+            "description": "+40 수용력"
+          }
+        },
+        "ammo": {
+          "0": {
+            "name": "구리화살",
+            "description": "일회성,+2 추가 관통 데미지, 5 무게"
+          },
+          "1": {
+            "name": "청동화살",
+            "description": "일회성,+8 추가 관통데미지, 5 무게"
+          }
+        },
+        "cloak": {
+          "0": {
+            "name": "가죽망토",
+            "description": "+1 사기, +2 참격방어, +1 관통방어"
+          }
+        },
+        "head": {
+          "0": {
+            "name": "구리투구",
+            "description": "+1 사기, +2 참격방어, +2 관통방어,  +1 타격방어, 20 무게"
+          }
+        }
+      }
     },
     "skirmisher": {
       "name": "경장보병",
-      "description": "근원거리 유닛. 도시밖 이동시 +50% 추가 식량소모"
+      "description": "근원거리 유닛. 도시밖 이동시 +50% 추가 식량소모",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "막대",
+            "description": "8 타격 데미지,2 사정거리, 일회성, 10 무게"
+          },
+          "1": {
+            "name": "구리투창",
+            "description": "20 관통 데미지,2 사정거리, 일회성, 20 무게"
+          },
+          "2": {
+            "name": "청동투창",
+            "description": "30 관통데미지,2 사정거리, 일회성, 15 무게"
+          }
+        },
+        "cloak": {
+          "0": {
+            "name": "가죽망토",
+            "description": "+1 사기, +2 참격방어, +1 관통방어"
+          }
+        },
+        "head": {
+          "0": {
+            "name": "구리투구",
+            "description": "+1 사기, +2 참격방어, +2 관통방어,  +1 타격방어, 20 무게"
+          }
+        }
+      }
     },
     "charioteer": {
       "name": "전차대",
-      "description": "도시밖 이동시 +150% 추가 식량소모"
+      "description": "도시밖 이동시 +150% 추가 식량소모",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "구리투창",
+            "description": "20 관통 데미지,2 사정거리, 일회성, 5 무게"
+          },
+          "1": {
+            "name": "청동투창",
+            "description": "30 관통데미지,2 사정거리, 일회성, 15 무게"
+          }
+        },
+        "cart": {
+          "0": {
+            "name": "전차",
+            "description": "+5 사기,+4 참격방어, +3 관통방어,  +2 타격방어, +5 추가 관통 데미지, +50 수용력"
+          }
+        },
+        "cloak": {
+          "0": {
+            "name": "가죽망토",
+            "description": "+1 사기, +2 참격방어, +1 관통방어"
+          }
+        },
+        "head": {
+          "0": {
+            "name": "구리투구",
+            "description": "+1 사기, +2 참격방어, +2 관통방어,  +1 타격방어, 10 무게"
+          }
+        }
+      }
+    },
+    "war cart": {
+      "name": "전투수레",
+      "description": "도시밖 이동시 +150% 추가 식량소모",
+      "equip": {
+        "main hand": {
+          "0": {
+            "name": "구리투창",
+            "description": "20 관통 데미지,2 사정거리, 일회성, 5 무게"
+          },
+          "1": {
+            "name": "청동투창",
+            "description": "30 관통데미지,2 사정거리, 일회성, 15 무게"
+          }
+        },
+        "cart": {
+          "0": {
+            "name": "전차",
+            "description": "+5 사기,+4 참격방어, +3 관통방어,  +2 타격방어, +5 추가 관통 데미지, +50 수용력"
+          }
+        },
+        "cloak": {
+          "0": {
+            "name": "가죽망토",
+            "description": "+1 사기, +2 참격방어, +1 관통방어"
+          }
+        },
+        "head": {
+          "0": {
+            "name": "구리투구",
+            "description": "+1 사기, +2 참격방어, +2 관통방어,  +1 타격방어, 10 무게"
+          }
+        }
+      }
     }
   },
   "snapshot": {
@@ -593,6 +1067,12 @@
     },
     "14": {
       "name": "우림"
+    },
+    "25": {
+      "name": "야레아"
+    },
+    "26": {
+      "name": "야레아"
     },
     "29": {
       "name": "Passaron"
@@ -795,6 +1275,12 @@
     "257": {
       "name": "하르베"
     },
+    "263": {
+      "name": "나바다"
+    },
+    "278": {
+      "name": "하모카"
+    },
     "295": {
       "name": "칼루"
     },
@@ -962,6 +1448,9 @@
     },
     "673": {
       "name": "페르 바스트"
+    },
+    "677": {
+      "name": "아부"
     },
     "678": {
       "name": "Elephantine"
@@ -1177,7 +1666,7 @@
       "name": "에리두"
     },
     "1161": {
-      "name": "Hamazi"
+      "name": "하마지"
     },
     "1183": {
       "name": "Ur"
@@ -2030,6 +2519,9 @@
     },
     "1624": {
       "name": "히트"
+    },
+    "1625": {
+      "name": "야레아"
     },
     "1627": {
       "name": "비산"
@@ -21299,6 +21791,12 @@
     },
     "8682": {
       "name": "Haicheng"
+    },
+    "8694": {
+      "name": "하마지"
+    },
+    "8696": {
+      "name": "이디클랏"
     }
   },
   "city": {
@@ -21714,7 +22212,7 @@
       "name": "Qumis"
     },
     "143": {
-      "name": "Hamazi"
+      "name": "하마지"
     },
     "144": {
       "name": "Kermanshah"
@@ -22578,7 +23076,7 @@
       "name": "움마"
     },
     "432": {
-      "name": "Akkad"
+      "name": "아카드"
     },
     "433": {
       "name": "악샤크"
@@ -26397,7 +26895,7 @@
       "name": "Zabala"
     },
     "1709": {
-      "name": "Bad-tibira"
+      "name": "밧 티비라"
     },
     "1710": {
       "name": "Kutha"
@@ -27452,7 +27950,7 @@
       "name": "헤테페레스"
     },
     "345": {
-      "name": "네펠트카우Nefertkau"
+      "name": "네펠트카우"
     },
     "346": {
       "name": "네펠트네수"
@@ -28926,6 +29424,27 @@
     },
     "838": {
       "name": "페르세넷"
+    },
+    "839": {
+      "name": "니반다"
+    },
+    "840": {
+      "name": "아슈시킬딩길"
+    },
+    "841": {
+      "name": "이스"
+    },
+    "842": {
+      "name": "테타"
+    },
+    "843": {
+      "name": "켄티메레쉬"
+    },
+    "844": {
+      "name": "제팟센"
+    },
+    "845": {
+      "name": "이세스"
     }
   },
   "faction": {
@@ -28995,7 +29514,7 @@
       "area": "메소포타미아"
     },
     "14": {
-      "name": "Akkad",
+      "name": "아카드",
       "region": "중동",
       "area": "메소포타미아"
     },
@@ -29067,7 +29586,7 @@
     "28": {
       "name": "하마지",
       "region": "중동",
-      "area": "이란"
+      "area": "메소포타미아"
     },
     "29": {
       "name": "Anshan",
@@ -33821,6 +34340,20 @@
       "name": "우르파",
       "region": "중동",
       "area": "메소포타미아"
+    }
+  },
+  "civilization": {
+    "sumer": {
+      "name": "수메르"
+    },
+    "kish": {
+      "name": "키쉬"
+    },
+    "elam": {
+      "name": "엘람"
+    },
+    "egypt": {
+      "name": "이집트"
     }
   }
 }

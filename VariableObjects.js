@@ -39,7 +39,7 @@ export default class VariableObjects{
 	
 	vertex(point,radius) {
 		if(point === undefined){
-			console.log("point undefined");
+			//console.log("point undefined");
 			return null;
 		}
 	    var phi = (90 - point[1]) * Math.PI / 180;
@@ -175,7 +175,8 @@ export default class VariableObjects{
 	    point.add( wireframe );
 
          if(city.factionData.id==0){
-            point.visible = false
+            if(!mainStore.debug)
+               point.visible = false
         }
 
 	    return point;
@@ -433,7 +434,8 @@ export default class VariableObjects{
 
          this.addDom(point,unit,'unit');
          unit.object = point;
-         point.visible = unit.explored
+         if(!mainStore.debug)
+             point.visible = unit.explored
          return point;
     }
 
@@ -667,7 +669,7 @@ export default class VariableObjects{
 
         var dir = new THREE.Vector3();
         if(position==null || object.position==null){
-            console.log("null")
+          //  console.log("null")
         }
         dir.subVectors( position, object.position ).normalize();
 

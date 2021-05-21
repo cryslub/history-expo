@@ -19,57 +19,7 @@ import { observer,inject } from "mobx-react"
 
 import mainStore from './MainContext.js';
 
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
-
+import i18n from 'i18n-js';
 
 
 export const Trade = ((props) => {
@@ -104,20 +54,20 @@ export const Trade = ((props) => {
         const totalPrice = (sourcePrice*amount*(11-bonus))/10
         let targetAmount = Util.intDivide(totalPrice,targetPrice);
         if(unit.resources[target]<targetAmount){
-            if(amount) return {message:"Not enough resource to trade"};
+            if(amount) return {message:i18n.t("ui.trade.not enough resource to trade")};
         }
         if(unit.capacity < unit.carrying - targetAmount+amount){
-            return {message:"Not enough capacity to hold"};
+            return {message:i18n.t("ui.trade.not enough capacity to hold")};
         }
 
-        return {message:"succeed",targetAmount : targetAmount};
+        return {message:i18n.t("ui.trade.succeed"),targetAmount : targetAmount};
     }
 
     const trade =(source,target,onAction)=>{
 
         const result = checkTrade(source,target);
 
-        if(result.message=='succeed'){
+        if(result.message==i18n.t("ui.trade.succeed")){
             const totalAmount = result.targetAmount
             unit.consumeResource(target,totalAmount);
             city.consumeResource(source,amount);
@@ -134,13 +84,13 @@ export const Trade = ((props) => {
 
          if(unit.resources.length ==0 || unit.carrying==0){
 
-            return <Paragraph>You are not holding any resources to trade with</Paragraph>
+            return <Paragraph>{i18n.t("ui.trade.you are not holding any resources to trade with")} </Paragraph>
         }
 
         const resource = mainStore.data.resources[key];
 
         return <>
-            <Paragraph>Trade amount</Paragraph>
+            <Paragraph>{i18n.t("ui.trade.trade amount")}</Paragraph>
             <View style={{flexDirection:'row',alignItems: 'center',justifyContent: 'center',padding:15}}>
                 <Button  style={{minWidth:0}} onPress={()=>minus(10,key)}>10</Button>
                 <Button  style={{minWidth:0}} onPress={()=>minus(5,key)}>5</Button>
@@ -149,14 +99,14 @@ export const Trade = ((props) => {
                 <Button  style={{minWidth:0}} onPress={()=>plus(5,key)}>5</Button>
                 <Button  style={{minWidth:0}} onPress={()=>plus(10,key)}>10</Button>
              </View>
-            <Paragraph>with</Paragraph>
+            <Paragraph>{i18n.t("ui.trade.with")}</Paragraph>
             {
                 Object.keys(unit.resources).map(k=>{
 
                     const result = checkTrade(key,k);
                     return <View style={{flexDirection:'row'}}>
                         <ResourceRow prefix={Util.intDivide(resource.price*amount*(11/10),mainStore.data.resources[k].price)} resource={k}/>
-                        {result.message=='succeed'?<Button onPress={()=>trade(key,k,onAction)}>Trade</Button>
+                        {result.message==i18n.t("ui.trade.succeed")?<Button onPress={()=>trade(key,k,onAction)}>{i18n.t("ui.trade.trade")}</Button>
                         :<Caption>{result.message}</Caption>}
                     </View>
                 })
@@ -166,8 +116,8 @@ export const Trade = ((props) => {
 
       return (
         <ScrollView style={{padding:10}}>
-        <Caption>Trade {city.buildings.trade?<>{city.trade.length}/{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)}</>:'0/0'}</Caption>
-        <Caption>The city will get 10% commission</Caption>
+        <Caption>{i18n.t("ui.trade.trade")} {city.buildings.trade?<>{city.trade.length}/{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)}</>:'0/0'}</Caption>
+        <Caption>{i18n.t("ui.trade.the city will get")} 10% {i18n.t("ui.trade.commission")}</Caption>
         <FlatGrid
            itemDimension={mainStore.unitSize}
            data={city.trade}

@@ -16,57 +16,6 @@ import buildings from "./json/building.json"
 
 import mainStore from './MainContext.js';
 
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
-
 
 
 export default class Assign extends Component {
@@ -112,7 +61,11 @@ export default class Assign extends Component {
             if(building.data.worker==unit.type){
                 arr.push(building);
             }
-            if((building.data.production ||building.data["hero effect"])&& unit.type=='hero'){
+            if((building.data.production ||building.data["hero effect"] || (building.data.build&&building.state=='deploy'))
+                && unit.type=='hero'){
+                arr.push(building);
+            }
+            if(unit.type=='worker' && building.data.build!=undefined && building.state=='deploy'){
                 arr.push(building);
             }
 		});

@@ -22,56 +22,6 @@ import mainStore from './MainContext.js';
 
 import i18n from 'i18n-js';
 
-const styles = StyleSheet.create({
-
-	title:{
-		fontSize:15,
-	},
-	electionTitle:{
-		fontSize:15,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left: -7
-	},
-	accordion:{
-		margin:0,
-		padding:0
-	},
-	election:{
-		margin:0,
-		paddingTop:4,
-		paddingBottom:4,
-	},
-	sub:{
-		marginLeft:12
-	},
-	faction:{
-    	marginLeft:30
-    },
-	subTitle:{
-		fontSize:13,
-		padding:0,
-		margin:0,
-		position:'relative',
-		left:-5
-	},
-	subIcon:{
-		width:15,
-		height:15
-	},
-
-    unit: {
-        padding: 8,
-         height: 60,
-         width: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 1,
-        margin:2
-     }
-});
-
 
 const Production = (props)=>{
     const production = props.data;
@@ -185,9 +135,9 @@ export default class Build extends Component {
                  <Button icon="plus" contentStyle={{marginLeft:12}} onPress={()=>this.plus()}/>
              </View>
              :null}
-            {disabled?null:<Button  onPress={()=>this.add(unit,1)}>Build</Button>}
+            {disabled?null:<Button  onPress={()=>this.add(unit,1)}>{i18n.t("ui.button.build")}</Button>}
              <View style={{width:'100%'}}>
-                <Caption style={{textAlign:'center'}}>Takes {city.getConstructionDays(unit.delay)} {i18n.t("ui.build.days")}</Caption>
+                <Caption style={{textAlign:'center'}}>{i18n.t("ui.build.takes")} {city.getConstructionDays(unit.delay)} {i18n.t("ui.build.taking days")}</Caption>
             </View>
         </>
     }
@@ -219,28 +169,28 @@ export default class Build extends Component {
 
 		return <SafeAreaView contentContainerStyle={{ padding: 10 }}>
 		<FlatGrid
-                   itemDimension={mainStore.unitSize}
-                   data={arr}
+           itemDimension={mainStore.unitSize}
+           data={arr}
 
-                   spacing={1}
-                   renderItem={({ item }) => {
-            		    const building = mainStore.data.buildings[item];
+           spacing={1}
+           renderItem={({ item }) => {
+                const building = mainStore.data.buildings[item];
 
-                        let disabled = false;
-                        const cost = building.cost;
-                        if(cost){
-                           if(Array.isArray(cost)){
-                                cost.forEach(c=>{
-                                    if(city.resources[c.type]< c.quantity || city.resources[c.type]==undefined) disabled=true;
-                                })
-                           }else{
-                                if(city.resources[cost.type]< cost.quantity || city.resources[cost.type]==undefined) disabled=true;
-                           }
-                        }
+                let disabled = false;
+                const cost = building.cost;
+                if(cost){
+                   if(Array.isArray(cost)){
+                        cost.forEach(c=>{
+                            if(city.resources[c.type]< c.quantity || city.resources[c.type]==undefined) disabled=true;
+                        })
+                   }else{
+                        if(city.resources[cost.type]< cost.quantity || city.resources[cost.type]==undefined) disabled=true;
+                   }
+                }
 
 
-                        return <Unit data={building}  action={()=>this.action(building,disabled)} disabled={disabled}/>
-                   }}
+                return <Unit data={building}  action={()=>this.action(building,disabled)} disabled={disabled}/>
+           }}
          />
 
 	     </SafeAreaView>

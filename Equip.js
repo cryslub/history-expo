@@ -17,54 +17,11 @@ import buildings from "./json/building.json"
 
 import mainStore from './MainContext.js';
 
-import {Resources,Moral} from './Common.js';
+import {Resources,Moral,NearByUnit} from './Common.js';
 
 import { observer} from "mobx-react"
 import i18n from 'i18n-js';
 
-
-const NearByUnit = (props) =>{
-
-    const unit = props.unit;
-
-    let currentPosition = unit.currentLocation?.name;
-    if(unit.currentRoad!=undefined){
-        const destinies = unit.currentRoad.destinies
-        currentPosition = destinies[0].city.name +" - "+destinies[1].city.name
-    }
-
-    return <Surface >
-           <View style={{flexDirection:'row',justifyContent:'space-between',height:28}} key={props.index}>
-               <View style={{flexDirection:'row',height:50,display:'flex',justifyContent:'center'}}>
-                   <Icon  icon={unit.icon} contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
-                   <Paragraph style={{position:'relative',top:7}}>{unit.name}</Paragraph>
-                   {unit.resources.food==undefined||unit.resources.food<=0?
-                    <Icon  icon="barley" color="#fc8b8b" contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
-                   :null}
-                   {unit.moral<=0?
-                    <Icon  icon="heart" color="#fc8b8b" contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
-                   :null}
-                   {unit.state=='fighting'?
-                   <Icon  icon="sword-cross" color="#fc8b8b" contentStyle={{position:'relative',top:8,marginLeft:20,height:40}}/>
-                   :null}
-               </View>
-               <View style={{flexDirection:'row'}}>
-                    <Button  style={{position:'relative',top:8,minWidth:40,width:40,marginRight:2,paddingTop:3}} icon="swap-horizontal" color="grey" onPress={()=>props.onExchange(unit)}/>
-               </View>
-
-           </View>
-           <View style={{flexDirection:'row',justifyContent:'space-between',height:28,margin:9}} >
-                <View style={{flexDirection:'row'}}>
-                    <Paragraph>Location </Paragraph>
-                   <Caption >{currentPosition}</Caption>
-               </View>
-                <View style={{flexDirection:'row'}}>
-                    <Paragraph>Origin </Paragraph>
-                   <Caption >{unit.city.name}</Caption>
-               </View>
-           </View>
-       </Surface>
-}
 
 
 const Equipment = (props)=>{
