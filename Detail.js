@@ -158,7 +158,7 @@ export default class Detail extends Component{
                     {
                         city.state=='traveling'&&city.moral>0?<Button mode="outlined" onPress={()=>city.toggleStop()}
                                 compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
-                                {city.pause?"Resume":"Stop"}
+                                {city.pause?i18n.t("ui.button.resume"):i18n.t("ui.button.stop")}
                             </Button>
                         :<>
                         {

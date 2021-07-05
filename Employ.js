@@ -74,7 +74,7 @@ export const Employ = ((props) => {
                 {unit.wage?<View style={{flexDirection:'row'}}>
                     <Paragraph>{i18n.t("ui.employ.daily wage : food")}  </Paragraph>
                     <ResourceIcon icon="barley" />
-                    <Paragraph>{unit.wage} </Paragraph>
+                    <Paragraph>{unit.wage} / {i18n.t("ui.common.day")}</Paragraph>
                 </View>:null
                 }
             </View>

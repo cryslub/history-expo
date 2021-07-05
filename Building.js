@@ -140,7 +140,7 @@ export  const  Building =  (observer((props) => {
                <Paragraph>{i18n.t("ui.build.production consumes")}</Paragraph>
                {
                    production.cost.map((cost,index)=>{
-                       return <ResourceRow prefix={cost.optional==true&&index!=0?<Paragraph>{i18n.t("ui.build.or")} </Paragraph>:null} resource={cost.type} suffix={Util.number(cost.quantity)}/>
+                       return <ResourceRow prefix={cost.optional==true&&index!=0?<Paragraph>{i18n.t("ui.build.or")} </Paragraph>:null} resource={cost.type} suffix={Util.number(cost.quantity*building.completedQuantity)}/>
 
                    })
                }

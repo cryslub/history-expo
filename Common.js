@@ -54,7 +54,7 @@ export const RoadScreen = (observer((props) => {
                             <View style={{flexDirection:'row',display:'flex',justifyContent:'center',padding:10}}>
                                    <View>
                                     <View style={{flexDirection:'row'}}>
-                                        <Paragraph style={{position:'relative',top:-2,marginRight:2}}>To {destiny.city.name}</Paragraph>
+                                        <Paragraph style={{position:'relative',top:-2,marginRight:2}}>{destiny.city.name}</Paragraph>
                                         <Caption >{(destiny.length/1000).toFixed(1)}km</Caption>
                                     </View>
                                     <View style={{flexDirection:'row'}}>
@@ -219,7 +219,7 @@ export const InfoContent =  (observer((props) => {
             </View>
             <View style={{flexDirection:'row'}}>
                 <Button style={{position:'relative',top:-7}} labelStyle={{fontSize:20,margin:0,position:'relative',top:-3}} onPress={()=>city.addFoodConsumptionRate(-0.5)}>-</Button>
-                <Paragraph>{city.foodConsumptionRate}</Paragraph>
+                <Paragraph>x{city.foodConsumptionRate}</Paragraph>
                 <Button style={{position:'relative',top:-7}} labelStyle={{fontSize:20,margin:0,position:'relative',top:-3}} onPress={()=>city.addFoodConsumptionRate(0.5)}>+</Button>
                 <Caption style={{marginLeft:15}}>{city.getHappinessGrowthText()} {i18n.t("ui.manage.info.happiness")}/{i18n.t("ui.manage.info.month")}</Caption>
             </View>
@@ -284,6 +284,7 @@ export const UnitScreen  = (observer((props) => {
     const city= props.type=='group'?unit.city:mainStore.selectedCity;
     const units = props.type=='group'?unit.units.slice():city.units.slice();
     let heroes = props.type=='group'?unit.heroes:city.heroes;
+    const editable = props.editable
 
     if(heroes){
         heroes = heroes.filter(hero => hero.assigned==undefined)
@@ -324,7 +325,7 @@ export const UnitScreen  = (observer((props) => {
         mainStore.pause();
         mainStore.selectedUnit = unit
 
-        props.navigation.navigate('Equip');
+        props.navigation.navigate('Equip',{editable:editable});
 
         onAction();
     }
@@ -339,13 +340,14 @@ export const UnitScreen  = (observer((props) => {
     const group = (unit,onAction)=>{
         mainStore.selectedUnit = unit
 
-          props.navigation.navigate('Group');
+          props.navigation.navigate('Group',{unit:unit});
 
           onAction();
     }
 
     const leave = (u,onAction)=>{
         unit.removeUnit(u);
+        u.inGroup= false
         city.addUnit(u);
         unit.checkCapacity()
         onAction();
@@ -509,16 +511,14 @@ export class Resources extends Component {
         let city = unit.currentLocation;
         const deploy = unit.data.action.deploy;
 
-        let condition = city.factionData.id==mainStore.selectedFaction.id;
+        let condition = city.factionData.id==mainStore.selectedFaction.id && unit.currentRoad == undefined;
 
         if(this.props.target != undefined){
             city = this.props.target;
             condition = true;
         }
 
-        var arr = Object.keys(city.resources).map(key=>{
-            return key
-        })
+        const arr = Object.keys(city.resources).filter(key=> key!='undefined')
 
         return <>
             {deploy==true?<>
@@ -595,7 +595,7 @@ export class Moral extends Component {
         return <View style={{flexDirection:'row'}}>
                <Icon icon="account"  />
                <Caption>{Math.floor(unit.manpower)} </Caption>
-               {unit.state=='traveling'||unit.state=='fighting'||unit.state=='waiting'?
+               {unit.state!=''?
                 <>
                <Icon icon="heart"  />
                <Caption>{unit.moral.toFixed(2)}/100</Caption>
@@ -660,7 +660,7 @@ export const NearByUnit = (props) =>{
 
     let currentPosition = unit.currentLocation?.name;
     if(unit.currentRoad!=undefined){
-        const destinies = unit.currentRoad.destinies
+        const destinies = unit.currentRoad.road.destinies
         currentPosition = destinies[0].city.name +" - "+destinies[1].city.name
     }
 

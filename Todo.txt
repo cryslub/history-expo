@@ -1,11 +1,20 @@
-AI - trade,  hero, multi army,weapon
+AI - trade,  hero, multi army,weapon, resource, idle unit disband
 
 
 //Production by happiness
 
+food system
 
-zoom gesture
 
+manpower simulation
+
+building limit / building size
+
+weapon consumption
+
+exotic resource - max happiness system
+
+flexible residence area & library
 
 livestock food consumption
 

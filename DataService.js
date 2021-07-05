@@ -105,6 +105,18 @@ export default class DataService{
            unit.name = i18n.t('unit.'+key+'.name')
            unit.description = i18n.t('unit.'+key+'.description')
 
+           if(unit.action?.equip){
+                Object.keys(unit.action?.equip).forEach((k)=>{
+                     const path = "unit."+key+".equip."+k
+
+                    const part = unit.action.equip[k]
+                    part.forEach((e,index)=>{
+                        e.name = i18n.t(path+"."+index+".name")
+                        e.description = i18n.t(path+"."+index+".description")
+                    })
+
+                })
+            }
         })
     }
 

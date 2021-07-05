@@ -78,7 +78,7 @@ export  const  HeroList =  (props) => {
                 <Caption >-{(city.heroes[value-2]?.valor/2).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing military unit")} </Caption>
                 <Caption >-{(city.heroes[value-2]?.wisdom/2).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing non-military unit")} </Caption>
                  <Caption >+{Math.floor(city.heroes[value-2]?.authority/4)} {i18n.t("ui.hero.max happiness")}</Caption>
-                <Caption >+{(city.heroes[value-2]?.authority/200).toFixed(2)} {i18n.t("ui.hero.happiness")}/{i18n.t("ui.hero.month")}</Caption>
+                <Caption >+{(city.heroes[value-2]?.authority/400).toFixed(2)} {i18n.t("ui.hero.happiness")}/{i18n.t("ui.hero.month")}</Caption>
             </>
             }
 

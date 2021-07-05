@@ -26,7 +26,7 @@ import i18n from 'i18n-js';
 
 export const Group =  (observer((props) => {
 
-         const unit = mainStore.selectedUnit
+         const unit = props.route.params.unit
 
     const removeHero = ()=>{
         const city = unit.currentLocation;
@@ -41,6 +41,7 @@ export const Group =  (observer((props) => {
     }
 
     const removable = unit.state=='' || (unit.currentRoad == undefined && unit.currentLocation.factionData.id==unit.city.factionData.id)
+
 
       return (
         <ScrollView >
@@ -60,10 +61,11 @@ export const Group =  (observer((props) => {
             </>:null
             }
             </View>
-             <UnitScreen unit={unit} type='group' {...props}/>
+             <UnitScreen unit={unit} type='group' {...props} editable={removable}/>
+
 
              <View style={{padding:10}}>
-                 <Resources unit={unit} />
+                 <Resources unit={unit} editable={removable}/>
              </View>
 
              {unit.nearByUnits.length>0?

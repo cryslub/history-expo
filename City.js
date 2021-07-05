@@ -154,7 +154,9 @@ export default class City extends SubUnits{
     }
 
     checkExplored(){
-        if(!this.explored){
+        if(this.explored==true){
+             this.object.visible = true
+        }else{
             this.hide()
         }
     }
@@ -178,7 +180,7 @@ export default class City extends SubUnits{
 
     addFarmsAndFood(){
 
-        const annualFood = (this.population*365/100 );
+        const annualFood = (this.population*365/100 )*1.1;
 
         const farms = Util.intDivide(annualFood,3000)
 
@@ -283,7 +285,7 @@ export default class City extends SubUnits{
        if(cost.type =='happiness'){
             let quantity = this.getHiringCost(unit);
 
-            this.happiness-=quantity;
+            this.addHappiness(-quantity);
         }else{
             this.resources[cost.type] -= cost.quantity
         }
@@ -380,18 +382,46 @@ export default class City extends SubUnits{
         }
         const storage = mainStore.data.resources[key].storage;
         if(storage){
-            const building = this.buildings[storage];
-            if(building){
-                const maxStorage = building.completedQuantity * building.data.storage.quantity;
-                quantity = Math.min(Math.floor(quantity),maxStorage-this.resources[key]);
-                this.resources[key]  +=quantity;
 
-                if(this.resources[key]>=maxStorage){
-                     this.addNeeds(storage,1)
+            if(Array.isArray(storage)){
+                const buildings = []
+                storage.forEach(s=>{
+                    const building = this.buildings[s];
+                     if(building) buildings.push(building)
+                })
+
+                if(buildings.length >0){
+                    let maxStorage = 0
+                    buildings.forEach(building=>{
+                        maxStorage += building.completedQuantity * building.data.storage.quantity;
+
+                    })
+
+                    quantity = Math.min(Math.floor(quantity),maxStorage-this.resources[key]);
+                    this.resources[key]  +=quantity;
+
+                    if(this.resources[key]>=maxStorage){
+                         this.addNeeds(storage[0],1)
+                    }
+
+                }else{
+                    this.addNeeds(storage[0],1)
                 }
             }else{
-                this.addNeeds(storage,1)
+                 const building = this.buildings[storage];
+                if(building){
+                    const maxStorage = building.completedQuantity * building.data.storage.quantity;
+                    quantity = Math.min(Math.floor(quantity),maxStorage-this.resources[key]);
+                    this.resources[key]  +=quantity;
+
+                    if(this.resources[key]>=maxStorage){
+                         this.addNeeds(storage,1)
+                    }
+                }else{
+                    this.addNeeds(storage,1)
+                }
             }
+
 
         }else{
             this.resources[key] += Math.floor(quantity);
@@ -516,6 +546,7 @@ export default class City extends SubUnits{
            //this.removeHero(unit.data)
         }else{
             unit.parent = building;
+            unit.inGroup = true
             building.units.push(unit);
             this.removeUnit(unit);
         }
@@ -541,42 +572,53 @@ export default class City extends SubUnits{
 
     }
 
+    setBuildingOnDone = (building,b)=>{
+
+        building.parent = b;
+        b.subs.push(building);
+
+        building.onDone = ()=>{
+            b.completedQuantity++;
+            b.subs.shift();
+    //                b.remain += (b.delay-b.remain)/b.quantity;
+
+            building.units.forEach(unit=>{
+                unit.mission = ''
+            })
+
+            if(b.type!='production'){
+                this.units = this.units.concat(b.units);
+                b.units = [];
+                this.units = this.units.concat(building.units);
+                building.units = [];
+
+            }else{
+                b.units = b.units.concat(building.units);
+                building.units = [];
+
+                b.units.forEach((unit)=>{
+                    if(b.data.worker != unit.data.type){
+                          b.removeUnit(unit)
+                          this.addUnit(unit)
+                    }
+                })
+
+            }
+            b.addEffect();
+
+            building.onDone = ()=>{
+            }
+        }
+    }
 
     addBuilding(building){
         const key = building.data.key;
         const b = this.buildings[key];
         if(!Util.initMap(this.buildings,key,building)){
-            building.onDone = ()=>{
-                b.completedQuantity++;
-                b.subs.shift();
-//                b.remain += (b.delay-b.remain)/b.quantity;
 
-                building.units.forEach(unit=>{
-                    unit.mission = ''
-                })
+            this.setBuildingOnDone(building,b)
 
-                if(b.type!='production'){
-                    this.units = this.units.concat(b.units);
-                    b.units = [];
-                    this.units = this.units.concat(building.units);
-                    building.units = [];
 
-                }else{
-                    b.units = b.units.concat(building.units);
-                    building.units = [];
-
-                    b.units.forEach((unit)=>{
-                        if(b.data.worker != unit.data.type){
-                              b.removeUnit(unit)
-                              this.addUnit(unit)
-                        }
-                    })
-
-                }
-                b.addEffect();
-            }
-            building.parent = b;
-            b.subs.push(building);
             b.setQuantity(b.quantity+1);
         }
         this.refreshBuildings();
@@ -596,19 +638,22 @@ export default class City extends SubUnits{
 
 
     getHygiene(){
-        let ret =Math.floor(Math.pow(80000-this.population,2)/100000000)+Util.isEmpty(this.effect['hygiene'])
+        const max = 80000
+        let ret =Math.floor(Math.pow(max-this.population,2)/100000000)
+        if(max-this.population<0) ret = -ret
+        ret += +Util.isEmpty(this.effect['hygiene'])
         if(this.snapshotSub?.resource?.water){
             ret += this.snapshotSub?.resource?.water/20
         }
         if(this.buildings['irrigation']){
-            ret += this.buildings['irrigation']?.completedQuantity/2
+            ret += this.buildings['irrigation']?.completedQuantity/20
         }
 
         return ret ;
     }
 
     getHappinessGrowth(){
-        return Math.log10(this.foodConsumptionRate)/3
+        return Math.log10(this.foodConsumptionRate)/3 + 0.01
     }
 
     getHappinessGrowthText(){
@@ -662,13 +707,20 @@ export default class City extends SubUnits{
 
 	dailyJob(diff){
 
-        if(this.resources.food){
+        if(this.resources.food != undefined){
             const consume = this.getFoodConsumption()*diff;
 
             this.happinessAccu += this.getHappinessGrowth();
 
             this.consumeResource("food",consume);
+
+            if(this.name=='우눅'){
+                var a= 0
+            }
+
+
             if(this.resources.food<=0) {
+
                 this.addHappiness(-1)
             }
             this.refreshResource();
@@ -735,7 +787,7 @@ export default class City extends SubUnits{
 	    const population = this.population;
 	    if(population>0){
             let growth = Math.floor((population*0.01*this.getGrowthRate())/12);
-            if(growth <1) growth =1;
+            if(growth>0 && growth <1) growth =1;
 
            // if(this.factionData.capital!=undefined){
 //                if(this.factionData.id==0 ||this.factionData.capital.id==this.id ){
@@ -745,14 +797,17 @@ export default class City extends SubUnits{
 //                }
           //  }
 
-            const residenceCoverage= this.buildings.residence.completedQuantity*1000;
-            if(population+growth>residenceCoverage) growth = residenceCoverage - population;
+            if(this.buildings.residence){
+                const residenceCoverage= this.buildings.residence?.completedQuantity*1000;
+                if(population+growth>residenceCoverage) growth = residenceCoverage - population;
 
-            if(population+growth>80000) growth = 0
+              //  if(population+growth>80000) growth = 0
 
 
 
-            this.population += growth;
+                this.population += growth;
+                if(this.population<100) this.population = 100
+            }
 
              this.addHappiness((this.happinessAccu/30)+Util.isEmpty(this.effect['happiness']));
              this.happinessAccu = 0;
@@ -833,12 +888,16 @@ export default class City extends SubUnits{
             }
 
         }
-        this.happiness -= 10
+        this.addHappiness(-5)
         this.governor = undefined
         this.chancellor = undefined
         this.setFactionData(faction)
         this.factionData.cities.push(this);
         this.changeColor(faction.color)
+
+        if(this.factionData.id==mainStore.selectedFaction.id){
+            this.reached()
+        }
     }
 
 	 changeColor(color){
@@ -881,7 +940,7 @@ export default class City extends SubUnits{
         let resource = true;
         Object.keys(equip.require).forEach(key=>{
             if(this.resources[key] == undefined || this.resources[key]<unit.data.manpower){
-                this.addNeeds(key,300)
+                this.addNeeds(key,200)
                 resource = false;
             }else{
 
@@ -1062,12 +1121,19 @@ export default class City extends SubUnits{
             foodConsumptionRate:this.foodConsumptionRate,
             governor:this.governor?.id,
             chancellor:this.chancellor?.id,
-            heroes:this.heroes.map(hero=> {return hero.id}),
+            heroes:this.heroes.map(hero=> {
+                let assigned = undefined
+                if(typeof hero.assigned == 'string'){
+                    assigned = hero.assigned
+                }
+                return {id:hero.id,assigned:assigned}
+            }),
             resources:this.resources,
             trade :this.trade,
             effect:this.effect,
             units:this.units.map(unit=>{return unit.getCoreData()}),
-            buildings:Object.keys(this.buildings).map(key=>{return this.buildings[key].getCoreData()})
+            buildings:Object.keys(this.buildings).map(key=>{return this.buildings[key].getCoreData()}),
+            unitIndex:this.unitIndex
         }
     }
 
@@ -1090,7 +1156,10 @@ export default class City extends SubUnits{
         this.chancellor = data.heroes[saved.chancellor]
 
         this.heroes = saved.heroes.map(hero=>{
-            return data.heroes[hero]
+            const h = data.heroes[hero.id]
+            h.assigned = hero.assigned
+
+            return h
         })
 
         this.resources = saved.resources
@@ -1100,7 +1169,7 @@ export default class City extends SubUnits{
         this.units = [];
 
         saved.units.forEach(unit=>{
-            const u = new UnitData()
+            const u = new UnitData(mainStore.data.units[unit.type],this)
             u.parseCoreData(unit,data)
             this.units.push(u)
         })
@@ -1108,10 +1177,12 @@ export default class City extends SubUnits{
         this.buildings = {};
 
         saved.buildings.forEach(building=>{
-            const b = new BuildingData()
+            const b = new BuildingData(mainStore.data.buildings[building.key],this)
             b.parseCoreData(building,data)
             this.buildings[building.key] = b
         })
+
+        this.unitIndex = saved.unitIndex
     }
 
     hide(){

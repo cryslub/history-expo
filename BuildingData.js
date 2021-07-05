@@ -171,7 +171,7 @@ export default class BuildingData extends UnitData{
                     this.bonusEffort += (this.hero.wisdom/(200*this.delay))*diff
                }
                let bonus = this.getBonus();
-               this.bonusEffort += (bonus / (100*this.completedQuantity)) * diff
+               this.bonusEffort += (bonus / (100*this.completedQuantity*this.delay)) * diff
             }
 
         }
@@ -228,6 +228,10 @@ export default class BuildingData extends UnitData{
 
         const production = this.getProduction();
 
+         if(this.city.name=='키쉬' && this.data.key =='library'){
+            var a = 0
+        }
+
         if(production){
 
             if(production.cost){
@@ -266,6 +270,7 @@ export default class BuildingData extends UnitData{
     }
 
     getResultQuantity(quantity){
+        if(quantity == undefined) quantity = this.getProduction().quantity
         if(this.completedQuantity ==0 ) return 0;
 
         let ret = quantity*this.completedQuantity
@@ -297,7 +302,10 @@ export default class BuildingData extends UnitData{
              key:this.data.key,
              effort:this.effort,
              bonusEffort:this.bonusEffort,
-             selectedProduction:this.selectedProduction
+             selectedProduction:this.selectedProduction,
+             subs:this.subs.map(sub=>{
+                return sub.getCoreData()
+             })
         }
 
         return {...parent,...data}
@@ -313,5 +321,17 @@ export default class BuildingData extends UnitData{
         this.selectedProduction = this.selectedProduction
 
         this.addJob()
+        saved.subs.forEach(sub=>{
+          const b = new BuildingData(mainStore.data.buildings[sub.key],this.city)
+          b.parseCoreData(sub,data)
+
+            this.city.setBuildingOnDone(b,this)
+            mainStore.jobs.push(b);
+        })
+
+        if(this.state=='produce'){
+            const production = this.getProduction();
+            this.delay = production.delay
+        }
     }
 }

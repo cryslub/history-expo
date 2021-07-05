@@ -75,7 +75,7 @@
     "name": "Livestock",
     "icon": "cow",
     "color": "#7c4945",
-    "storage": "livestock",
+    "storage": ["livestock","kishite livestock"],
     "price": 100
   },
   "copper": {
@@ -149,7 +149,7 @@
   },
   "silver": {
     "name": "Silver",
-    "icon": "coin",
+    "icon": "alpha-s-circle",
     "color": "silver",
     "storage": "warehouse",
     "price": 100
@@ -163,7 +163,7 @@
   },
   "tablet": {
     "name": "Clay tablet",
-    "icon": "file-document-box",
+    "icon": "text-box",
     "color": "#d97557",
     "storage": "warehouse",
     "price": 5

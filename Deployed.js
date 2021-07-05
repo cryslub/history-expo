@@ -55,7 +55,7 @@ const Unit = (props) =>{
 
     let currentPosition = unit.currentLocation?.name;
     if(unit.currentRoad!=undefined){
-        const destinies = unit.currentRoad.destinies
+        const destinies = unit.currentRoad.road.destinies
         currentPosition = destinies[0].city.name +" - "+destinies[1].city.name
     }
 

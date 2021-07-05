@@ -53,8 +53,23 @@ export default class UnitData extends SubUnits{
             this.setCity(city)
         }
 
-        if(city.snapshotSub?.add?.build!=undefined){
-            const u = city.snapshotSub?.add?.build[unit.type]
+
+
+        this.sort = sort;
+    }
+
+
+    setCity = (city)=>{
+        this.city = city;
+        this.delay = city.getConstructionDays(this.delay);
+        this.remain = this.delay;
+
+        this.factionData = city.factionData;
+        this.currentLocation = city;
+
+        const unit = this.data
+         if(city.snapshotSub?.add?.build!=undefined){
+            const u = city.snapshotSub?.add?.build[this.data.type]
             if(u!=undefined)
                 this.data.action.build = this.data.action.build.concat(u)
         }
@@ -75,18 +90,6 @@ export default class UnitData extends SubUnits{
                 }
             }
         }
-
-        this.sort = sort;
-    }
-
-
-    setCity = (city)=>{
-        this.city = city;
-        this.delay = city.getConstructionDays(this.delay);
-        this.remain = this.delay;
-
-        this.factionData = city.factionData;
-        this.currentLocation = city;
 
     }
 
@@ -396,6 +399,7 @@ export default class UnitData extends SubUnits{
         if(this.data.wage){
             this.city.wage-=this.data.wage
         }
+        this.city.addHappiness(-1)
     }
 
      disband = () =>{
@@ -433,9 +437,8 @@ export default class UnitData extends SubUnits{
         const d = (Math.max(damage.piercing-5,0)+Math.max(damage.blunt-2,0)+Math.max(damage.slash-10,0)-bonus);
         if(d>0){
 
-            city.buildings.wall.completedQuantity -= (d*mod/100)
-            city.buildings.wall.quantity -= (d*mod/100)
-
+            city.buildings.wall.completedQuantity = Util.positiveSub(city.buildings.wall.completedQuantity,(d*mod/100))
+            city.buildings.wall.quantity = Util.positiveSub(city.buildings.wall.quantity,(d*mod/100))
 
         }
     }
@@ -527,7 +530,7 @@ export default class UnitData extends SubUnits{
                 if(this.state!='fleeing'){
 
                     const result = Util.aStar(this,this.city);
-                    this.startMove(result.path)
+                    this.startMove(result.path,this.city)
                     this.state='fleeing'
                 }
             }
@@ -953,6 +956,7 @@ export default class UnitData extends SubUnits{
 
         if(this.currentRoad != undefined){
             this.currentRoad.road.units.forEach(unit=>{
+                if(unit.state=='fleeing') return
                 if(unit.object.position.distanceTo(this.object.position)<0.2 && unit != this){
                     if(unit.hasArmy() && unit.city.factionData.id != this.city.factionData.id){
                         this.blocked = unit;
@@ -1109,7 +1113,7 @@ export default class UnitData extends SubUnits{
              hero:this.hero?.id,
              remain:this.remain,
              currentLocation:this.currentLocation?.id,
-             currentRoad:this.currentRoad?.id,
+             currentRoad:{road:this.currentRoad?.road.id, cost:this.currentRoad?.cost},
              blocked:this.blocked?.id,
              moral:this.moral,
              position:position,
@@ -1124,11 +1128,16 @@ export default class UnitData extends SubUnits{
              distanceFromLast:this.distanceFromLast,
              units:this.units.map(unit=>{return unit.getCoreData()}),
              equipments:this.equipments,
-             job:mainStore.jobs.includes(this)
+             job:mainStore.jobs.includes(this),
+             unitIndex:this.unitIndex,
+             inGroup:this.inGroup,
+             selectedProduction:this.selectedProduction
         }
     }
 
     parseCoreData(saved,data){
+
+        this.unitIndex = saved.unitIndex
 
         if(saved.sort =='unit'){
             this.setBaseData(mainStore.data.units[saved.type])
@@ -1138,15 +1147,31 @@ export default class UnitData extends SubUnits{
 
 
         this.explored = saved.explored
+        this.inGroup = saved.inGroup
 
         this.setCity(data.cities[saved.city])
         this.sort = saved.sort
         this.state = saved.state
         this.resources = saved.resources
-        this.hero = data.heroes[saved.hero]
+        this.selectedProduction = saved.selectedProduction
+
+        if(saved.hero != undefined){
+            this.city.heroes.forEach(hero=>{
+                if(hero.id == saved.hero){
+                    this.hero = hero
+                    this.hero.assigned = this
+
+                }
+
+            })
+        }
         this.remain = saved.remain
         this.currentLocation = data.cities[saved.currentLocation]
-        this.currentRoad = data.roadMap[saved.currentRoad]
+        const road = data.roadMap[saved.currentRoad?.road]
+        if(road!=undefined){
+            road.units.push(this)
+            this.currentRoad = {cost:saved.currentRoad.cost,road:road}
+        }
         this.blocked = data.cities[saved.blocked]
         this.moral = saved.moral
         this.men  = saved.men
@@ -1155,7 +1180,8 @@ export default class UnitData extends SubUnits{
         this.destination = data.cities[saved.destination]
         this.targetUnit = saved.targetUnit
 
-        if(this.destination && this.destination.id!=this.currentLocation.id){
+
+        if(this.destination && (this.destination.id!=this.currentLocation.id||this.currentRoad!=undefined) ){
             const result = Util.aStar(this,this.destination)
             this.path = result.path
         }
@@ -1168,8 +1194,9 @@ export default class UnitData extends SubUnits{
         this.units = [];
 
         saved.units.forEach(unit=>{
-            const u = new UnitData()
+            const u = new UnitData(mainStore.data.units[unit.type],this.city)
             u.parseCoreData(unit,data)
+            u.parent = this
             this.units.push(u)
         })
 

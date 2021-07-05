@@ -34,9 +34,12 @@
       "enter": "입성",
       "add": "고용",
       "select": "선택",
-      "build": "건설"
+      "build": "건설",
+      "resume": "재개",
+      "stop": "정지"
     },
     "title": {
+      "manage": "관리",
       "faction list": "세력목록",
       "deployed": "이동중인 유닛",
       "hero list": "통치자 선택",
@@ -234,7 +237,7 @@
       "description": "농부들은 이곳에서 식량을 생산할수 있다"
     },
     "irrigation": {
-      "name": "관개장치",
+      "name": "관개시설",
       "description": "식량생산량과 위생수치를 증가시킨다. 관계장치는 물자원 수만큼 건설가능하다. 영웅배정시 영웅의 권위수치에 따라 식량생산량이 증가한다."
     },
     "clay": {
@@ -263,7 +266,7 @@
     },
     "livestock": {
       "name": "목장",
-      "description": "일꾼들은 이곳에서 가축을 기를수 있다"
+      "description": "일꾼들은 이곳에서 가축을 기를수 있다. -1 위생."
     },
     "wool": {
       "name": "양농장",
@@ -367,11 +370,11 @@
     },
     "nanna": {
       "name": "에 키쉬누갈",
-      "description": "달의신 난나의 신전. +5% 기본 인구증가율, 도시 통치자의 지혜수치에 따라 행복보너스."
+      "description": "달의신 난나의 신전. +5% 기본 인구증가율, 도시 통치자의 지혜수치에 따라 행복증가."
     },
     "abzu": {
       "name": "에 압주",
-      "description": "물의신 엔키의 신전. +5 기본 위생"
+      "description": "물의신 엔키의 신전. +5 위생"
     },
     "babbar": {
       "name": "에 바빠르",
@@ -379,7 +382,7 @@
     },
     "shara": {
       "name": "에 마흐",
-      "description": "소 전쟁의신 샤라의 신전. -5% 전투유닛 행복비용"
+      "description": "전쟁의신 샤라의 신전. -5% 전투유닛 행복비용"
     },
     "ninlil": {
       "name": "닌릴의 신전",
@@ -411,7 +414,7 @@
     },
     "sikil": {
       "name": "에 시킬",
-      "description": "니나주의 신전. +2 기본 위생"
+      "description": "니나주의 신전. +2 위생"
     },
     "pabilsag": {
       "name": "파빌삭의 신전",
@@ -434,7 +437,7 @@
       "description": "양의신 바넵제뎃의 신전. +10% 양모 생산량"
     },
     "eye temple": {
-      "name": "Eye Temple",
+      "name": "눈의 신전",
       "description": ""
     },
     "per aat": {
@@ -442,8 +445,8 @@
       "description": "태양신 아툼의 대신전. +5 최대 행복"
     },
     "neith": {
-      "name": "나이스의 신전",
-      "description": "여신 나이스의 신전. -3% 전투유닛 행복비용, 도시 통치자의 지혜수치에 따라 행복증가 보너스"
+      "name": "네이트의 신전",
+      "description": "여신 네이트의 신전. +2% 기본 인구증가율, +2 위생, -2% 전투유닛 행복비용, 도시 통치자의 지혜수치에 따라 행복증가"
     },
     "wadjet": {
       "name": "와젯의 신전",
@@ -455,27 +458,27 @@
     },
     "heryshaf": {
       "name": "헤리샤프의 신전",
-      "description": "도시 통치자의 용기수치에 따라 행복증가 보너스"
+      "description": "도시 통치자의 용기수치에 따라 행복증가"
     },
     "inpu": {
       "name": "인푸의 신전",
-      "description": "+3 기본 위생, +10% 도시 침략자의 사기저하"
+      "description": "+2 위생, +10% 도시 침략자의 사기저하"
     },
     "anhur": {
       "name": "안후르의 신전",
       "description": "전쟁의신 안후르의 신전. -10% 전투유닛 행복비용"
     },
     "horus": {
-      "name": "호루스의 신전",
-      "description": "매의 신 호루스의 신전. +5 최대 행복"
+      "name": "헤루의 신전",
+      "description": "매의 신 헤루의 신전. +5 최대 행복"
     },
     "khnum": {
       "name": "크눔의 신전",
-      "description": "+10% 식량 생산량"
+      "description": "나일강의 신 크눔의 신전. +5 위생"
     },
     "hathor": {
-      "name": "하소르의 신전",
-      "description": "여신 하소르의 신전. +5% 기본 인구증가율, +2 최대행복"
+      "name": "하토르의 신전",
+      "description": "여신 하토르의 신전. +3% 기본 인구증가율, +0.03 행복/월"
     },
     "djoser": {
       "name": "조세르의 피라미드",
@@ -519,7 +522,7 @@
     },
     "kishite livestock": {
       "name": "목장",
-      "description": "일꾼들은 이곳에서 가축을 기를수 있다"
+      "description": "일꾼들은 이곳에서 가축을 기를수 있다. -1 위생."
     },
     "kishite wool": {
       "name": "양목장",
@@ -551,7 +554,7 @@
     },
     "hospital": {
       "name": "병원",
-      "description": "+2 기본 위생"
+      "description": "+2 위생"
     },
     "ziggurat": {
       "name": "지구라트",
@@ -29444,7 +29447,7 @@
       "name": "제팟센"
     },
     "845": {
-      "name": "이세스"
+      "name": "이세수"
     }
   },
   "faction": {

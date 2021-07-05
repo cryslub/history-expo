@@ -117,7 +117,9 @@ const Equipment = (props)=>{
            <Subheading style={{marginLeft:5,top: -3,position: 'relative'}}>{e.name} </Subheading>
 
        </View>
-        <Caption>{e.description} </Caption>
+       <View style={{flexDirection:'row'}}>
+            <Caption>{e.description} </Caption>
+        </View>
        <View style={{flexDirection:'row'}}>
 
            <Paragraph >Require</Paragraph>
@@ -144,6 +146,8 @@ export default class Equip extends Component {
             visible :false,
             amount:1
         }
+
+
 	}
     changeAmount = ()=>{
         if(this.state.amount ==1){
@@ -193,6 +197,8 @@ export default class Equip extends Component {
 
 		 const city = unit.currentLocation;
 
+		 const editable =  city.factionData.id==mainStore.selectedFaction.id && unit.currentRoad == undefined;
+
 		const arr = Object.keys(city.buildings).filter(key=>{
 		    const building = city.buildings[key];
 		    if(building.data.production){
@@ -222,28 +228,40 @@ export default class Equip extends Component {
                 </View>
                 <Divider/>
             </>:null}
-            <Caption>{i18n.t("ui.equip.equipments")}</Caption>
-            {
-                Object.keys(equip).map(key=>{
-                    return <View style={{flexDirection:'row'}} key={key}>
-                        <Paragraph>{i18n.t("ui.equip.type."+key)} </Paragraph>
-                        <Caption> {unit.equipments[key]==undefined?i18n.t("ui.equip.none"):unit.equipments[key].data.name} </Caption>
-                        <Button icon="playlist-edit" onPress={()=>this.change(key)} />
-                    </View>
-                })
-
-            }
-            {unit.inGroup!=true?<Resources unit={unit} />:null}
-            {unit.nearByUnits.length>0?
+            {equip!=null?
             <>
-                <Caption>{i18n.t("ui.equip.near by units")}</Caption>
+                <Caption>{i18n.t("ui.equip.equipments")}</Caption>
                 {
-                    unit.nearByUnits.map((u,index)=>{
-                        return <NearByUnit key={index} unit={u} onExchange={this.onExchange}/>
+                    Object.keys(equip).map((key,index)=>{
+                        const path = "unit."+unit.data.type+".equip."+key
+
+                        return <View style={{flexDirection:'row'}} key={key}>
+                            <Paragraph>{i18n.t("ui.equip.type."+key)} </Paragraph>
+                            <Caption> {unit.equipments[key]==undefined?i18n.t("ui.equip.none"):unit.equipments[key].data.name} </Caption>
+                            {editable?
+                            <Button icon="playlist-edit" onPress={()=>this.change(key)} />
+                            :null
+                            }
+                        </View>
                     })
                 }
-            </>:null
-            }
+            </>
+            :null}
+
+            {unit.inGroup!=true?<>
+                <Resources unit={unit} />
+                {unit.nearByUnits.length>0?
+                <>
+                    <Caption>{i18n.t("ui.equip.near by units")}</Caption>
+                    {
+                        unit.nearByUnits.map((u,index)=>{
+                            return <NearByUnit key={index} unit={u} onExchange={this.onExchange}/>
+                        })
+                    }
+                </>:null
+                }
+            </>:null}
+
 	     </ScrollView>
 	}
 	

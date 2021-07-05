@@ -81,7 +81,7 @@ export const ChangeEquip = (props)=>{
     let equipIndex = 0;
     if(unit.equipments[key]){
         unit.data.action.equip[key].forEach((equipment,index)=>{
-             if(equipment == unit.equipments[key].data)   equipIndex = index+2;
+             if(equipment.key == unit.equipments[key].data.key)   equipIndex = index+1;
         })
     }
 
@@ -106,7 +106,7 @@ export const ChangeEquip = (props)=>{
             if(id==0){
                 unit.setEquipment(key,undefined)
             }else{
-                const equipment = unit.data.action.equip[key][id-1];
+                const equipment = mainStore.data.units[unit.data.type].action.equip[key][id-1];
                 unit.setEquipment(key,{data:equipment,amount:1})
                 setAmount(1)
                 bringResource(false,equipment,1)
@@ -151,7 +151,12 @@ export const ChangeEquip = (props)=>{
 		return <ScrollView contentContainerStyle={{ padding: 10 }}>
             <Equipment data={{name:i18n.t("ui.equip.none")}} unit={unit}  path={path} equipped={value==0} onSelect={()=>onSelect(0)}/>
             {unit.data.action.equip[key].map((equipment,index)=>{
-                    return <Equipment data={{name:i18n.t(path+"."+index+".name"),description:i18n.t(path+"."+index+".description")}}  unit={unit} path={path} city={city} index={index+1} key={index} equipped={(index+1)==value}
+                    const data = {
+                        name:i18n.t(path+"."+index+".name"),
+                        description:i18n.t(path+"."+index+".description"),
+                        require:equipment.require
+                    }
+                    return <Equipment data={data}  unit={unit} path={path} city={city} index={index+1} key={index} equipped={(index+1)==value}
                         disabled={!unit.isEquipmentAvailable(equipment)} onSelect={()=>onSelect(index+1)}/>
                 })
             }

@@ -113,6 +113,14 @@ import * as THREE from 'three';
         if(n-result >0) result++;
         return result;
     },
+    positiveSub(source,sub){
+        source -= sub
+
+        if(source<0){
+            source = 0
+        }
+        return source
+    },
     getDistance(lat1,lon1,lat2,lon2){
           const R = 6371e3; // metres
           const φ1 = lat1 * Math.PI/180; // φ, λ in radians
@@ -183,10 +191,10 @@ import * as THREE from 'three';
                     }else{
                         s = unit.object.position;
                     }
-                    if(s.distanceTo(end.currentRoad.destinies[0].city.object.position) >s.distanceTo(end.currentRoad.destinies[1].city.object.position)){
-                        end = end.currentRoad.destinies[1].city
+                    if(s.distanceTo(end.currentRoad.road.destinies[0].city.object.position) >s.distanceTo(end.currentRoad.road.destinies[1].city.object.position)){
+                        end = end.currentRoad.road.destinies[1].city
                     }else{
-                        end = end.currentRoad.destinies[0].city
+                        end = end.currentRoad.road.destinies[0].city
                     }
                 }
             }

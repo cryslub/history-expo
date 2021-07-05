@@ -165,7 +165,7 @@
     "key": "livestock",
     "type": "production",
     "delay": 20,
-    "description": "Workers can breed livestock from here",
+    "description": "Workers can breed livestock from here. -1 base hygiene.",
     "icon": "cow",
     "color": "#7c4945",
     "worker": "worker",
@@ -187,6 +187,9 @@
     "storage": {
       "type": "livestock",
       "quantity": 50
+    },
+    "effect": {
+      "hygiene" : -1
     }
   },
   "wool": {
@@ -230,7 +233,7 @@
     "key": "kishite livestock",
     "type": "production",
     "delay": 20,
-    "description": "Workers can breed livestock from here",
+    "description": "Workers can breed livestock from here. -1 hygiene.",
     "icon": "cow",
     "color": "#7c4945",
     "worker": "worker",
@@ -252,6 +255,9 @@
     "storage": {
       "type": "livestock",
       "quantity": 50
+    },
+    "effect": {
+      "hygiene" : -1
     }
   },
   "kishite wool": {
@@ -439,6 +445,10 @@
         {
           "type": "clay",
           "quantity": 10
+        },
+        {
+          "type": "wood",
+          "quantity": 1
         }
       ]
     }
@@ -606,19 +616,12 @@
     "type": "production",
     "delay": 10,
     "description": "Artisans can make clay tablet from here",
-    "icon": "file-document-box",
+    "icon": "text-box",
     "color": "#d97557",
     "cost": [{
       "type": "brick",
       "quantity": 50
-    },
-      {
-        "type": "clay",
-        "quantity": 5},
-      {
-        "type": "mud",
-        "quantity": 5
-      }],
+    }],
     "worker": "artisan",
 
     "production": {
@@ -629,6 +632,10 @@
         {
           "type": "clay",
           "quantity": 5
+        },
+        {
+          "type": "wood",
+          "quantity": 1
         }
       ]
     }
@@ -640,7 +647,7 @@
     "key": "library",
     "type": "production",
     "delay": 60,
-    "description": "Scribe can manage manpower from here. From 3,000 population, city needs libraries to increase its manpower. +10 available manpower per month until 1/3 of city population",
+    "description": "Scribes can manage manpower from here. From 3,000 population, city needs libraries to increase its manpower. +10 available manpower per month until 1/3 of city population",
     "icon": "book",
     "color": "#d97557",
     "cost": [{
@@ -957,7 +964,7 @@
     "worker": "artisan",
     "production": [
       {
-        "delay": 20,
+        "delay": 10,
         "result": "club",
         "quantity": 10,
         "cost": [
@@ -968,7 +975,7 @@
         ]
       },
       {
-        "delay": 30,
+        "delay": 20,
         "result": "mace",
         "quantity": 10,
         "cost": [
@@ -1307,7 +1314,7 @@
     "type": "production",
     "delay": 1000,
     "unique": true,
-    "description": "+2 base hygiene",
+    "description": "+2 hygiene",
     "icon": "hospital-box",
     "color": "#70543e",
     "cost": [
@@ -1476,7 +1483,7 @@
     "key": "abzu",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god of water Enki. +5 base hygiene",
+    "description": "Temple dedicated to god of water Enki. +5 hygiene",
     "icon": "bank",
     "color": "#00b573",
     "worker": "priest",
@@ -1766,7 +1773,7 @@
     "key": "sikil",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god Ninazu. +2 base hygiene",
+    "description": "Temple dedicated to god Ninazu. +2 hygiene",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -1984,7 +1991,7 @@
     "key": "neith",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to goddess Neith. -3% happiness cost of employing military unit, Grants happiness growth bonus depends on the wisdom of the governor",
+    "description": "Temple dedicated to goddess Neith. +2% base population growth, +2 hygiene, -2% happiness cost of employing military unit, Grants happiness growth bonus depends on the wisdom of the governor",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -2002,8 +2009,10 @@
       }]
     },
     "effect": {
-      "military happiness cost" :3,
-      "wisdom happiness" : 1
+      "population growth" : 2,
+      "military happiness cost" :2,
+      "wisdom happiness" : 1,
+      "hygiene": 2
     }
   },
 
@@ -2100,7 +2109,7 @@
     "key": "inpu",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god Inpu. +3 base hygiene, +10% moral decrease rate of the invaders",
+    "description": "Temple dedicated to god Inpu. +2 hygiene, +10% moral decrease rate of the invaders",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -2118,7 +2127,7 @@
       }]
     },
     "effect": {
-      "hygiene" : 3,
+      "hygiene" : 2,
       "invader moral decrease" : 10
     }
   },
@@ -2149,7 +2158,6 @@
       }]
     },
     "effect": {
-      "hygiene" : 3,
       "military happiness cost" : 10
     }
   },
@@ -2190,7 +2198,7 @@
     "key": "khnum",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to god Khnum. +10% food production",
+    "description": "Temple dedicated to god Khnum. +5 hygiene",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -2208,7 +2216,7 @@
       }]
     },
     "effect": {
-      "food production" : 10
+      "hygiene" : 5
     }
   },
 
@@ -2219,7 +2227,7 @@
     "key": "hathor",
     "type": "effect",
     "delay": 1000,
-    "description": "Temple dedicated to goddess Hathor. +5% base population growth, +2 max happiness",
+    "description": "Temple dedicated to goddess Hathor. +3% base population growth, +0.03 happiness per month",
     "icon": "bank",
     "color": "#70543e",
     "worker": "priest",
@@ -2237,8 +2245,8 @@
       }]
     },
     "effect": {
-      "population growth" : 5,
-      "max happiness": 2
+      "population growth" : 3,
+      "happiness" : 0.03
     }
   },
 

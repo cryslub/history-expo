@@ -1,9 +1,8 @@
 {
   "8533":{
     "name": "Unug",
-    "heroes": [1,3,5,809],
+    "heroes": [1,3,5],
     "governor": 1,
-    "chancellor": 809,
     "capital": true,
     "buildings": ["anu ziggurat","eanna","palace"],
     "resource":{

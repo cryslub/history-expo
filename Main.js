@@ -12,6 +12,8 @@ import FactionList from './FactionList.js';
 import {Deployed} from './Deployed.js';
 
 import {Manage} from './Manage.js';
+import {CityManage} from './CityManage.js';
+
 import {Info} from './Info.js';
 import {HeroInfo} from './HeroInfo.js';
 import {HeroList} from './HeroList.js';
@@ -79,6 +81,9 @@ export default class Main extends Component{
         // i18n.locale = 'en'
 
          i18n.locale = Localization.locale;
+         if(i18n.locale!='ko-KR'){
+            i18n.locale = 'en'
+         }
 	}
 	
 	componentDidMount(){
@@ -91,7 +96,11 @@ export default class Main extends Component{
 	render(){
 		return  <PaperProvider  theme={theme}>
                 <NavigationContainer theme={theme}>
-                    <Stack.Navigator initialRouteName="Home">
+                    <Stack.Navigator initialRouteName="Home"
+                        screenOptions={{
+                         headerBackTitleVisible: false
+                       }}
+                       >
                         <Stack.Screen name="Home" component={Interface} options={{ headerStyle: {height: 0},title:''}} onLoad={this.onLoad}/>
                         <Stack.Screen name="Scenario" component={Scenario} options={{ title:'Select Scenario'}}/>
                         <Stack.Screen name="FactionList" component={FactionList} options={{ title:i18n.t("ui.title.faction list")}}/>
@@ -99,6 +108,7 @@ export default class Main extends Component{
 
                         <Stack.Screen name="Manage" component={Manage}
                                 options={({ route }) => ({
+                                    title:i18n.t("ui.title.manage"),
                                     headerTitle: props =>
                                         <View style={{flexDirection:'row'}}>
                                             <Paragraph style={{position:'relative',top:5,fontSize:18}}> {mainStore.data.cities[route.params.city].name} </Paragraph>

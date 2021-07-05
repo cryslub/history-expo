@@ -21,6 +21,43 @@ export class CityAI{
 
     weeklyJob(diff){
         this.checkNeeds();
+
+        this.adjustFoodConsumptionRate()
+
+    }
+
+    getExtraFoodConsumption(){
+        let extra = this.city.resourceConsume?.food;
+        extra = extra==undefined?0:extra;
+        extra += this.city.wage
+
+        return extra
+
+    }
+
+    adjustFoodConsumptionRate(){
+
+        const extra = this.getExtraFoodConsumption()
+        const city = this.city
+        if(this.city.name=='아다나'){
+            const a = 0
+        }
+
+         const array = [2,1.5,1,0.5];
+        array.some(rate=>{
+            const ret = Math.floor(Util.intDivide(city.population,100) * rate);
+
+
+            if(city.resources.food>(ret+extra)*(366-getDayOfYear(mainStore.date))*1.05){
+                city.foodConsumptionRate = rate;
+                return true;
+            }
+            if(rate == 0.5){
+                city.foodConsumptionRate = rate;
+                return true;
+            }
+            return false;
+        })
     }
 
     checkNeeds(){
@@ -93,13 +130,21 @@ export class CityAI{
                      }
                   }
 
+                  if(city.name=='키쉬'){
+                      var a = 0
+                  }
+
                 if(this.city.manpower<=limit){
-                    if(key =='tablet'||key =='papyrus'||key =='papyrus sedge'||key =='mud'){
+                    if(key =='tablet'||key =='papyrus'||key =='papyrus sedge'||key =='mud'||key =='wood'){
 
                     }else return
 
                 }else{
-                    if(this.foodShortage) return
+                    if(this.foodShortage){
+                        if(key =='clay'||key =='pottery'||key =='mud'||key =='brick'){
+                        }else
+                            return
+                    }
                 }
 
 
@@ -141,6 +186,9 @@ export class CityAI{
                         this.orderUnitToBuild('artisan',this.buildings.beer)
                     break;
                     case 'tablet':
+                        if(city.name=='키쉬'){
+                            var a = 0
+                        }
                         this.orderUnitToBuild('artisan',this.buildings.tablet)
                     break;
                     case 'papyrus':
@@ -255,7 +303,7 @@ export class CityAI{
 
             }
 
-            if((city.buildings[building] || city.population<3000) && city.getMaxManpower()<800){
+            if((city.buildings[building] || city.population<2500) && city.getMaxManpower()<800){
                 return this.checkResidence();
             }else{
                 if(city.buildings[building] !=undefined){
@@ -288,6 +336,7 @@ export class CityAI{
     }
 
     checkHappinessBuildings(){
+         const city = this.city
         if(this.city.manpower>400){
             const market= this.city.buildings.market;
             if((market==undefined || market.quantity < this.city.population/10000) && this.city.population>1500){
@@ -300,6 +349,11 @@ export class CityAI{
             }
         }
 
+        let extra = this.city.resourceConsume?.food;
+        extra = extra==undefined?0:extra;
+        extra += this.city.wage
+
+
         const rate = this.city.foodConsumptionRate;
         if(rate<2){
             this.foodConsumptionRateGoal = 2
@@ -307,25 +361,17 @@ export class CityAI{
             const ret = Util.intDivide(this.city.population,100) * this.foodConsumptionRateGoal;
 
             if(this.city.manpower>200 || rate==0.5){
-                this.checkFarms(ret)
+                this.checkFarms(ret+this.city.wage)
             }else{
                 this.checkGranary();
             }
+
+            this.city.buildings.farm.units.forEach(unit=>{
+                city.equipUnit(unit,'main hand','stone tool')
+            })
         }
 
-        const array = [2,1.5,1,0.5];
-        array.some(rate=>{
-            const ret = Math.floor(Util.intDivide(this.city.population,100) * rate);
 
-            let extra = this.city.resourceConsume?.food;
-            extra = extra==undefined?0:extra;
-
-            if(this.city.resources.food>(ret+extra)*(366-getDayOfYear(mainStore.date))){
-                this.city.foodConsumptionRate = rate;
-                return true;
-            }
-            return false;
-        })
 
 
     }
@@ -334,12 +380,16 @@ export class CityAI{
         const farm = this.city.buildings.farm;
         const granary = this.city.buildings.granary;
 
-        if(granary.quantity*this.buildings.granary.storage.quantity<farm.quantity*this.buildings.farm.production.quantity){
+        if(granary.quantity*granary.data.storage.quantity<farm.getResultQuantity()){
 
             this.orderUnitToBuild('worker',this.buildings.granary)
-
+           //  this.foodShortage = true
+             return false
         }
+
+        return true
     }
+
 
     checkFarms(consumption){
         const city = this.city;
@@ -347,25 +397,26 @@ export class CityAI{
         const farm = this.city.buildings.farm;
         let extra = this.city.resourceConsume?.food;
         extra = extra==undefined?0:extra;
+        extra += this.city.wage
 
-        if(farm.getResultQuantity(this.buildings.farm.production.quantity)<=(consumption+extra)*365){
-            this.foodShortage = true
-            if(!this.manpowerShortage){
-                if(city.checkBuildingAvailability(this.buildings.irrigation) && city.manpower>200){
-                    this.orderUnitToBuild('worker',this.buildings.irrigation)
+        if(farm.getResultQuantity(this.buildings.farm.production.quantity)<=(consumption+extra)*365*1.05){
+
+            if(this.checkGranary()){
+                if(!this.manpowerShortage){
+                    if(city.checkBuildingAvailability(this.buildings.irrigation) && city.manpower>200){
+                        this.orderUnitToBuild('worker',this.buildings.irrigation)
+                    }
+
+                    this.city.employ(mainStore.data.units.farmer,(unit)=>{
+                        this.city.build(unit,this.buildings.farm)
+                    });
                 }
-
-                this.city.employ(mainStore.data.units.farmer,(unit)=>{
-                    this.city.build(unit,this.buildings.farm)
-                });
             }
 
             ret = false;
-        }else{
-            this.foodShortage = false
         }
 
-        this.checkGranary();
+
 
         return ret;
     }
@@ -373,7 +424,12 @@ export class CityAI{
     checkFood(){
 
 
-        this.checkFarms(this.city.getFoodConsumption())
+        if(this.checkFarms(this.city.getFoodConsumption())==false){
+            this.foodShortage = true
+        }else{
+            this.foodShortage = false
+        }
+
 
 
     }

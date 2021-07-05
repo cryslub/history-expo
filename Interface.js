@@ -536,7 +536,7 @@ export  const Interface = (props) =>{
 
         const currentRoad = target.currentRoad;
         if(currentRoad!=undefined){
-            const destinies = currentRoad.destinies;
+            const destinies = currentRoad.road.destinies;
             if(destinies[0].city.id==path[path.length-1].id){
                 path.push(destinies[1].city)
             }else{
@@ -566,6 +566,7 @@ export  const Interface = (props) =>{
     }
     const group = (unit)=>{
         mainStore.pause();
+        mainStore.selectedUnit = unit
          props.navigation.navigate('Group', {unit:unit});
     }
 
@@ -588,8 +589,8 @@ export  const Interface = (props) =>{
       mainStore.data = new DataService(objects);
       mainStore.data.load();
         if(Platform.OS != 'web'){
-//            load()
-            mainStore.setStage('main')
+            load()
+//            mainStore.setStage('main')
         }else{
             mainStore.setStage('main')
         }
@@ -610,7 +611,9 @@ export  const Interface = (props) =>{
              if(response.exists){
                  FileSystem.readAsStringAsync(saveFileUri)
                  .then((json ) => {
-                     parseSaved(json)
+                     if(parseSaved(json)==false){
+                        mainStore.setStage( 'main')
+                     }
                   })
              }else{
                 mainStore.setStage( 'main')
@@ -622,6 +625,7 @@ export  const Interface = (props) =>{
 
     const getCoreData = ()=>{
         return {
+            version:'0.1',
             cities : Object.keys(mainStore.data.cities).map(key=>{
                 return mainStore.data.cities[key].getCoreData()
             }),
@@ -630,16 +634,19 @@ export  const Interface = (props) =>{
     }
 
     const parseSaved = (contents)=>{
-          const saved = JSON.parse(contents)
-            parseCoreData(saved.main,mainStore.data)
+        const saved = JSON.parse(contents)
+        if(saved.version==undefined) return false
+        parseCoreData(saved.main,mainStore.data)
 
 
-            saved.cities.forEach(city=>{
-                mainStore.data.cities[city.id].parseCoreData(city,mainStore.data)
-            })
+        saved.cities.forEach(city=>{
+            mainStore.data.cities[city.id].parseCoreData(city,mainStore.data)
+        })
 
-            mainStore.data.checkExplored()
-            initGame()
+        mainStore.data.checkExplored()
+        initGame()
+
+        return true
     }
 
     const parseCoreData = (saved,data)=>{

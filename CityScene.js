@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import ExpoTHREE, { THREE } from 'expo-three'; // 2.2.2-alpha.1
 import ExpoGraphics from 'expo-graphics'; // 0.0.3
-
+import OrbitControls from './OrbitControlsView.js'
 
 import {  View,Animated,PanResponder,TouchableOpacity,Text,StyleSheet  } from 'react-native';
 import PinchZoomResponder from 'react-native-pinch-zoom-responder'
@@ -39,12 +39,13 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default class ThreeScene extends Component{
+export default class CityScene extends Component{
 
 	constructor(){
 		super();
 		this.doubleTap = React.createRef();
-		
+		this.controls = React.createRef();
+
 		this.state={
 			textlabels :[],
 			detail:{},
@@ -64,7 +65,8 @@ export default class ThreeScene extends Component{
              initialLeftWithoutZoom: 0,
              initialZoom: 1,
              top: 0,
-             left: 0
+             left: 0,
+             camera:null
 		}
 		
 		
@@ -209,35 +211,67 @@ export default class ThreeScene extends Component{
 
 	onContextCreate = async ({ gl, arSession, width, height, scale }) => {
 
-		this.renderer = new ExpoTHREE.Renderer({ gl });
-	    this.renderer.setPixelRatio(scale);
-	    this.renderer.setSize(width, height);
-	    this.renderer.setClearColor(0x000000, 1.0);
-	
-	    this.loaded = false;
-	    
-	    
-	    //ADD SCENE
-	    this.scene = new THREE.Scene()
-	    //ADD CAMERA
-	    this.camera = new THREE.PerspectiveCamera(30, width / height, 3, 150);
-	    
-	    this.globe = new Globe(this.scene);
-	    this.globe.init();
-	    this.mesh = this.globe.mesh;
-	
-		this.cameraHandler = new CameraHandler(this.container,this.camera,this.mesh,{
-		    initialPoint:{lat:30,long:39,distance:200},
-		    boundary:{top:0.65,bottom:0.4,left:5.2,right:5.6}
-		});
-		this.objects = new VariableObjects(this.scene,this.mesh,this.globe,this.container);
-		mainStore.objects = this.objects;
-	//	console.log(this.objects)
-//		this.setState({textlabels:this.objects.textlabels})
-		
-		this.props.onLoad(this.objects);
+	    this.renderer = new ExpoTHREE.Renderer({ gl });
+        this.renderer.setPixelRatio(scale);
+        this.renderer.setSize(width, height);
+        this.renderer.setClearColor(0x000000, 1.0);
+
+        const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+	    camera.position.set( 1000, 1000, 1000 );
+		camera.lookAt( 0, 0, 0 );
+		this.setState({camera:camera})
+
+		this.scene = new THREE.Scene();
+		this.scene.background = new THREE.Color( 0xf0f0f0 );
+
+        // roll-over helpers
+
+        const rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+        const rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 1, transparent: true } );
+        const rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+
+        var geo = new THREE.EdgesGeometry( rollOverMesh.geometry );
+        var mat = new THREE.LineBasicMaterial( { color: 0x111111, linewidth: 1 } );
+        var wireframe = new THREE.LineSegments( geo, mat );
+        wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+        rollOverMesh.add( wireframe );
 
 
+        this.scene.add( rollOverMesh );
+
+        // cubes
+
+    //    const cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+     //   const cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( 'textures/square-outline-textured.png' ) } );
+
+        // grid
+
+        const gridHelper = new THREE.GridHelper( 1000, 20 );
+        this.scene.add( gridHelper );
+
+        //
+
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+
+        const geometry = new THREE.PlaneGeometry( 1000, 1000 );
+        geometry.rotateX( - Math.PI / 2 );
+
+        const plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+        this.scene.add( plane );
+
+        //objects.push( plane );
+
+        // lights
+
+        const ambientLight = new THREE.AmbientLight( 0x606060 );
+        this.scene.add( ambientLight );
+
+        const directionalLight = new THREE.DirectionalLight( 0xffffff );
+        directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
+        this.scene.add( directionalLight );
+
+//        controls.touches = { TWO: THREE.TOUCH.ROTATE, ONE: THREE.TOUCH.DOLLY_PAN };
 	};
 
 	onResize = ({ width, height, scale }) => {
@@ -249,18 +283,17 @@ export default class ThreeScene extends Component{
 
   	onRender = delta => {
 
-  	    let changed = this.cameraHandler.render();
+  	  //  let changed = this.cameraHandler.render();
 
-        const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.width,this.height );
+     //   const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.width,this.height );
 
-        this.setState({textlabels:ret.textlabels,detail:ret.detail})
+       // this.setState({textlabels:ret.textlabels,detail:ret.detail})
 
-	    if(changed ||  this.rendered!=true){
+	  //  if(changed ||  this.rendered!=true){
 	       // console.log("render")
-
-            this.renderer.render(this.scene, this.camera);
+            this.renderer.render(this.scene, this.state.camera);
             this.rendered = true
-	    }
+	  //  }
   	};
   
 	 
@@ -294,15 +327,20 @@ export default class ThreeScene extends Component{
 		const detail = this.state.detail;
 		
 	    return(
-	    	<View {...this.panResponder.panHandlers} style={{ flex: 1 ,overflow:'hidden'}}  onLayout={ this.onLayout}>
-		    	<ExpoGraphics.View
-		        	style={{ flex: 1 }}
-		            onContextCreate={this.onContextCreate}
-		            onRender={this.onRender}
-		            onResize={this.onResize}
-		            arEnabled={false}
-		    		ref={(container) => { this.container = container }}	>
-		    	</ExpoGraphics.View>
+	    	<View style={{ flex: 1 ,overflow:'hidden'}}  onLayout={ this.onLayout}>
+	    	     <OrbitControls
+                    style={{flex: 1}}
+                    camera={this.state.camera}
+                    ref={this.controls}>
+                    <ExpoGraphics.View
+                        style={{ flex: 1 }}
+                        onContextCreate={this.onContextCreate}
+                        onRender={this.onRender}
+                        onResize={this.onResize}
+                        arEnabled={false}
+                        ref={(container) => { this.container = container }}	>
+                    </ExpoGraphics.View>
+                </OrbitControls>
 		    	{
 		    		this.state.textlabels.map((label,i)=>{
 		    			if(!label.added) return null;
