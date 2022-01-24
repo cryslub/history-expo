@@ -542,7 +542,24 @@
       "quantity": 200
     }
   },
+  "trade": {
+    "id": 31,
+    "name": "Trading Post",
+    "key": "trade",
+    "type": "trade",
+    "delay": 60,
+    "description": "You need 1 trading post per 5 resource to trade. ",
+    "icon": "cached",
+    "color": "#e3c378",
+    "worker": "merchant",
+    "trade": {
+    },
+    "cost": [{
+      "type": "brick",
+      "quantity": 100
+    }]
 
+  },
   "beer": {
     "id": 31,
     "name": "Brewery",
@@ -1044,8 +1061,48 @@
             "quantity": 2
           }
         ]
-      }
-     ]
+      },
+      {
+        "delay": 30,
+        "result": "copper spear",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "copper",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 40,
+        "result": "bronze spear",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "copper dagger",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "copper",
+            "quantity": 2
+          }
+        ]
+      }]
   },
   "ranged": {
     "id": 31,
@@ -1067,7 +1124,7 @@
       "quantity": 150
     }],
     "worker": "artisan",
-    "production":
+    "production": [
       {
         "delay": 10,
         "result": "sling",
@@ -1078,7 +1135,89 @@
             "quantity": 10
           }
         ]
-      }
+      },
+      {
+        "delay": 30,
+        "result": "copper javelin",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "copper",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 40,
+        "result": "bronze javelin",
+        "quantity": 20,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "stick",
+        "quantity": 30,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "bow",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 20
+          }
+        ]
+      },
+      {
+        "delay": 30,
+        "result": "copper arrow",
+        "quantity": 60,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "copper",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "delay": 40,
+        "result": "bronze arrow",
+        "quantity": 60,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
+          }
+        ]
+      }]
   },
   "armoursmith": {
     "id": 31,
@@ -1111,7 +1250,17 @@
         }
       ]
     },
-
+      {
+        "delay": 30,
+        "result": "quiver",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "leather",
+            "quantity": 10
+          }
+        ]
+      },
       {
         "delay": 50,
         "result": "helmet",
@@ -1120,6 +1269,21 @@
           {
             "type": "copper",
             "quantity": 10
+          }
+        ]
+      },
+      {
+        "delay": 50,
+        "result": "shield",
+        "quantity": 10,
+        "cost": [
+          {
+            "type": "leather",
+            "quantity": 30
+          },
+          {
+            "type": "food",
+            "quantity": 30
           }
         ]
       }]
@@ -1159,7 +1323,7 @@
       "quantity": 180
     }],
     "worker": "artisan",
-    "production": {
+    "production": [{
       "delay": 90,
       "result": "cart",
       "quantity": 1,
@@ -1169,7 +1333,22 @@
           "quantity": 20
         }
       ]
-    }
+    },
+      {
+        "delay": 50,
+        "result": "vexilloid",
+        "quantity": 5,
+        "cost": [
+          {
+            "type": "wood",
+            "quantity": 10
+          },
+          {
+            "type": "bronze",
+            "quantity": 1
+          }
+        ]
+      }]
   },
   "palace": {
     "id": 31,

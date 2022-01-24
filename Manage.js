@@ -64,6 +64,7 @@ const BuildingScreen = (observer((props) => {
            }}
          />
 
+        <View style={{height:20}}/>
      </ScrollView>
    );
 }))

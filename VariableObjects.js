@@ -513,18 +513,36 @@ export default class VariableObjects{
 	getSelected(mouse,camera,callback){
 		 
 	    var self = this;
-		  
-		var raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera( mouse, camera );
-		  
-		var intersects = raycaster.intersectObjects( self.objects );
-		
+
 		self.clicked = [];
-		intersects.forEach( function(intersect){
-		 	if(self.objectMap[intersect.object.id] !== undefined){
-		 		self.clicked.push(self.objectMap[intersect.object.id]);
-		 	}
-		});
+		var adj = [
+		    {x:0,y:0},
+		    {x:0.01,y:0.01},
+		    {x:-0.01,y:-0.01},
+		    {x:0.01,y:-0.01},
+		    {x:-0.01,y:0.01},
+		    {x:0,y:0.01},
+		    {x:0,y:-0.01},
+		    {x:0.01,y:0},
+		    {x:-0.01,y:0}
+		]
+
+        var idx = 0
+        do{
+            var point = {x:mouse.x+adj[idx].x,y:mouse.y+adj[idx].y}
+
+            var raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera( point, camera );
+
+            var intersects = raycaster.intersectObjects( self.objects );
+
+            intersects.forEach( function(intersect){
+                if(self.objectMap[intersect.object.id] !== undefined){
+                    self.clicked.push(self.objectMap[intersect.object.id]);
+                }
+            });
+            idx++
+		}while(self.clicked.length==0 && idx<adj.length)
 
 		if(self.clicked.length>0){
 		    callback(self.clicked,self.objectMap[intersects[0].object.id]);

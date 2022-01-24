@@ -129,7 +129,6 @@ export  const  SelectChancellor =  (props) => {
                  <Caption >-{(city.heroes[value-2]?.valor/4).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing military unit")} </Caption>
                  <Caption >-{(city.heroes[value-2]?.wisdom/4).toFixed(1)}% {i18n.t("ui.hero.happiness cost of employing non-military unit")} </Caption>
                  <Caption >+{Math.floor(city.heroes[value-2]?.authority/4)} {i18n.t("ui.hero.max happiness")}</Caption>
-                 <Caption >+{(city.heroes[value-2]?.authority/800).toFixed(2)} {i18n.t("ui.hero.happiness")}/{i18n.t("ui.hero.month")}</Caption>
             </>
             }
 

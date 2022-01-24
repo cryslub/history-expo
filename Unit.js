@@ -130,9 +130,6 @@ export default class Unit extends Component {
 
                     {this.icon(data)}
                    <View style={{height:40,display:'flex',justifyContent:'center',flexDirection:'row'}}>
-                        {data.hero?
-                        <Button icon="star" color='grey' style={ { alignItems: 'center',justifyContent: 'center',marginTop:2,marginLeft:-9,minWidth:24,width:24,height:18}} contentStyle={{marginLeft:13,marginRight:-6,width:12}} />
-                        :null}
                        <Paragraph style={{marginTop:7,fontSize:data.name.length>20?10:12,textAlign:'center',lineHeight:13}}>{data.name}</Paragraph>
                    </View>
                    {this.props.quantity?this.props.quantity():null}

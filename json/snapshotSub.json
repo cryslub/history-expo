@@ -4,7 +4,7 @@
     "heroes": [1,3,5],
     "governor": 1,
     "capital": true,
-    "buildings": ["anu ziggurat","eanna","palace"],
+    "buildings": ["anu ziggurat","eanna"],
     "resource":{
       "water" : 50
     }
@@ -30,7 +30,14 @@
       "stone" : 2
     }
   },
-
+  "59":{
+    "name": "Anshan",
+    "capital": true,
+    "resource":{
+      "wood" : 2,
+      "stone" : 2
+    }
+  },
   "73":{
     "heroes": [807,796],
     "governor": 807,
@@ -63,7 +70,7 @@
     "heroes": [2],
     "governor": 2,
     "capital": true,
-    "buildings": ["ekur","eshumesha","palace"],
+    "buildings": ["ekur","eshumesha"],
     "resource":{
       "water" : 30
     }
@@ -83,8 +90,9 @@
     }
   },
   "193":{
+    "name": "Shekna",
     "resource":{
-      "wood" : 3,
+      "wood" : 2,
       "stone" : 2
     }
   },
@@ -110,6 +118,12 @@
       "water" : 40
     }
   },
+  "856":{
+    "name": "Ugarit",
+    "resource":{
+      "wood" : 2
+    }
+  },
   "857":{
     "capital": true,
     "buildings": ["great temple"],
@@ -119,7 +133,8 @@
     }
   },
   "859":{
-    "heroes": [7],
+    "name": "Ebla",
+    "heroes": [7,8],
     "governor": 7,
     "capital": true,
     "buildings": ["kura","palace"]
@@ -144,19 +159,38 @@
       "stone" : 2
     }
   },
-  "296":{
-    "heroes": [8],
-    "governor": 8,
+  "249":{
+    "name": "Karkamish",
     "resource":{
-      "water" : 20
+      "water" : 10
+    }
+  },
+  "296":{
+    "name": "Emar",
+    "resource":{
+      "water" : 30
+    }
+  },
+  "372":{
+    "resource":{
+      "wood" : 3,
+      "stone": 2,
+      "copper": 2
     }
   },
   "8694":{
     "capital": true
   },
+  "442":{
+    "name": "Malidiya",
+    "resource":{
+      "wood" : 2,
+      "stone" : 2
+    }
+  },
   "446":{
     "resource":{
-      "wood" : 5,
+      "wood" : 4,
       "stone" : 3
     }
   },
@@ -286,6 +320,14 @@
   "720":{
     "fontSize": 16
   },
+  "743":{
+    "name": "Khantap",
+    "resource":{
+      "wood" : 2
+    }
+  },
+
+
   "862":{
     "fontSize": 16,
     "resource":{
@@ -310,7 +352,8 @@
   "1060":{
     "buildings": ["pabilsag"],
     "resource":{
-      "water" : 20
+      "water" : 20,
+      "wood": 2
     }
   },
   "8681":{
@@ -320,6 +363,14 @@
     "resource":{
       "copper" : 2,
       "stone" : 2
+    }
+  },
+  "8698":{
+    "name": "Urashtu",
+    "resource":{
+      "copper" : 2,
+      "stone" : 2,
+      "water" : 30
     }
   }
 }

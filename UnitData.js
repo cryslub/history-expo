@@ -38,6 +38,7 @@ export default class UnitData extends SubUnits{
     pause = false;
     moral = 0;
     explored = true
+    mission={}
 
     constructor(unit,city,sort,unitIndex) {
 
@@ -358,6 +359,7 @@ export default class UnitData extends SubUnits{
                    unit.men -= d
                    if(!unit.onDeploy()){
                         unit.city.population-=d
+                        unit.city.consumedManpower -=d
                    }
                    if(damage.isCritical){
                         if(unit.parent==undefined){
@@ -407,7 +409,7 @@ export default class UnitData extends SubUnits{
         if(this.type=='group'){
             city.units = city.units.concat(this.units);
             if(this.hero!=undefined){
-                city.addHero(this.hero)
+                this.removeHero(this.hero)
             }
         }else{
             if(this.data.manpower!=undefined){
@@ -737,7 +739,8 @@ export default class UnitData extends SubUnits{
         return this.state!='traveling'&&
             this.currentLocation.trade.length>0&&
             this.currentLocation.factionData.id!=mainStore.selectedFaction.id&&
-            (this.type=='merchant' || this.hasUnit('merchant'))
+            (this.type=='merchant' || this.hasUnit('merchant'))&&
+            this.currentRoad==undefined
     }
 
     @computed get carrying(){

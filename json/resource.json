@@ -323,10 +323,17 @@
   },
   "stick": {
     "name": "Throwing Stick",
-    "icon": "loading",
+    "icon": "boomerang",
     "color": "#8D6142",
     "storage": "armoury",
     "price": 5
+  },
+  "vexilloid": {
+    "name": "Vexilloid",
+    "icon": "flag-triangle",
+    "color": "#794909",
+    "storage": "armoury",
+    "price": 400
   }
 
 }

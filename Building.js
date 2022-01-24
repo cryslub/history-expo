@@ -12,7 +12,7 @@ import ResourceRow from './ResourceRow.js';
 
 
 import mainStore from './MainContext.js';
-import Hero from './Hero.js';
+import Hero from './Hero.js';i18n
 
 import i18n from 'i18n-js';
 

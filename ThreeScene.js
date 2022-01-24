@@ -113,6 +113,8 @@ export default class ThreeScene extends Component{
 	  handlePanResponderGrant = (e, gestureState) => {
 		  const event = this._transformEvent({ ...e, gestureState });
 
+           // console.log("here")
+
 		  this.cameraHandler.handlePanResponderGrant(event.nativeEvent)
 		  this.objects.onMouseover(this.cameraHandler.touch,this.camera);
 
@@ -228,7 +230,7 @@ export default class ThreeScene extends Component{
 	
 		this.cameraHandler = new CameraHandler(this.container,this.camera,this.mesh,{
 		    initialPoint:{lat:30,long:39,distance:200},
-		    boundary:{top:0.65,bottom:0.4,left:5.2,right:5.6}
+		    boundary:{top:0.7,bottom:0.4,left:5.2,right:5.65}
 		});
 		this.objects = new VariableObjects(this.scene,this.mesh,this.globe,this.container);
 		mainStore.objects = this.objects;

@@ -265,7 +265,8 @@
     "manpower": 5,
     "wage": 1,
     "action": {
-      "assign": true
+      "assign": true,
+      "deploy": true
     }
   },
   "merchant": {
@@ -476,7 +477,6 @@
     "name": "Spearman",
     "type": "spearman",
     "category": "army",
-    "special": true,
     "icon": "zodiac-sagittarius",
     "description": "Main tankers. +100% extra food consumption when traveling",
     "delay": 40,
@@ -578,7 +578,6 @@
     "name": "Bowman",
     "type": "bowman",
     "category": "army",
-    "special": true,
     "icon": "bullseye-arrow",
     "description": "Main range unit. +50% extra food consumption when traveling",
     "delay": 60,
@@ -707,7 +706,6 @@
     "name": "Skirmisher",
     "type": "skirmisher",
     "category": "army",
-    "special": true,
     "icon": "format-horizontal-align-right",
     "description": "Light infantry unit. +50% extra food consumption when traveling",
     "delay": 30,

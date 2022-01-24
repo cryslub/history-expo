@@ -55,7 +55,6 @@ export  const  HeroInfo =  (observer((props) => {
 
           <Paragraph >+{(hero.authority/10).toFixed(1)} {i18n.t("ui.hero.info.moral when assigned to a group")}</Paragraph>
           <Paragraph >+{Math.floor(hero.authority/4)} {i18n.t("ui.hero.info.max happiness when assigned as a governor")}</Paragraph>
-          <Paragraph >+{(hero.authority/400).toFixed(2)} {i18n.t("ui.hero.info.happiness/month when assigned as a governor")}</Paragraph>
 
      </ScrollView>
 

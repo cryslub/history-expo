@@ -13,7 +13,6 @@ import SelectDialog from './SelectDialog';
 import ResponsiveDrawer from './ResponsiveDrawer.js';
 import ThreeScene from './ThreeScene';
 import DataService from './DataService.js';
-import Detail from './Detail.js';
 import timer from './Timer.js';
 import Util from './Util.js';
 import {Progress} from './Common.js';
@@ -399,7 +398,8 @@ export  const Interface = (props) =>{
     mainStore.scene = scene;
     mainStore.onSelectUnit = onSelectUnit
 
-    setInterval(()=>timer(mainStore.data),200)
+    const interval = mainStore.debug?200:400
+    setInterval(()=>timer(mainStore.data),interval)
     //console.log("timer start")
 
      AppState.addEventListener("change", (nextAppState)=>{

@@ -8,11 +8,14 @@ export class CityAI{
 
     needs = {};
     needSource = {};
+    trader = {}
     buildings = mainStore.data.buildings
 
     constructor(city) {
         this.city = city;
         this.manpowerShortage = false
+
+
     }
 
     dailyJob(diff){
@@ -22,7 +25,7 @@ export class CityAI{
     weeklyJob(diff){
         this.checkNeeds();
 
-        this.adjustFoodConsumptionRate()
+//        this.adjustFoodConsumptionRate()
 
     }
 
@@ -75,6 +78,9 @@ export class CityAI{
 
                 if(key=="stone tool") building ='toolsmith';
 
+                if(key=="cart") building ='workshop';
+
+
                 if(city.civilization){
                     const civ = city.civilization.key
                     if(civ == 'egypt'){
@@ -95,7 +101,9 @@ export class CityAI{
                     }
                 }
 
-                if(this.city.buildings[building] != undefined){
+                const b =this.city.buildings[building]
+
+                if(b != undefined){
                     const production  =mainStore.data.buildings[building]?.production;
                     if(production!=undefined){
                         let p = production;
@@ -107,18 +115,31 @@ export class CityAI{
                             });
                         }
 
-                        if(key=='livestock'){
+                        if(key=='wool'){
                             let a = 0;
                         }
-                        if(this.city.resourceConsume[key]==undefined&&need<300){
-                            return;
-                        }
-                        if( (this.city.resourceConsume[key]<=(this.city.buildings[building]?.quantity*p.quantity)/p.delay)&&(typeof need != 'number' || need<300)){
-                            return;
+                        if(Number.isInteger(need)){
+                            if( (need/100<=(b?.quantity*p.quantity)/p.delay)){
+                                return;
+                            }
+                        }else{
+                            if(this.city.resourceConsume[key]==undefined){
+                                return;
+                            }
+                            if( (this.city.resourceConsume[key]<=(b?.quantity*p.quantity)/p.delay)){
+                                return;
+                            }
                         }
 
-                        this.city.buildings[building].units.forEach(unit=>{
-                            city.equipUnit(unit,'main hand','stone tool')
+                        if(b.resourceShortage){
+                            return
+                        }
+
+                        b.units.forEach(unit=>{
+                            const key = 'main hand'
+                            if(unit.equipments[key] == undefined){
+                                city.equipUnit(unit,key,'stone tool')
+                            }
                         })
                     }
                 }
@@ -135,7 +156,7 @@ export class CityAI{
                   }
 
                 if(this.city.manpower<=limit){
-                    if(key =='tablet'||key =='papyrus'||key =='papyrus sedge'||key =='mud'||key =='wood'){
+                    if(key =='tablet'||key =='papyrus'||key =='papyrus sedge'||key =='mud'||key =='wood'||key =='clay'){
 
                     }else return
 
@@ -163,6 +184,9 @@ export class CityAI{
                     break;
                     case 'copper':
                         this.orderUnitToBuild('worker',this.buildings.copper,need)
+                    break;
+                    case 'tin':
+                        this.orderUnitToBuild('worker',this.buildings.tin,need)
                     break;
                     case 'wood':
                         this.orderUnitToBuild('worker',this.buildings.wood,need)
@@ -220,7 +244,9 @@ export class CityAI{
                     case 'club':
                         this.orderUnitToBuild('artisan',this.buildings.melee)
                     break;
-
+                    case 'cart':
+                        this.orderUnitToBuild('artisan',this.buildings.workshop)
+                    break;
                     case 'warehouse':
                         this.orderUnitToBuild('worker',this.buildings.warehouse)
                     break;
@@ -261,6 +287,8 @@ export class CityAI{
 
     //        this.addNeed({type:'happiness',quantity:1});
         }
+
+        this.city.militaryJob();
 
         this.checkFood();
         this.checkRareResource();
@@ -303,12 +331,12 @@ export class CityAI{
 
             }
 
-            if((city.buildings[building] || city.population<2500) && city.getMaxManpower()<800){
+            if((city.buildings[building] || city.population<3500) && city.getMaxManpower()<800){
                 return this.checkResidence();
             }else{
                 if(city.buildings[building] !=undefined){
                     let p = city.buildings[building].data.production
-                    if(city.buildings[building].quantity * p.quantity < Util.intDivide(city.getMaxManpower(),100) ){
+                    if(city.buildings[building].quantity * p.quantity < Util.intDivide(city.getMaxManpower(),200) ){
                         //if(building =='sumerian library'){
                             //console.log(city.buildings[building].quantity * p.quantity +","+ city.getMaxManpower()/50 )
                         //}
@@ -354,33 +382,39 @@ export class CityAI{
         extra += this.city.wage
 
 
-        const rate = this.city.foodConsumptionRate;
-        if(rate<2){
-            this.foodConsumptionRateGoal = 2
-            if(rate ==0.5) this.foodConsumptionRateGoal = 1
-            const ret = Util.intDivide(this.city.population,100) * this.foodConsumptionRateGoal;
+       // const rate = this.city.foodConsumptionRate;
+       // if(rate<2){
+        //    this.foodConsumptionRateGoal = 2
+         //   if(rate ==0.5) this.foodConsumptionRateGoal = 1
+         //   const ret = Util.intDivide(this.city.population,100) * this.foodConsumptionRateGoal;
 
-            if(this.city.manpower>200 || rate==0.5){
-                this.checkFarms(ret+this.city.wage)
-            }else{
-                this.checkGranary();
-            }
+          //  if(this.city.manpower>200 || rate==0.5){
+          //      this.checkFarms(ret+this.city.wage)
+           // }else{
+           //     this.checkGranary();
+          //  }
 
-            this.city.buildings.farm.units.forEach(unit=>{
-                city.equipUnit(unit,'main hand','stone tool')
-            })
-        }
+          //  this.city.buildings.farm.units.forEach(unit=>{
+          //      city.equipUnit(unit,'main hand','stone tool')
+          //  })
+       // }
 
 
 
 
     }
 
+
+
     checkGranary(){
         const farm = this.city.buildings.farm;
         const granary = this.city.buildings.granary;
+        let result = this.city.getFoodConsumption() * 365 * 1.05
+//        if(farm!=undefined){
+ //           result = farm.getResultQuantity()
+  //      }
 
-        if(granary.quantity*granary.data.storage.quantity<farm.getResultQuantity()){
+        if(granary.quantity*granary.data.storage.quantity<result){
 
             this.orderUnitToBuild('worker',this.buildings.granary)
            //  this.foodShortage = true
@@ -394,15 +428,21 @@ export class CityAI{
     checkFarms(consumption){
         const city = this.city;
         let ret = true;
+
+        let result = 0
         const farm = this.city.buildings.farm;
         let extra = this.city.resourceConsume?.food;
         extra = extra==undefined?0:extra;
         extra += this.city.wage
 
-        if(farm.getResultQuantity(this.buildings.farm.production.quantity)<=(consumption+extra)*365*1.05){
+        if(farm!=undefined)
+           result = farm.getResultQuantity(this.buildings.farm.production.quantity)
+
+
+        if(result<=(consumption+extra)*365*1.05){
 
             if(this.checkGranary()){
-                if(!this.manpowerShortage){
+                //if(!this.manpowerShortage){
                     if(city.checkBuildingAvailability(this.buildings.irrigation) && city.manpower>200){
                         this.orderUnitToBuild('worker',this.buildings.irrigation)
                     }
@@ -410,7 +450,7 @@ export class CityAI{
                     this.city.employ(mainStore.data.units.farmer,(unit)=>{
                         this.city.build(unit,this.buildings.farm)
                     });
-                }
+                //}
             }
 
             ret = false;
@@ -424,11 +464,13 @@ export class CityAI{
     checkFood(){
 
 
-        if(this.checkFarms(this.city.getFoodConsumption())==false){
-            this.foodShortage = true
-        }else{
-            this.foodShortage = false
-        }
+//        if(this.checkFarms(this.city.getFoodConsumption())==false){
+ //           this.foodShortage = true
+   //     }else{
+     //       this.foodShortage = false
+       // }
+        this.checkFarms(0);
+     //  this.checkGranary();
 
 
 
@@ -453,6 +495,178 @@ export class CityAI{
 
     }
 
+    scan(key){
+
+        if(this.city.happiness<0) return
+        if(this.city.factionData.id==0) return
+
+
+        let target = this.scanDomestic(key)
+        if(target == undefined){
+            target = this.scanForeign(key)
+            if(target == undefined){
+            }else{
+                this.trade(key,target)
+            }
+        }else{
+            this.transfer(key,target)
+        }
+    }
+
+    scanDomestic(key){
+       let target
+        let distance
+
+        if(this.city.factionData.id!=0){
+            this.city.factionData.cities.forEach(city=>{
+                if(this.city == city) return
+                const b = city.buildings[key]
+                if(b==undefined) return
+                const p = b.getProduction()
+                if(  city.resources[key]>50){
+                    if(distance == undefined || distance > this.city.getDistance(city)){
+                        target = city
+                        distance = this.city.getDistance(city)
+                    }
+                }
+            })
+        }
+        return target
+    }
+
+    scanForeign(key){
+       let target
+        let distance
+
+        Object.values(mainStore.data.cities).forEach(city=>{
+           // if(this.city.factionData.id!=0)
+                if(this.city.factionData.id == city.factionData.id) return
+            const b = city.buildings[key]
+            if(b==undefined) return
+            const p = b.getProduction()
+            if( city.resources[key]>50 && city.trade.indexOf(key) >-1){
+                if(distance == undefined || distance > this.city.getDistance(city)){
+                    target = city
+                    distance = this.city.getDistance(city)
+                }
+            }
+        })
+        return target
+    }
+
+    makeTraderGroup(key){
+        let trader = this.trader[key]
+        const city = this.city
+
+        if(trader == undefined){
+            city.employ(mainStore.data.units.group,(group)=>{
+                group.aiType= 'trader'
+                this.trader[key] = group
+            });
+        }else{
+            if(trader.units.length<10){
+                 const merchant = city.getUnit('merchant') ;
+                 if(merchant==undefined){
+                     city.employ(mainStore.data.units.merchant,merchant=>{
+
+                     });
+                 }else{
+
+                     if(merchant.equipments['livestock']==undefined){
+                        city.equipUnit(merchant ,'livestock','donkey')
+                    }else{
+                        trader.addGroup(merchant)
+                    }
+
+
+                 }
+             }
+
+            trader.units.forEach(unit=>{
+                if(unit.equipments['cart']==undefined){
+                    city.equipUnit(unit ,'cart','cart')
+                }
+            })
+        }
+
+        return trader
+    }
+
+    trade(key,target){
+
+        let trader = this.makeTraderGroup(key)
+        const city = this.city
+
+
+         if(trader!=undefined && trader.units.length>1
+            && trader.state=='' && trader.currentLocation == city){
+            let quantity = Util.intDivide( trader.capacity,3)
+            if(city.resources['wool']<quantity){
+                city.addNeeds('wool',quantity)
+                quantity = city.resources['wool']
+
+            }
+            let consume = city.consumeResource('wool',quantity)
+            trader.addResource('wool', consume);
+
+
+            quantity = Math.min(500,        trader.capacity - trader.carrying)
+            consume = city.consumeResource('food',quantity)
+            trader.addResource('food', consume);
+
+            const result = Util.aStar(trader,target);
+            const travelDays = this.travelDays(trader,result)*1.1
+            if(trader.survivableDays> (travelDays)*3 && travelDays<city.happiness) {
+                mainStore.addUnit(trader);
+                trader.startMove(result.path,target);
+                trader.mission={
+                    type:'trade',
+                    key:key
+                }
+
+                // this.trader[key] = undefined
+            }
+
+
+          }
+
+
+
+    }
+
+
+    transfer(key,target){
+
+        let trader = this.makeTraderGroup(key)
+        const city = this.city
+
+
+        if(trader!=undefined && trader.units.length>1
+            && trader.state=='' && trader.currentLocation == city){
+
+               const quantity = Math.min(500,        trader.capacity - trader.carrying)
+                let consume = city.consumeResource('food',quantity)
+                trader.addResource('food', consume);
+
+                const result = Util.aStar(trader,target);
+                const travelDays = this.travelDays(trader,result)*1.1
+                if(trader.survivableDays> (travelDays)*2 && travelDays<city.happiness ) {
+                    mainStore.addUnit(trader);
+                    trader.startMove(result.path,target);
+                    trader.mission={
+                        type:'transfer',
+                        key:key
+                    }
+                   //  this.trader[key] = undefined
+                }
+
+        }
+
+    }
+
+    travelDays(unit,result){
+        return Util.intDivide((result.length/1000),unit.speed)
+    }
 
     orderUnitToBuild(type,building,need){
         const city = this.city;
@@ -462,6 +676,9 @@ export class CityAI{
         }
 
         if(!city.checkBuildingAvailability(building)){
+            if(building.key == 'wood' || building.key == 'stone'){
+                this.scan(building.key)
+            }
             return false;
         }
 
@@ -472,9 +689,11 @@ export class CityAI{
                 this.build(worker,building,need)
 
             }else{
-                if(this.city.manpower >= mainStore.data.units[type].manpower){
+                if(this.city.manpower >= mainStore.data.units[type].manpower && this.city.happiness>-10){
                     this.city.employ(mainStore.data.units[type],(unit)=>{
-                        this.build(unit,building,need)
+                        if(this.checkResourceForBuild(building)){
+                            this.build(unit,building,need)
+                        }
 
                     });
 
@@ -574,7 +793,7 @@ export class CityAI{
     makeGroup(){
         const city = this.city;
         if(this.militaryGroup == undefined){
-            this.militaryGroup = city.getUnit('group')
+            this.militaryGroup = city.getUnit('group','army')
             if(this.militaryGroup == undefined){
                 city.employ(mainStore.data.units.group,(group)=>{
                     group.aiType= 'army'
@@ -593,6 +812,9 @@ export class CityAI{
             if(worker == undefined){
                 city.addWorkerToGroup(group);
             }else{
+                if(worker.equipments['cart']==undefined){
+                    city.equipUnit(worker,'cart','cart')
+                }
                 if(worker.equipments['livestock']==undefined){
                     city.equipUnit(worker,'livestock','donkey')
                 }else{
@@ -620,6 +842,21 @@ export class CityAI{
     deploy(target){
         const group = this.militaryGroup;
         if(group == undefined) return;
+
+        if(group.hero == undefined){
+            let leader
+            this.city.heroes.forEach(hero=>{
+                if(hero.assigned == undefined && (leader == undefined||leader?.valor<hero.valor )){
+                    leader = hero
+                }
+            })
+
+            if(leader != undefined){
+                group.setHero( leader)
+                leader.assigned = group;
+            }
+        }
+
         const result = Util.aStar(group,target);
 
         mainStore.addUnit(group);
@@ -667,10 +904,66 @@ export class FactionAI{
 
             if(unit.city.factionData.id == this.faction.id){
                 if(unit.state == 'waiting'){
+                    const city = unit.currentLocation
+
                     if(unit.currentLocation == unit.city && unit.currentRoad==undefined){
+
+                        Object.keys(unit.resources).forEach(key=>{
+                            city.addResource(key,unit.resources[key]);
+                            unit.consumeResource(key,unit.resources[key]);
+                        })
                         unit.enter();
                     }else{
                         if(!unit.currentLocation.checkEnemy() || unit.currentRoad!=undefined){
+                            if(unit.mission.type=='trade'){
+                                let target = 'wool'
+                                let targetAmount = unit.resources[target]
+
+                                if(targetAmount==0){
+                                    target = 'food'
+                                    const result = Util.aStar(unit,unit.city);
+
+                                    let consume = unit.foodConsumption();
+                                    targetAmount = unit.resources[target] - city.ai.travelDays(unit,result)*(consume)*1.1
+
+                                }
+                                const source = unit.mission.key
+                               const sourceResource = mainStore.data.resources[source];
+                                const targetResource = mainStore.data.resources[target];
+
+                                const sourcePrice = sourceResource.price;
+                                const targetPrice = targetResource.price;
+                                 let bonus = 0
+
+                                 const totalPrice = (targetPrice*targetAmount*((1+city.getTradeRate())*10-bonus))/10
+                                 let sourceAmount = Util.intDivide(totalPrice,sourcePrice);
+
+
+
+                                 unit.consumeResource(target,targetAmount);
+                                 city.consumeResource(unit.mission.key,sourceAmount);
+
+                                unit.addResource(unit.mission.key,sourceAmount);
+                                city.addResource(target,targetAmount);
+
+                                unit.mission = {}
+                            }
+                            if(unit.mission.type=='transfer'){
+                                 let target = 'food'
+                                  const source = unit.mission.key
+                                   const result = Util.aStar(unit,unit.city);
+                                   let consume = unit.foodConsumption();
+                                 const targetAmount = unit.resources[target] - city.ai.travelDays(unit,result)*(consume)*1.1
+                                 let sourceAmount = Math.min(unit.capacity - city.ai.travelDays(unit,result)*(consume)*1.1,city.resources[source]/2)
+
+                                 unit.consumeResource(target,targetAmount);
+                                 city.consumeResource(unit.mission.key,sourceAmount);
+
+                                unit.addResource(unit.mission.key,sourceAmount);
+                                city.addResource(target,targetAmount);
+
+                                unit.mission = {}
+                            }
                              const result = Util.aStar(unit,unit.city);
                              unit.startMove(result.path,unit.city);
                         }
@@ -694,7 +987,7 @@ export class FactionAI{
         let cities = [];
         this.faction.cities.forEach(city=>{
 
-            city.militaryJob();
+
 
             if(city.getMilitaryUnits('armed')>0){
                 const unit = city.getUnit('warrior')

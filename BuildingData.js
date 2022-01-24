@@ -20,6 +20,8 @@ export default class BuildingData extends UnitData{
         if(city)
             this.addJob()
 
+        this.resourceShortage = false
+
     }
 
     addJob(){
@@ -28,6 +30,22 @@ export default class BuildingData extends UnitData{
 
             this.onDone = this.productionDone
         }
+    }
+
+    addResource = (key, quantity)=>{
+
+        this.city.addResource(key,quantity)
+
+    }
+
+    getProductionQuantity = (key,quantity,bonus)=>{
+        const maxEffort = this.getMaxEffort();
+
+        quantity = ((quantity*this.completedQuantity)*(this.effort/maxEffort));
+        bonus += Util.isEmpty(this.city.effect[key+' production'])/100
+        quantity *= (1+bonus+this.bonusEffort);
+
+        return quantity
     }
 
     productionDone = ()=>{
@@ -53,9 +71,7 @@ export default class BuildingData extends UnitData{
         }
         if(this.state == 'produce'){
             const maxEffort = this.getMaxEffort();
-
-            let  quantity = ((production.quantity*this.completedQuantity)*(this.effort/maxEffort));
-            const bonus = Util.isEmpty(this.city.effect[this.data.key+' production'])/100
+            let bonus = 0
             if(this.data.key == 'farm'){
                 if(this.city.buildings.irrigation){
                     const irrigation = this.city.buildings.irrigation
@@ -67,16 +83,20 @@ export default class BuildingData extends UnitData{
 
                 }
             }
-            quantity *= (1+bonus+this.bonusEffort);
+            let quantity = this.getProductionQuantity(this.data.key,production.quantity,bonus)
 
             if(production.result!='happiness' && production.result!='manpower'){
+                let remain = 0
                 if(Array.isArray(production.result)){
                     production.result.forEach(result=>{
-                        city.addResource(result.key,result.quantity)
+                        const q = this.getProductionQuantity(this.data.key,result.quantity,0)
+                        this.addResource(result.key,q)
                     })
                 }else{
-                    quantity = city.addResource(production.result,quantity)
+                    this.addResource(production.result,quantity)
                 }
+
+
             }
 
 
@@ -91,12 +111,29 @@ export default class BuildingData extends UnitData{
                             const consume = (c.quantity*this.completedQuantity)*this.effort/maxEffort;
                             if(this.resources[c.type] >= consume){
                                 consumedCount++;
-                                this.resources[c.type] -= (c.quantity*this.completedQuantity)*this.effort/maxEffort;
+                                let amount = (c.quantity*this.completedQuantity)*this.effort/maxEffort
+                                if(maxEffort ==0)  amount = 0
+                                this.resources[c.type] -= amount;
+
+                                if(c.type=='beer'||c.type=='pottery'||c.type=='cloth'){
+                                    Util.initMap(city.exoticResourceBuffer,c.type,0)
+                                    city.exoticResourceBuffer[c.type] += amount
+
+                                }
                             }
                         })
                     }
                 }
                 city.addHappiness((quantity*consumedCount)/(city.population/1000));
+
+
+            }else{
+                const cost = production.cost;
+                if(cost){
+                    cost.forEach(c=>{
+                        this.resources[c.type] = Util.positiveSub(this.resources[c.type],(c.quantity*this.completedQuantity));
+                    })
+                }
             }
 
             if(production.result=='manpower'){
@@ -138,7 +175,7 @@ export default class BuildingData extends UnitData{
 
         }
         if(this.state == 'produce'){
-            if(this.data.key!='farm' && this.units.length==0){
+            if(this.data.key!='farm' && (this.units.length==0 || this.city.resources.food==0)){
                 check = false;
             }else{
                 if(!this.checkResource()) check = false;
@@ -266,6 +303,7 @@ export default class BuildingData extends UnitData{
         if(isOptional){
             return resourceCount>0
         }
+        this.resourceShortage = !ret
         return ret;
     }
 

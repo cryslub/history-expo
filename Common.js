@@ -96,6 +96,10 @@ export const TradeScreen = (observer((props) => {
         </>
     }
 
+    const arr = city.trade.filter(key=>{
+        return city.resources[key] != undefined && city.resources[key] > 0
+    })
+
       return (
         <View style={{padding:10}}>
             <View style={{flexDirection:'row'}}>
@@ -107,7 +111,7 @@ export const TradeScreen = (observer((props) => {
             </View>
         <FlatGrid
            itemDimension={mainStore.unitSize}
-           data={city.trade.slice()}
+           data={arr}
 
            spacing={1}
            renderItem={({ item }) => {
@@ -213,16 +217,8 @@ export const InfoContent =  (observer((props) => {
                 <Paragraph style={{position:'relative',top:-2}}>{i18n.t("ui.manage.info.food consumption")} </Paragraph>
                 <Caption> {Util.number(city?.getFoodConsumption())}/{i18n.t("ui.manage.info.day")} {Util.number(city?.getFoodConsumption()*365)}/{i18n.t("ui.manage.info.year")}</Caption>
             </View>
-            <View style={{flexDirection:'row'}}>
-                <Caption style={{marginLeft:22}}>{i18n.t("ui.manage.info.consumption rate")} </Caption>
 
-            </View>
-            <View style={{flexDirection:'row'}}>
-                <Button style={{position:'relative',top:-7}} labelStyle={{fontSize:20,margin:0,position:'relative',top:-3}} onPress={()=>city.addFoodConsumptionRate(-0.5)}>-</Button>
-                <Paragraph>x{city.foodConsumptionRate}</Paragraph>
-                <Button style={{position:'relative',top:-7}} labelStyle={{fontSize:20,margin:0,position:'relative',top:-3}} onPress={()=>city.addFoodConsumptionRate(0.5)}>+</Button>
-                <Caption style={{marginLeft:15}}>{city.getHappinessGrowthText()} {i18n.t("ui.manage.info.happiness")}/{i18n.t("ui.manage.info.month")}</Caption>
-            </View>
+
 
             <View style={{flexDirection:'row'}}>
                 <Icon icon="heart"  />
@@ -613,11 +609,17 @@ export class SubUnits {
 
     @observable units = [];
 
-    getUnit(type){
+    getUnit(type,aiType){
         let ret;
         this.units.forEach(unit=>{
             if(unit.type==type){
-                ret= unit;
+                if(aiType!=undefined){
+                    if(unit.aiType == aiType){
+                        ret = unit
+                    }
+                }else{
+                    ret= unit;
+                }
             }
         })
         return ret;

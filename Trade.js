@@ -51,7 +51,7 @@ export const Trade = ((props) => {
             bonus = unit.hero.wisdom/100
         }
 
-        const totalPrice = (sourcePrice*amount*(11-bonus))/10
+        const totalPrice = (sourcePrice*amount*((1+city.getTradeRate())*10-bonus))/10
         let targetAmount = Util.intDivide(totalPrice,targetPrice);
         if(unit.resources[target]<targetAmount){
             if(amount) return {message:i18n.t("ui.trade.not enough resource to trade")};
@@ -114,13 +114,17 @@ export const Trade = ((props) => {
         </>
     }
 
+    const arr = city.trade.filter(key=>{
+        return city.resources[key] != undefined && city.resources[key] > 0
+    })
+
       return (
         <ScrollView style={{padding:10}}>
         <Caption>{i18n.t("ui.trade.trade")} {city.buildings.trade?<>{city.trade.length}/{Math.min(city.buildings.trade.completedQuantity,city.buildings.trade.units.length)}</>:'0/0'}</Caption>
-        <Caption>{i18n.t("ui.trade.the city will get")} 10% {i18n.t("ui.trade.commission")}</Caption>
+        <Caption>{i18n.t("ui.trade.the city will get")} {city.getTradeRate()*100}% {i18n.t("ui.trade.commission")}</Caption>
         <FlatGrid
            itemDimension={mainStore.unitSize}
-           data={city.trade}
+           data={arr}
 
            spacing={1}
            renderItem={({ item }) => {

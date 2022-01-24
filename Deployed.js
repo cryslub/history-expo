@@ -128,7 +128,7 @@ export const Deployed = (props)=>{
 
 	const select = (unit) =>{
 
-		mainStore.onSelect(unit);
+		mainStore.onSelectUnit(unit);
 
 		props.navigation.navigate('Home')
 	}
@@ -144,7 +144,7 @@ export const Deployed = (props)=>{
     return <ScrollView >
      {
         mainStore.units.map((unit,index)=>{
-            if(unit.city.factionData.id == mainStore.selectedFaction.id){
+            if(unit.city.factionData.id == mainStore.selectedFaction.id || mainStore.debug){
                 return <Unit key={index} unit={unit} onSelect={select} move={move} info={info} trade={trade}/>
             }
         })

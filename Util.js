@@ -243,6 +243,9 @@ import * as THREE from 'three';
             })
 
             selectedScore = scores[bestKey]
+            if(selectedScore == undefined){
+                console.log(unit)
+            }
             pivot = selectedScore.city;
             selectedLength = selectedScore.length;
             selectedScore.selected = true;

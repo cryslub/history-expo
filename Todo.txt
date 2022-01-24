@@ -1,26 +1,35 @@
-AI - trade,  hero, multi army,weapon, resource, idle unit disband
-
+AI -  hero, advanced weapon, multi army,idle unit disband, long range trade by buying food
 
 //Production by happiness
 
-food system
+basic militia
+
+rebel
+
+population max
+
+food distribution
+
+moral system
+
+manpower by class
 
 
-manpower simulation
+corruption
+
+fame & order
+
+building storage
+
 
 building limit / building size
 
 weapon consumption
 
-exotic resource - max happiness system
-
-flexible residence area & library
 
 livestock food consumption
 
-trade commission
 
-unit happiness condition
 
 road roughness
 
