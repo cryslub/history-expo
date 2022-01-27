@@ -52,7 +52,7 @@
     "react-native-web": "~0.13.12",
     "react-native-webgl": "^0.8.0",
     "stream": "0.0.2",
-    "three": "^0.116.1",
+    "three": "^0.137.0",
     "watchman": "^1.0.0"
   },
   "devDependencies": {
