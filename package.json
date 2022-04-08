@@ -31,7 +31,7 @@
     "expo-three": "^5.4.0",
     "expo-three-orbit-controls": "^2.0.0",
     "i18n-js": "^3.8.0",
-    "jszip": "^3.4.0",
+    "jszip": "^3.7.0",
     "jszip-utils": "^0.1.0",
     "mobx": "4.5.2",
     "mobx-react": "5.2.8",
