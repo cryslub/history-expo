@@ -28,7 +28,11 @@ const OrbitControlsView = React.forwardRef(({ camera, ...props }, ref) => {
         getControls() {
             return controls;
         },
+        zoom(delta){
+            controls.handleMouseWheel({deltaY:delta})
+        },
     }), [controls]);
+
     const responder = React.useMemo(() => {
         function onTouchEnded(nativeEvent) {
             var _a;
@@ -48,6 +52,7 @@ const OrbitControlsView = React.forwardRef(({ camera, ...props }, ref) => {
             onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
             onPanResponderGrant({ nativeEvent }) {
                 var _a;
+                props.onPanResponderGrant(nativeEvent)
                 return (_a = controls) === null || _a === void 0 ? void 0 : _a.onTouchStart(nativeEvent);
             },
             onPanResponderMove({ nativeEvent }) {

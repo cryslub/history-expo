@@ -9,18 +9,20 @@ import PinchZoomResponder from 'react-native-pinch-zoom-responder'
 import { PinchGestureHandler, RotationGestureHandler,State,PanGestureHandler,TapGestureHandler } from 'react-native-gesture-handler';
 import { Subheading,Paragraph,Button,Caption  } from 'react-native-paper';
 
+import { observer} from "mobx-react"
+
 
 import Globe from './Globe.js';
 import CameraHandler from './CameraHandler.js';
 import VariableObjects from './VariableObjects.js';
 import Detail from './Detail.js';
 import Icon from './Icon.js';
-
+import Top from './Top.js'
 
 import mainStore from './MainContext.js'
 
 import Util from './Util.js';
-
+import Label from './Label.js'
 
 const styles = StyleSheet.create({
 	text:{
@@ -36,8 +38,58 @@ const styles = StyleSheet.create({
 	},
 	textLabel:{
 		position:'absolute'
-	}
+	},
+	right:{
+        position: 'absolute',
+        right: 0,
+        top: '50%',
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        padding: 5
+    },
+    box:{
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        padding: 5,
+        flexDirection:'row'
+    },
 });
+
+
+
+const Side =  (observer((props) => {
+
+    const onInfo = ()=>{
+          props.navigation.navigate('Manage', {city:props.city });
+    }
+
+    return <>
+        {mainStore.stage!='main'&&mainStore.stage!="load"?<>
+
+            <View style={styles.box}>
+
+                <Button mode="outlined"  icon="text-box"  onPress={onInfo}
+                    compact={true} color="white" style={{borderColor:'white',marginRight:3}} labelStyle={{fontSize:12}}>
+                </Button>
+
+             </View>
+
+            <View style={styles.right}>
+
+                <Button mode="outlined"  onPress={()=>props.zoom(-1)}
+                    compact={true} color="white" style={{borderColor:'white',marginBottom:3}} labelStyle={{fontSize:9}}>
+                    +
+                </Button>
+                <Button mode="outlined"  onPress={()=>props.zoom(1)}
+                    compact={true} color="white" style={{borderColor:'white',marginBottom:3}} labelStyle={{fontSize:9}}>
+                    -
+                </Button>
+
+            </View>
+         </>:null}
+    </>
+}))
 
 export default class CityScene extends Component{
 
@@ -45,6 +97,10 @@ export default class CityScene extends Component{
 		super();
 		this.doubleTap = React.createRef();
 		this.controls = React.createRef();
+		this.objects = [];
+		this.objectMap = {};
+		this.pointer = new THREE.Vector2();
+        this.raycaster = new THREE.Raycaster();
 
 		this.state={
 			textlabels :[],
@@ -77,7 +133,7 @@ export default class CityScene extends Component{
 		    onPanResponderRelease: this.handlePanResponderEnd,
 		    onPanResponderTerminate: this.handlePanResponderEnd,
 		});
-		
+
 	}
 
 
@@ -100,6 +156,30 @@ export default class CityScene extends Component{
     		this.objects.detail(label.city)
 	}
 
+
+    makeDetailHtml(building){
+
+        if(this.detailHtml === undefined && building!=undefined){
+	        this.detailHtml = new  Label(building)
+		}
+
+		if(building === undefined){
+	        this.detailHtml.added = false;
+			return;
+		}
+
+//		  this.detailHtml.element.className ="text-detail";
+		this.detailHtml.name = building.name;
+		this.detailHtml.added = true;
+
+
+		this.detailHtml.color = building.color;
+
+//		  this.detailHtml.setHTML(html);
+		this.detailHtml.setParent(building.object);
+
+	  }
+
 	detailOff = ()=>{
 	    const detail = this.state.detail;
 	    detail.added = false;
@@ -114,9 +194,23 @@ export default class CityScene extends Component{
 	  // We were granted responder status! Let's update the UI
 	  handlePanResponderGrant = (e, gestureState) => {
 		  const event = this._transformEvent({ ...e, gestureState });
+//            console.log(event)
 
-		  this.cameraHandler.handlePanResponderGrant(event.nativeEvent)
-		  this.objects.onMouseover(this.cameraHandler.touch,this.camera);
+          this.pointer.set( ( event.locationX /event.target.clientWidth ) * 2 - 1, - ( event.locationY / event.target.clientHeight ) * 2 + 1 );
+          this.raycaster.setFromCamera( this.pointer, this.state.camera );
+          const intersects = this.raycaster.intersectObjects( this.objects, false );
+
+          if ( intersects.length > 0 ) {
+                const intersect = intersects[ 0 ];
+                const building = this.objectMap[intersect.object.id]
+
+                this.makeDetailHtml(building)
+          }else{
+                this.makeDetailHtml()
+          }
+
+//		  this.cameraHandler.handlePanResponderGrant(event.nativeEvent)
+//		  this.objects.onMouseover(this.cameraHandler.touch,this.camera);
 
 	  };
 
@@ -217,7 +311,7 @@ export default class CityScene extends Component{
         this.renderer.setClearColor(0x000000, 1.0);
 
         const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-	    camera.position.set( 1000, 1000, 1000 );
+	    camera.position.set( 1000, 2000, 1000 );
 		camera.lookAt( 0, 0, 0 );
 		this.setState({camera:camera})
 
@@ -226,7 +320,7 @@ export default class CityScene extends Component{
 
         // roll-over helpers
 
-        const rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
+     /*   const rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
         const rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 1, transparent: true } );
         const rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 
@@ -238,7 +332,7 @@ export default class CityScene extends Component{
 
 
         this.scene.add( rollOverMesh );
-
+*/
         // cubes
 
     //    const cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
@@ -246,7 +340,7 @@ export default class CityScene extends Component{
 
         // grid
 
-        const gridHelper = new THREE.GridHelper( 1000, 20 );
+        const gridHelper = new THREE.GridHelper( 2000, 40 );
         this.scene.add( gridHelper );
 
         //
@@ -272,9 +366,53 @@ export default class CityScene extends Component{
         this.scene.add( directionalLight );
 
 //        controls.touches = { TWO: THREE.TOUCH.ROTATE, ONE: THREE.TOUCH.DOLLY_PAN };
+        this.addBuildings()
 	};
 
+    addBuildings = ()=>{
+    	const city = mainStore.data.cities[this.props.city]
+
+        city.buildingArray.forEach(building=>{
+            this.addBuilding(building)
+        })
+    }
+
+    addBuilding = (building)=>{
+
+        const props = building.props
+        const size = building.size
+
+        const width = 50*size.width
+        const length =  50*size.length
+        const rollOverGeo = new THREE.BoxGeometry( width, 30, length );
+        const rollOverMaterial = new THREE.MeshBasicMaterial( { color:building.color, opacity: 1, transparent: true } );
+        const rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+
+
+        rollOverMesh.position.x =  (50*props.x-width/2);
+        rollOverMesh.position.z =  (50*props.y-length/2);
+        rollOverMesh.position.y = 15;
+
+//        rollOverMesh.position.y = -50;
+
+        var geo = new THREE.EdgesGeometry( rollOverMesh.geometry );
+        var mat = new THREE.LineBasicMaterial( { color: 0x111111, linewidth: 1 } );
+        var wireframe = new THREE.LineSegments( geo, mat );
+        wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+        rollOverMesh.add( wireframe );
+
+
+        this.scene.add( rollOverMesh );
+
+        this.objects.push(rollOverMesh)
+        this.objectMap[rollOverMesh.id] = building
+
+        building.object = rollOverMesh
+    }
+
 	onResize = ({ width, height, scale }) => {
+	    if(this.camera == undefined) return
+
 		this.camera.aspect = width / height;
 	    this.camera.updateProjectionMatrix();
 	    this.renderer.setPixelRatio(scale);
@@ -287,8 +425,11 @@ export default class CityScene extends Component{
 
      //   const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.width,this.height );
 
-       // this.setState({textlabels:ret.textlabels,detail:ret.detail})
-
+      // this.setState({textlabels:ret.textlabels,detail:ret.detail})
+        if(this.detailHtml!=undefined){
+			 this.detailHtml.updatePosition(true,this.state.camera,this.width,this.height);
+			 this.setState({detail:this.detailHtml})
+		}
 	  //  if(changed ||  this.rendered!=true){
 	       // console.log("render")
             this.renderer.render(this.scene, this.state.camera);
@@ -298,7 +439,10 @@ export default class CityScene extends Component{
   
 	 
 	 zoom = (delta) =>{		 
-		 this.cameraHandler.zoom(delta);
+		 //this.cameraHandler.zoom(delta);
+	//	 console.log(this.controls)
+		 const controls = this.controls.current
+		 controls.zoom(delta)
 	 }
 	 
 	 moveCameraTo = (lat,long,distance)=>{
@@ -322,82 +466,91 @@ export default class CityScene extends Component{
          this.height = height
      }
 
+
 	render(){
 		const self = this;
 		const detail = this.state.detail;
-		
+
+        const city = this.props.city;
+
 	    return(
-	    	<View style={{ flex: 1 ,overflow:'hidden'}}  onLayout={ this.onLayout}>
-	    	     <OrbitControls
-                    style={{flex: 1}}
-                    camera={this.state.camera}
-                    ref={this.controls}>
-                    <ExpoGraphics.View
-                        style={{ flex: 1 }}
-                        onContextCreate={this.onContextCreate}
-                        onRender={this.onRender}
-                        onResize={this.onResize}
-                        arEnabled={false}
-                        ref={(container) => { this.container = container }}	>
-                    </ExpoGraphics.View>
-                </OrbitControls>
-		    	{
-		    		this.state.textlabels.map((label,i)=>{
-		    			if(!label.added) return null;
+	        <>
+                <View  style={{ flex: 1 ,overflow:'hidden'}}  onLayout={ this.onLayout}>
+                     <OrbitControls
+                        style={{flex: 1}}
+                        camera={this.state.camera}
+                        ref={this.controls}
+                        onPanResponderGrant={this.handlePanResponderGrant}>
 
-		    			const style = {top:label.top,left:label.left,marginTop:label.placement==='top'?-25:0};
-		    			if(label.type=='unit'){
-		    			    style.marginTop=5;
-		    			    if(label.city.currentLocation.labelPosition!='top'){
-		    			        style.marginTop=-28;
-		    			    }
+                        <ExpoGraphics.View
+                            style={{ flex: 1 }}
+                            onContextCreate={this.onContextCreate}
+                            onRender={this.onRender}
+                            onResize={this.onResize}
+                            arEnabled={false}
+                            ref={(container) => { this.container = container }}	>
+                        </ExpoGraphics.View>
+                    </OrbitControls>
+                    {
+                        this.state.textlabels.map((label,i)=>{
+                            if(!label.added) return null;
 
-		    			    //style.marginLeft='-10%';
-		    			}
+                            const style = {top:label.top,left:label.left,marginTop:label.placement==='top'?-25:0};
+                            if(label.type=='unit'){
+                                style.marginTop=5;
+                                if(label.city.currentLocation.labelPosition!='top'){
+                                    style.marginTop=-28;
+                                }
 
-                        const icons = [];
-                        if(label.city.state=='fighting'){
-                            icons.push("sword-cross")
-                        }
-                        if(label.city.moral<=0){
-                            icons.push("heart")
-                        }
-                        if(label.city.resources.food==undefined||label.city.resources.food<=0){
-                            icons.push("barley")
-                        }
+                                //style.marginLeft='-10%';
+                            }
+
+                            const icons = [];
+                            if(label.city.state=='fighting'){
+                                icons.push("sword-cross")
+                            }
+                            if(label.city.moral<=0){
+                                icons.push("heart")
+                            }
+                            if(label.city.resources.food==undefined||label.city.resources.food<=0){
+                                icons.push("barley")
+                            }
 
 
-		    			return 	<TouchableOpacity key={i}
-		    				style={[styles.textLabel,style]}
-		    				onPress={()=>this.detail(label)}>
-		    				    {label.type=='unit'?<>
-		    				        <View  style={{flexDirection:'row'}}>
-		    				        {
-		    				            icons.map((icon,index)=>{
-                                            return  <View key={index} style={[{padding:0}]}>
-                                               <Button icon={icon} color="#fc8b8b" style={[styles.text,{paddingRight:0,marginTop:2,marginLeft:-22-(index*14),minWidth:24,width:24,height:22}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
-                                            </View>
-		    				            })
-		    				        }
-                                     <View style={[{backgroundColor:label.textColor,padding:0,flexDirection:'row'}]}>
-                                         <Button icon={label.city.getIcon()} color="white" style={[styles.text,{marginTop:2,minWidth:28,width:28,height:28}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
-                                         {label.city.getMilitaryUnits('armed')>0?<Text  style={[styles.text,{paddingLeft:0,margin:'auto'}]}>{Math.floor(label.city.getMilitaryUnits('armed'))}</Text>:null}
-                                      </View>
+                            return 	<TouchableOpacity key={i}
+                                style={[styles.textLabel,style]}
+                                onPress={()=>this.detail(label)}>
+                                    {label.type=='unit'?<>
+                                        <View  style={{flexDirection:'row'}}>
+                                        {
+                                            icons.map((icon,index)=>{
+                                                return  <View key={index} style={[{padding:0}]}>
+                                                   <Button icon={icon} color="#fc8b8b" style={[styles.text,{paddingRight:0,marginTop:2,marginLeft:-22-(index*14),minWidth:24,width:24,height:22}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
+                                                </View>
+                                            })
+                                        }
+                                         <View style={[{backgroundColor:label.textColor,padding:0,flexDirection:'row'}]}>
+                                             <Button icon={label.city.getIcon()} color="white" style={[styles.text,{marginTop:2,minWidth:28,width:28,height:28}]} contentStyle={{marginLeft:6,marginRight:-10}}/>
+                                             {label.city.getMilitaryUnits('armed')>0?<Text  style={[styles.text,{paddingLeft:0,margin:'auto'}]}>{Math.floor(label.city.getMilitaryUnits('armed'))}</Text>:null}
+                                          </View>
+                                         </View>
+                                     </>
+                                    : <View style={[{backgroundColor:label.textColor,padding:0}]}>
+                                        <Text  style={styles.text}>{label.name}</Text>
                                      </View>
-		    				     </>
-		    				    : <View style={[{backgroundColor:label.textColor,padding:0}]}>
-		    				        <Text  style={styles.text}>{label.name}</Text>
-		    				     </View>
-		    					}
+                                    }
 
-		    			</TouchableOpacity >
-		    		})
-		    	}
-		    	{detail.added?
-		    	<Detail detail={detail}  scene={this} interface={this.props.interface}/>
-		    	:null
-		    	}
-	    	</View>
+                            </TouchableOpacity >
+                        })
+                    }
+                    {detail.added?
+                    <Detail detail={detail}  scene={this} interface={this.props.interface}/>
+                    :null
+                    }
+                </View>
+                <Top menu={false}/>
+                <Side zoom={this.zoom}  navigation={this.props.navigation} city={city}/>
+	    	</>
 	    )
 	  }
 }

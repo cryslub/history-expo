@@ -1,25 +1,35 @@
 {
   "8533":{
     "name": "Unug",
+    "originalName": "",
     "heroes": [1,3,5],
     "governor": 1,
     "capital": true,
-    "buildings": ["anu ziggurat","eanna"],
+    "buildings": {
+      "anu ziggurat": {"x": -4,"y":2},
+      "eanna": {"x": 6,"y":-8}
+    },
     "resource":{
       "water" : 50
     }
   },
   "860":{
+    "name": "Urim",
     "heroes": [804,802,806,839,840],
     "governor": 804,
     "capital": true,
-    "buildings": ["nanna"],
+    "buildings": {
+      "nanna": {"x": 1,"y":1}
+    },
     "resource":{
       "water" : 40
     }
   },
   "1":{
-    "buildings": ["abzu"],
+    "name": "Eridu",
+    "buildings": {
+      "abzu": {"x": 1,"y":1}
+    },
     "resource":{
       "water" : 10
     }
@@ -39,51 +49,73 @@
     }
   },
   "73":{
+    "name": "Lagash",
     "heroes": [807,796],
     "governor": 807,
     "capital": true,
-    "buildings": ["dumuzid"],
+    "buildings": {
+      "dumuzid": {"x": 1,"y":1}
+    },
     "resource":{
       "water" : 40
     }
   },
   "78":{
-    "buildings": ["babbar"],
+    "name": "Larsam",
+    "buildings": {
+      "babbar": {"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
   },
   "49":{
+    "name": "Nagar",
     "capital": true,
-    "buildings": ["eye temple"]
+    "buildings": {
+      "eye temple": {"x": 1,"y":1}
+    }
   },
   "57":{
+    "name": "Adab",
     "heroes": [25,797],
     "governor": 25,
     "capital": true,
-    "buildings": ["ninhursag"],
+    "buildings": {
+      "ninhursag": {"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
   },
   "102":{
+    "name": "Nibru",
     "heroes": [2],
     "governor": 2,
     "capital": true,
-    "buildings": ["ekur","eshumesha"],
+    "buildings": {
+      "ekur": {"x": 10,"y":-4},
+      "eshumesha": {"x": 0,"y":4}
+    },
     "resource":{
       "water" : 30
     }
   },
   "106":{
-    "buildings": ["ninlil"],
+    "name": "Shurupak",
+    "buildings": {
+      "ninlil": {"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
   },
   "108":{
+    "name": "Susa",
     "capital": true,
-    "buildings": ["inshushinak"],
+    "buildings": {
+      "inshushinak": {"x": 1,"y":1}
+    },
     "resource":{
       "wood" : 2,
       "stone" : 2
@@ -97,9 +129,13 @@
     }
   },
   "8535":{
+    "name": "Umma",
     "heroes": [808],
     "governor": 808,
-    "buildings": ["shara","nisaba"],
+    "buildings": {
+      "shara": {"x": 3,"y":0},
+      "nisaba": {"x": -2,"y":3}
+    },
     "resource":{
       "water" : 30
     }
@@ -108,7 +144,9 @@
     "name": "Kish",
     "heroes": [795],
     "governor": 795,
-    "buildings": ["palace"],
+    "buildings": {
+      "palace":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 40
     }
@@ -125,8 +163,11 @@
     }
   },
   "857":{
+    "name": "Megiddo",
     "capital": true,
-    "buildings": ["great temple"],
+    "buildings": {
+      "great temple":{"x": 1,"y":1}
+    },
     "resource":{
       "wood" : 3,
       "stone" : 2
@@ -137,19 +178,31 @@
     "heroes": [7,8],
     "governor": 7,
     "capital": true,
-    "buildings": ["kura","palace"]
+    "buildings": {
+      "kura":{"x": -3,"y":2},
+      "palace":{"x": 1,"y":1}
+    }
   },
   "213":{
-    "buildings": ["sikil"]
+    "name": "Eshnunna",
+    "buildings": {
+      "sikil":{"x": 1,"y":1}
+    }
   },
   "216":{
-    "buildings": ["babbar"],
+    "name": "Zimbir",
+    "buildings": {
+      "babbar":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 20
     }
   },
   "222":{
-    "buildings": ["urash"],
+    "name": "Dilbat",
+    "buildings": {
+      "urash":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 20
     }
@@ -204,21 +257,28 @@
     }
   },
   "639":{
+    "name": "Zau",
     "fontSize": 16,
-    "buildings": ["neith"],
+    "buildings": {
+      "neith":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
   },
   "641":{
     "fontSize": 16,
-    "buildings": ["wadjet"]
+    "buildings": {
+      "wadjet":{"x": 1,"y":1}
+    }
   },
   "668":{
     "name": "Djedet",
     "heroes": [13,351],
     "governor": 13,
-    "buildings": ["banebdjedet"],
+    "buildings": {
+      "banebdjedet":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
@@ -231,12 +291,17 @@
   },
 
   "861":{
+    "name": "Inbu-Hedj",
     "heroes": [9,345,18],
     "governor": 9,
     "chancellor": 18,
     "fontSize": 16,
     "capital": true,
-    "buildings": ["ptah","djoser","palace"],
+    "buildings": {
+      "ptah":{"x": 3,"y":10},
+      "palace":{"x": 1,"y":1},
+      "djoser":{"x": -15,"y":-15}
+    },
     "resource":{
       "stone" : 2,
       "water" : 40
@@ -254,10 +319,13 @@
     }
   },
   "149":{
+    "name": "Iunu",
       "heroes": [15,350],
     "governor": 15,
     "fontSize": 16,
-    "buildings": ["per aat"],
+    "buildings": {
+      "per aat":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
@@ -266,7 +334,9 @@
     "heroes": [14],
     "governor": 14,
     "fontSize": 12,
-    "buildings": ["heryshaf"],
+    "buildings": {
+      "heryshaf":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
@@ -281,7 +351,9 @@
     "heroes": [10,349],
     "governor": 10,
     "fontSize": 16,
-    "buildings": ["khnum"],
+    "buildings": {
+      "khnum":{"x": 1,"y":1}
+    },
     "resource":{
       "water": 20,
       "stone" : 3
@@ -294,7 +366,10 @@
     "heroes": [12],
     "governor": 12,
     "fontSize": 16,
-    "buildings": ["anhur"],
+    "buildings": {
+      "anhur":{"x": 1,"y":1}
+    },
+
     "resource":{
       "water": 30,
       "stone" : 2
@@ -302,7 +377,10 @@
   },
   "711":{
     "fontSize": 16,
-    "buildings": ["inpu"],
+    "buildings": {
+      "inpu":{"x": 1,"y":1}
+    },
+
     "resource":{
       "water" : 30
     }
@@ -311,7 +389,9 @@
     "heroes": [11,344],
     "governor": 11,
     "fontSize": 16,
-    "buildings": ["hathor"],
+    "buildings": {
+      "hathor":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 30
     }
@@ -338,7 +418,9 @@
   "863":{
     "name": "Nekhen",
     "fontSize": 16,
-    "buildings": ["horus"],
+    "buildings": {
+      "horus":{"x": 1,"y":1}
+    },
     "resource":{
       "water": 20,
       "stone" : 2
@@ -350,7 +432,10 @@
     }
   },
   "1060":{
-    "buildings": ["pabilsag"],
+
+    "buildings": {
+      "pabilsag":{"x": 1,"y":1}
+    },
     "resource":{
       "water" : 20,
       "wood": 2

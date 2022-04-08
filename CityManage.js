@@ -180,12 +180,13 @@ export  const  CityManage =  (observer((props) => {
 
     const { city } = props.route.params;
 
+
     mainStore.setSelectedCity(mainStore.data.cities[city]);
 
 
     return <View contentContainerStyle={{ padding: 10,height:'100%' }} style={{height:'100%'}}>
 
-        <CityScene />
+        <CityScene city={city} navigation={props.navigation}/>
 
 
      </View>

@@ -17,7 +17,7 @@
     "@react-navigation/stack": "^5.3.7",
     "date-fns": "^2.16.1",
     "earcut": "^2.2.2",
-    "expo": "^41.0.0",
+    "expo": "^41.0.1",
     "expo-asset-utils": "^1.2.0",
     "expo-file-system": "~11.0.2",
     "expo-gl": "~10.2.0",

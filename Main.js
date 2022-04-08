@@ -106,7 +106,7 @@ export default class Main extends Component{
                         <Stack.Screen name="FactionList" component={FactionList} options={{ title:i18n.t("ui.title.faction list")}}/>
                         <Stack.Screen name="Deployed" component={Deployed} options={{ title:i18n.t("ui.title.deployed")}}/>
 
-                        <Stack.Screen name="Manage" component={Manage}
+                        <Stack.Screen name="CityManage" component={CityManage}
                                 options={({ route }) => ({
                                     title:i18n.t("ui.title.manage"),
                                     headerTitle: props =>
@@ -116,6 +116,18 @@ export default class Main extends Component{
                                         </View>}
                                 )}
                          />
+
+                         <Stack.Screen name="Manage" component={Manage}
+                                 options={({ route }) => ({
+                                     title:i18n.t("ui.title.manage"),
+                                     headerTitle: props =>
+                                         <View style={{flexDirection:'row'}}>
+                                             <Paragraph style={{position:'relative',top:5,fontSize:18}}> {mainStore.data.cities[route.params.city].name} </Paragraph>
+                                             <Title style={{fontSize:route.params.city.snapshotSub?.fontSize}}> {mainStore.data.cities[route.params.city].originalName}</Title>
+                                         </View>}
+                                 )}
+                          />
+
                         <Stack.Screen name="Info" component={Info}
                                 options={({ route }) => ({
                                     headerTitle: props =>

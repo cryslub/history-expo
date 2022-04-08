@@ -13,6 +13,8 @@ export default class City extends SubUnits{
 
 
     @observable buildings = {};
+    @observable buildingArray = [];
+
     @observable resources = {};
     exoticResourceBuffer = {};
     @observable manpower = 0;
@@ -123,11 +125,22 @@ export default class City extends SubUnits{
 
             })
 
-            this.snapshotSub.buildings?.forEach(building=>{
-                const b = this.initBuilding(building,1);
+            const buildings = this.snapshotSub.buildings
+            if(buildings){
+                if(Array.isArray(buildings)){
+                    this.snapshotSub.buildings?.forEach(building=>{
+                        const b = this.initBuilding(building,1);
 
-                b.setState('')
-            })
+                        b.setState('')
+                    })
+                }else{
+                    Object.keys(buildings).forEach(building=>{
+                        const b = this.initBuilding(building,1,buildings[building]);
+                        b.setState('')
+                    })
+                }
+            }
+
         }
 
 
@@ -143,9 +156,9 @@ export default class City extends SubUnits{
         this.addResidences();
         this.addFarmsAndFood();
         this.addMilitia()
-        this.initBuilding("warehouse",1);
+//        this.initBuilding("warehouse",1);
         const walls = Util.intDivide(this.population,10000)
-        this.initBuilding("wall",walls);
+//        this.initBuilding("wall",walls);
 
         this.setManpower(Math.min(500,this.getMaxManpower()))
 
@@ -170,12 +183,18 @@ export default class City extends SubUnits{
         }
     }
 
-    initBuilding(key,quantity){
+    initBuilding(key,quantity,props){
         const building =  new BuildingData(mainStore.data.buildings[key],this,"building");
         this.buildings[key]=(building);
         building.onDone();
         building.quantity = quantity;
         building.completedQuantity = quantity;
+
+        if(props){
+            building.props = props
+            this.buildingArray.push(building)
+        }
+
 
         return building
     }
@@ -183,7 +202,7 @@ export default class City extends SubUnits{
     addResidences(){
 
         const residences = Util.intDivide(this.population,1500);
-        this.initBuilding("residence",residences);
+        this.initBuilding("residence",0);
 
     }
 
@@ -984,7 +1003,7 @@ export default class City extends SubUnits{
         if(armyCount<this.population/100 && this.happiness>5){
             this.addNeeds('defense',0)
         }
-        if(this.buildings.wall.quantity<this.getDefenseMax()){
+        if(this.buildings.wall?.quantity<this.getDefenseMax()){
            this.addNeeds('wall',0)
         }
         if(this.happiness>40 && this.factionData.id!=0){

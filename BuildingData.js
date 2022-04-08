@@ -22,6 +22,7 @@ export default class BuildingData extends UnitData{
 
         this.resourceShortage = false
 
+        this.size = unit.size
     }
 
     addJob(){

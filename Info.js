@@ -273,7 +273,7 @@ export  const  Info =  (observer((props) => {
 
     const { city } = props.route.params;
 
-    mainStore.setSelectedCity(city);
+//    mainStore.setSelectedCity(city);
     console.log("init")
 
 
