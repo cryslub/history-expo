@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
 	   	backgroundColor: 'rgba(0,0,0,0.2)',
-	   	paddingTop:20,
 	   	paddingBottom:5,
 	   	width:'100%'
     },
@@ -84,6 +83,10 @@ const Top =  (observer((props) => {
         mainStore.resume();
     }
 
+    const cancelBuild = ()=>{
+        props.cancelBuild()
+    }
+
     const menu = ()=>{
         mainStore.setStage( 'main');
         mainStore.pause();
@@ -100,14 +103,27 @@ const Top =  (observer((props) => {
 
     return  <>
         {mainStore.stage!="main"&&mainStore.stage!="load"?
-        <View style={styles.top}>
+        <View style={[styles.top,{paddingTop:props.menu==false?5:20}]}>
              {mainStore.stage=='start'?<Paragraph style={{color:'white',padding:3}}>  {i18n.t("ui.top.choose your faction")}</Paragraph>:null}
-             {mainStore.stage=='choose'?<View style={{flexDirection:'row'}}>
+             {mainStore.stage=='choose'?<View style={{flexDirection:'row',alignItems:'baseline',justifyContent:'space-between',paddingRight:2}}>
                 <Paragraph style={{color:'white',marginRight:3}}>  {i18n.t("ui.top.select destination")}</Paragraph>
                  <Button mode="outlined" onPress={()=>cancel()}
                     compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
                     {i18n.t("ui.button.cancel")}
                 </Button>
+              </View>:null}
+             {mainStore.stage=='build'?<View style={{flexDirection:'row',alignItems:'baseline',justifyContent:'space-between',paddingRight:2}}>
+                 <Paragraph style={{color:'white',marginRight:3}}>  {i18n.t("ui.top.choose building place")}</Paragraph>
+                 <View style={{flexDirection:'row',alignItems:'center',display:'flex'}}>
+                     <Button mode="outlined" onPress={()=>cancelBuild()}
+                        compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
+                        {i18n.t("ui.button.cancel")}
+                    </Button>
+                     <Button mode="outlined" onPress={()=>props.build()}
+                        compact={true} color="white" style={styles.button} labelStyle={{fontSize:9}}>
+                        {i18n.t("ui.button.build")}
+                    </Button>
+                </View>
               </View>:null}
              {mainStore.stage=='game'?<View style={{flexDirection:'row',alignItems:'center',display:'flex'}}>
                 {props.menu!=false?

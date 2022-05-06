@@ -301,11 +301,19 @@ export class CityAI{
             const building = this.city.buildings[key];
             if(building.data.production !=undefined){
                 if(building.completedQuantity >building.units.length){
-                    const type = this.buildings[key].worker
-                    if(type!=''){
-                        this.city.employ(mainStore.data.units[type],(unit)=>{
-                            this.city.assign(unit,building)
-                        });
+                    const worker = this.buildings[key].worker
+                    if(typeof(worker)==='object'){
+                        Object.keys(worker).forEach(key=>{
+                            this.city.employ(mainStore.data.units[key],(unit)=>{
+                                this.city.assign(unit,building)
+                            });
+                        })
+                    }else{
+                        if(worker!=''){
+                            this.city.employ(mainStore.data.units[worker],(unit)=>{
+                                this.city.assign(unit,building)
+                            });
+                        }
                     }
                 }
             }

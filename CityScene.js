@@ -5,6 +5,7 @@ import ExpoGraphics from 'expo-graphics'; // 0.0.3
 import OrbitControls from './OrbitControlsView.js'
 
 import {  View,Animated,PanResponder,TouchableOpacity,Text,StyleSheet  } from 'react-native';
+import { createStackNavigator,HeaderBackButton } from '@react-navigation/stack';
 import PinchZoomResponder from 'react-native-pinch-zoom-responder'
 import { PinchGestureHandler, RotationGestureHandler,State,PanGestureHandler,TapGestureHandler } from 'react-native-gesture-handler';
 import { Subheading,Paragraph,Button,Caption  } from 'react-native-paper';
@@ -15,7 +16,7 @@ import { observer} from "mobx-react"
 import Globe from './Globe.js';
 import CameraHandler from './CameraHandler.js';
 import VariableObjects from './VariableObjects.js';
-import Detail from './Detail.js';
+import Detail from './BuildingDetail.js';
 import Icon from './Icon.js';
 import Top from './Top.js'
 
@@ -67,14 +68,15 @@ const Side =  (observer((props) => {
     return <>
         {mainStore.stage!='main'&&mainStore.stage!="load"?<>
 
-            <View style={styles.box}>
+            {mainStore.stage=='build'?null:
+                <View style={styles.box}>
 
-                <Button mode="outlined"  icon="text-box"  onPress={onInfo}
-                    compact={true} color="white" style={{borderColor:'white',marginRight:3}} labelStyle={{fontSize:12}}>
-                </Button>
+                    <Button mode="outlined"  icon="text-box"  onPress={onInfo}
+                        compact={true} color="white" style={{borderColor:'white',marginRight:3}} labelStyle={{fontSize:12}}>
+                    </Button>
 
-             </View>
-
+                 </View>
+            }
             <View style={styles.right}>
 
                 <Button mode="outlined"  onPress={()=>props.zoom(-1)}
@@ -93,6 +95,7 @@ const Side =  (observer((props) => {
 
 export default class CityScene extends Component{
 
+
 	constructor(){
 		super();
 		this.doubleTap = React.createRef();
@@ -101,6 +104,7 @@ export default class CityScene extends Component{
 		this.objectMap = {};
 		this.pointer = new THREE.Vector2();
         this.raycaster = new THREE.Raycaster();
+        this.detailHtml= {}
 
 		this.state={
 			textlabels :[],
@@ -134,44 +138,54 @@ export default class CityScene extends Component{
 		    onPanResponderTerminate: this.handlePanResponderEnd,
 		});
 
+
+
 	}
 
 
+    componentDidMount = ()=>{
+
+        const navigation = this.props.navigation
+
+        navigation.setOptions({
+            headerLeft: (props) => (
+                <HeaderBackButton
+                  {...props}
+                  onPress={() => {
+                    mainStore.resume();
+                    mainStore.setStage('game')
+                    this.cancelBuild()
+                    navigation.goBack()
+                  }}
+                />
+              )
+        })
+    }
+
 	detail = (label)=>{
-	    let multiSelected = false;
-	    if(label.city.sort=='unit'){
-	        const nearByUnits = label.city.nearByUnits
 
+	    this.makeDetailHtml(label.city)
 
-	        if(nearByUnits.length>0){
-	            multiSelected = true
-                const list = nearByUnits.concat([label.city])
-                mainStore.setSelectionList( list)
-
-                this.props.interface.openSelectDialog()
-	        }
-	    }
-
-	    if(!multiSelected)
-    		this.objects.detail(label.city)
 	}
 
 
     makeDetailHtml(building){
 
-        if(this.detailHtml === undefined && building!=undefined){
-	        this.detailHtml = new  Label(building)
-		}
+        if(mainStore.stage=='build') return;
 
 		if(building === undefined){
 	        this.detailHtml.added = false;
+
 			return;
+		}else{
+			 this.detailHtml = new  Label(building)
+
 		}
 
 //		  this.detailHtml.element.className ="text-detail";
 		this.detailHtml.name = building.name;
 		this.detailHtml.added = true;
-
+        this.detailHtml.building = building
 
 		this.detailHtml.color = building.color;
 
@@ -202,15 +216,39 @@ export default class CityScene extends Component{
 
           if ( intersects.length > 0 ) {
                 const intersect = intersects[ 0 ];
-                const building = this.objectMap[intersect.object.id]
 
-                this.makeDetailHtml(building)
+                if(mainStore.stage=='build'){
+                    if ( intersect.object == this.plane ) {
+
+                        const onBuild = mainStore.onBuild
+                        const rollOverMesh = onBuild.object
+
+                        rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+                        rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 );
+
+                        const size = onBuild.size
+                         rollOverMesh.position.x -=  size.width%2*25;
+                        rollOverMesh.position.z -=  size.length%2*25;
+
+                        rollOverMesh.position.y = 15
+                    }
+                }else{
+                    if ( intersect.object !== this.plane ) {
+
+
+                        const building = this.objectMap[intersect.object.id]
+
+                        this.makeDetailHtml(building)
+
+                    }else{
+                         this.makeDetailHtml()
+                   }
+               }
           }else{
                 this.makeDetailHtml()
           }
 
-//		  this.cameraHandler.handlePanResponderGrant(event.nativeEvent)
-//		  this.objects.onMouseover(this.cameraHandler.touch,this.camera);
+
 
 	  };
 
@@ -311,12 +349,12 @@ export default class CityScene extends Component{
         this.renderer.setClearColor(0x000000, 1.0);
 
         const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-	    camera.position.set( 1000, 2000, 1000 );
+	    camera.position.set( 800, 1500, 1000 );
 		camera.lookAt( 0, 0, 0 );
 		this.setState({camera:camera})
 
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color( 0xf0f0f0 );
+		this.scene.background = new THREE.Color( 0x414141 );
 
         // roll-over helpers
 
@@ -341,20 +379,28 @@ export default class CityScene extends Component{
         // grid
 
         const gridHelper = new THREE.GridHelper( 2000, 40 );
-        this.scene.add( gridHelper );
+//        this.scene.add( gridHelper );
 
         //
 
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
 
-        const geometry = new THREE.PlaneGeometry( 1000, 1000 );
-        geometry.rotateX( - Math.PI / 2 );
+        const geometry = new THREE.BoxGeometry( 2000,30, 2000 );
 
-        const plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-        this.scene.add( plane );
 
-        //objects.push( plane );
+        this.plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color:0xFFE99E } ) );
+        this.plane.position.y= -16;
+
+        var geo = new THREE.EdgesGeometry( this.plane.geometry );
+        var mat = new THREE.LineBasicMaterial( { color: 0x111111, linewidth: 1, opacity: 1 } );
+        var wireframe = new THREE.LineSegments( geo, mat );
+        wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
+        this.plane.add( wireframe );
+
+        this.scene.add( this.plane );
+
+        this.objects.push( this.plane );
 
         // lights
 
@@ -367,6 +413,8 @@ export default class CityScene extends Component{
 
 //        controls.touches = { TWO: THREE.TOUCH.ROTATE, ONE: THREE.TOUCH.DOLLY_PAN };
         this.addBuildings()
+
+     //   console.log('on context create')
 	};
 
     addBuildings = ()=>{
@@ -377,26 +425,28 @@ export default class CityScene extends Component{
         })
     }
 
-    addBuilding = (building)=>{
+    addBuilding = (building,onBuild)=>{
 
-        const props = building.props
+        const props = building.props?building.props:{x:0,y:0}
         const size = building.size
+
+        if(size == undefined) return
 
         const width = 50*size.width
         const length =  50*size.length
         const rollOverGeo = new THREE.BoxGeometry( width, 30, length );
-        const rollOverMaterial = new THREE.MeshBasicMaterial( { color:building.color, opacity: 1, transparent: true } );
+        const rollOverMaterial = new THREE.MeshBasicMaterial( { color:building.color, opacity: onBuild==true?0.5:1, transparent: true } );
         const rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 
 
-        rollOverMesh.position.x =  (50*props.x-width/2);
-        rollOverMesh.position.z =  (50*props.y-length/2);
+        rollOverMesh.position.x =  (50*props.x-size.width%2*25);
+        rollOverMesh.position.z =  (50*props.y-size.length%2*25);
         rollOverMesh.position.y = 15;
 
 //        rollOverMesh.position.y = -50;
 
         var geo = new THREE.EdgesGeometry( rollOverMesh.geometry );
-        var mat = new THREE.LineBasicMaterial( { color: 0x111111, linewidth: 1 } );
+        var mat = new THREE.LineBasicMaterial( { color: 0x111111, linewidth: 1, opacity: onBuild==true?0.5:1 } );
         var wireframe = new THREE.LineSegments( geo, mat );
         wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
         rollOverMesh.add( wireframe );
@@ -408,6 +458,20 @@ export default class CityScene extends Component{
         this.objectMap[rollOverMesh.id] = building
 
         building.object = rollOverMesh
+
+        if(onBuild==true){
+        }else{
+            const label = new Label(building,'building');
+            label.setParent(rollOverMesh)
+            label.added = true
+
+
+            this.state.textlabels.push(label)
+        }
+    }
+
+    addRollover = (building)=>{
+        this.addBuilding(building,true)
     }
 
 	onResize = ({ width, height, scale }) => {
@@ -426,10 +490,17 @@ export default class CityScene extends Component{
      //   const ret = this.objects.render(this.cameraHandler.touch,this.camera,this.width,this.height );
 
       // this.setState({textlabels:ret.textlabels,detail:ret.detail})
-        if(this.detailHtml!=undefined){
+      this.state.textlabels.forEach(label=>{
+        label.updatePosition(true,this.state.camera,this.width,this.height);
+      })
+
+
+
+        if(this.detailHtml.added){
 			 this.detailHtml.updatePosition(true,this.state.camera,this.width,this.height);
-			 this.setState({detail:this.detailHtml})
+
 		}
+		 this.setState({detail:this.detailHtml})
 	  //  if(changed ||  this.rendered!=true){
 	       // console.log("render")
             this.renderer.render(this.scene, this.state.camera);
@@ -464,14 +535,80 @@ export default class CityScene extends Component{
          var {x, y, width, height} = event.nativeEvent.layout;
          this.width = width
          this.height = height
+
+        if(mainStore.stage=='build'){
+            this.addRollover(mainStore.onBuild)
+        }
+//         console.log('onlayout')
      }
 
+    cancelBuild = ()=>{
+        mainStore.setStage('game');
+        mainStore.resume();
+
+        const object = mainStore.onBuild.object
+        if(object){
+            this.scene.remove(object)
+
+            Util.arrayRemove(this.objects,object)
+
+            mainStore.onBuild.object = undefined
+        }
+    }
+
+
+    build = ()=>{
+
+
+
+        if(this.checkOccupation()) return
+
+
+        const onBuild = mainStore.onBuild
+
+        const props = this.getPosition()
+
+         const city = mainStore.selectedCity;
+
+        const building = city.build(mainStore.buildingUnit,onBuild,props);
+
+        this.addBuilding(building)
+
+        this.cancelBuild()
+
+    }
+
+    getPosition = ()=>{
+        const onBuild = mainStore.onBuild
+        const position = onBuild.object.position
+        const size = onBuild.size
+        const x = (position.x + size.width%2*25) /50
+        const y = (position.z + size.length%2*25) /50
+
+        console.log(x+","+y)
+
+        return {x,y}
+
+    }
+
+    checkOccupation = ()=>{
+
+        const onBuild = mainStore.onBuild
+
+        const props = this.getPosition()
+
+         const city = mainStore.selectedCity;
+
+        return city.isOccupied(onBuild,props)
+    }
 
 	render(){
 		const self = this;
 		const detail = this.state.detail;
 
         const city = this.props.city;
+
+     //   console.log("render")
 
 	    return(
 	        <>
@@ -495,7 +632,7 @@ export default class CityScene extends Component{
                         this.state.textlabels.map((label,i)=>{
                             if(!label.added) return null;
 
-                            const style = {top:label.top,left:label.left,marginTop:label.placement==='top'?-25:0};
+                            const style = {top:label.top,left:label.left-15,marginTop:-25};
                             if(label.type=='unit'){
                                 style.marginTop=5;
                                 if(label.city.currentLocation.labelPosition!='top'){
@@ -512,14 +649,11 @@ export default class CityScene extends Component{
                             if(label.city.moral<=0){
                                 icons.push("heart")
                             }
-                            if(label.city.resources.food==undefined||label.city.resources.food<=0){
-                                icons.push("barley")
-                            }
 
 
-                            return 	<TouchableOpacity key={i}
+                            return 	<View key={i}
                                 style={[styles.textLabel,style]}
-                                onPress={()=>this.detail(label)}>
+                               >
                                     {label.type=='unit'?<>
                                         <View  style={{flexDirection:'row'}}>
                                         {
@@ -535,21 +669,23 @@ export default class CityScene extends Component{
                                           </View>
                                          </View>
                                      </>
-                                    : <View style={[{backgroundColor:label.textColor,padding:0}]}>
-                                        <Text  style={styles.text}>{label.name}</Text>
+                                    : <View style={[{padding:0}]}>
+                                         <Button icon={label.city.icon} color="white" style={[styles.text,{marginTop:2,minWidth:28,width:28,height:28,opacity:label.city.state=='deploy'?0.5:1}]} contentStyle={{marginLeft:6,marginRight:-10}}
+                                          onPress={()=>this.detail(label)}/>
                                      </View>
                                     }
 
-                            </TouchableOpacity >
+                            </View >
                         })
                     }
                     {detail.added?
-                    <Detail detail={detail}  scene={this} interface={this.props.interface}/>
+                    <Detail detail={detail}  scene={this} interface={this.props.interface} navigation={this.props.navigation}/>
                     :null
                     }
                 </View>
-                <Top menu={false}/>
-                <Side zoom={this.zoom}  navigation={this.props.navigation} city={city}/>
+                <Top menu={false} cancelBuild={this.cancelBuild} build={this.build}/>
+                <Side zoom={this.zoom}  navigation={this.props.navigation} city={city} />
+
 	    	</>
 	    )
 	  }

@@ -25,7 +25,10 @@ class MainStore{
     jobs = [];
     originalSpeed = 1;
     movingUnit = {};
+    buildingUnit = {};
+
     units = [];
+    onBuild ={}
 
     constructor() {
     }
@@ -88,6 +91,16 @@ class MainStore{
         this.scene.current.rendered = false
 
      }
+
+      build = (building,unit)=>{
+
+        this.buildingUnit = unit;
+         this.onBuild= building;
+         this.pause();
+         this.stage="build";
+//         this.scene.current.rendered = false
+
+      }
 
      redraw = ()=>{
         this.scene.current.rendered = false

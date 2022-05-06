@@ -109,6 +109,16 @@ export default class Main extends Component{
                         <Stack.Screen name="CityManage" component={CityManage}
                                 options={({ route }) => ({
                                     title:i18n.t("ui.title.manage"),
+                                    headerLeft: (props) => (
+                                        <HeaderBackButton
+                                          {...props}
+                                          onPress={() => {
+                                            mainStore.resume();
+                                            mainStore.setStage('game')
+                                            navigation.goBack()
+                                          }}
+                                        />
+                                      ),
                                     headerTitle: props =>
                                         <View style={{flexDirection:'row'}}>
                                             <Paragraph style={{position:'relative',top:5,fontSize:18}}> {mainStore.data.cities[route.params.city].name} </Paragraph>

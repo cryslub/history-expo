@@ -5,6 +5,8 @@ import { Button ,Dialog,Modal,Portal ,Paragraph,List,IconButton,Caption,Subheadi
 
 import Icon from './Icon.js';
 import Util from './Util.js';
+import Progress from './Progress.js';
+
 
 import { observer} from "mobx-react"
 
@@ -28,15 +30,6 @@ const styles = StyleSheet.create({
 const containerStyle = {backgroundColor: 'white', padding: 20};
 
 
-export const Progress = (props)=>{
-     const width = props.width
-     const style = props.style
-     style.width = width;
-     return <Animated.View
-         style={[StyleSheet.absoluteFill], style}
-      >
-      </Animated.View>
-}
 
 @observer
 export default class Unit extends Component {

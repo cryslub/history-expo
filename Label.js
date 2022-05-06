@@ -12,6 +12,7 @@ class Label{
         this.parent= false;
         this.position= new THREE.Vector3(0,0,0);
         this.added=false;
+        this.icon = city.icon;
     }
     setParent= function(threejsobj) {
       this.parent = threejsobj;
@@ -19,6 +20,8 @@ class Label{
     updatePosition= function(show,camera,width,height) {
            if(this.parent) {
              this.position.copy(this.parent.position);
+           }else{
+            return
            }
 
            var coords2d = this.get2DCoords(this.position, camera,width,height);
@@ -26,16 +29,18 @@ class Label{
            this.top = coords2d.y;
            if(mainStore.selectedFaction){
                let color = 'rgba(0,100,255,0)'
-               if(this.city.factionData.id == mainStore.selectedFaction.id){
+               if(this.city.factionData?.id == mainStore.selectedFaction?.id){
                    color = 'rgba(0,100,255,0.3)';
                }
                this.textColor = color;
            }
 
            if(show!==true){
-               var distance = this.parent.position.distanceTo(camera.position);
+
+               var distance = this.parent.position?.distanceTo(camera.position);
 
                var a = this.parent.scale.x / 0.3;
+
 
                if(distance < Math.pow(a,2) * 100){
                    this.added  = true;
@@ -47,6 +52,7 @@ class Label{
                if(distance> 400){
                    this.added  = false;
                }
+
 
            }
            if(this.city.object?.visible==false && !this.city.detail) this.added=false

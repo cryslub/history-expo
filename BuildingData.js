@@ -63,9 +63,17 @@ export default class BuildingData extends UnitData{
             })
             this.completedQuantity++;
             this.units.forEach((unit)=>{
-                if(this.data.worker != unit.data.type){
-                      this.removeUnit(unit)
-                      city.addUnit(unit)
+                const worker = this.data.worker
+                if(typeof(worker)==='object'){
+                    if(worker[unit.data.type] == undefined){
+                          this.removeUnit(unit)
+                          city.addUnit(unit)
+                    }
+                }else{
+                    if(worker != unit.data.type){
+                          this.removeUnit(unit)
+                          city.addUnit(unit)
+                    }
                 }
             })
             this.addEffect();
@@ -158,6 +166,20 @@ export default class BuildingData extends UnitData{
 
     }
 
+    getMaxAssigned = ()=>{
+
+        const worker = this.data.worker
+
+        if(typeof(worker) === 'object'){
+            let ret =  0
+
+            Object.keys(worker).forEach(key=>{
+                ret += worker[key];
+            })
+
+            return ret
+        }else {return 1}
+    }
 
     onJob = (diff)=>{
 
@@ -204,7 +226,9 @@ export default class BuildingData extends UnitData{
 
          if(diff>0 && this.state == 'produce'){
             if(this.checkResource()){
-               this.effort += Math.min(this.units.length,this.completedQuantity)*diff;
+
+
+               this.effort += Math.min(this.units.length,this.getMaxAssigned())*diff;
                if(this.hero){
                     this.bonusEffort += (this.hero.wisdom/(200*this.delay))*diff
                }
@@ -330,6 +354,22 @@ export default class BuildingData extends UnitData{
          let sum =  this.getBonus();
 
         return ret * (1+bonus+sum/(100*this.completedQuantity))
+    }
+
+
+    dismissUnit = (unit)=>{
+        this.removeUnit(unit)
+        if(this.type=='trade'){
+            if(this.units.length<this.city.trade.length){
+               this.city.trade.pop();
+               this.city.refreshTrade();
+            }
+        }
+    }
+
+    unassignUnit = (unit)=>{
+        this.dismissUnit(unit)
+        this.city.units.push(unit);
     }
 
     getCoreData(){

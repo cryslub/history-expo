@@ -2,6 +2,12 @@ AI -  hero, advanced weapon, multi army,idle unit disband, long range trade by b
 
 //Production by happiness
 
+building upgrade
+
+
+basic storage or building storage
+
+
 basic militia
 
 rebel
@@ -19,7 +25,6 @@ corruption
 
 fame & order
 
-building storage
 
 
 building limit / building size

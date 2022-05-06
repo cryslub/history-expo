@@ -8,11 +8,17 @@
     "description": "Farmers can produce foods from here",
     "icon": "barley",
     "color": "#e3c378",
-    "worker": "farmer",
+    "worker": {
+      "farmer": 2
+    },
     "production": {
       "delay": 365,
       "result": "food",
       "quantity": 1500
+    },
+    "size": {
+      "width": 2,
+      "length": 2
     }
   },
   "irrigation": {

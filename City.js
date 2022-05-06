@@ -9,6 +9,8 @@ import Util from './Util.js';
 import {CityAI} from './AI.js';
 import {SubUnits} from './Common.js'
 
+const citySize = 20
+
 export default class City extends SubUnits{
 
 
@@ -39,6 +41,8 @@ export default class City extends SubUnits{
 
     resourceConsume = {};
     effect = {};
+
+    occupationMap = [];
 
 	constructor(city,$scope) {
 
@@ -191,12 +195,58 @@ export default class City extends SubUnits{
         building.completedQuantity = quantity;
 
         if(props){
-            building.props = props
-            this.buildingArray.push(building)
+            this.placeBuilding(building,props)
         }
 
 
         return building
+    }
+
+    placeBuilding(building,props){
+
+        building.props = props
+        this.buildingArray.push(building)
+
+        const size = building.size
+
+        this.iterateOccupationMap(size,props,(x,y)=>{
+            this.occupationMap[x][y] = true
+        })
+      //  console.log(this.occupationMap)
+    }
+
+    iterateOccupationMap(size,props,callback){
+
+        if(size == undefined) return
+        if(props == undefined) return
+
+        for(var i=0;i<size.width;i++){
+            for(var j=0;j<size.length;j++){
+                const x = props.x-Math.floor(size.width/2) + i
+                const y = props.y-Math.floor(size.length/2) +j
+                if(this.occupationMap[x]==undefined){
+                    this.occupationMap[x] = [];
+                }
+                callback(x,y)
+            }
+        }
+    }
+
+    isOccupied(building,props){
+
+
+        let result = false
+        const size = building.size
+
+
+
+        this.iterateOccupationMap(size,props,(x,y)=>{
+            if(this.occupationMap[x][y] == true)
+                result = true
+            if(x<-citySize || x>=citySize || y<-citySize || y>=citySize) result = true
+        })
+
+        return result
     }
 
     addResidences(){
@@ -369,7 +419,7 @@ export default class City extends SubUnits{
         return Math.floor(days * (1-bonus));
     }
 
-    build(unit,building,need){
+    build(unit,building,props){
 
         const city = this;
         const cost = building.cost;
@@ -414,6 +464,9 @@ export default class City extends SubUnits{
               })
             })
         }
+
+        this.placeBuilding(buildingData,props)
+
 
         return buildingData;
     }
@@ -682,7 +735,7 @@ export default class City extends SubUnits{
         const b = this.buildings[key];
         if(!Util.initMap(this.buildings,key,building)){
 
-            this.setBuildingOnDone(building,b)
+           // this.setBuildingOnDone(building,b)
 
 
             b.setQuantity(b.quantity+1);

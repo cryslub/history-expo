@@ -78,11 +78,12 @@ export default class Build extends Component {
         const { unit } = this.props.route.params;
         const city = mainStore.selectedCity;
 
-        city.build(unit,building);
+//        city.build(unit,building);
 
 
+        mainStore.build(building,unit);
         this.props.navigation.goBack();
-       this.props.navigation.navigate('Building');
+       this.props.navigation.navigate('CityManage');
        // city.refreshBuildings();
     }
 
@@ -157,7 +158,7 @@ export default class Build extends Component {
 
 
             if(key=='wall'){
-                if(city.buildings.wall.quantity>=city.getDefenseMax()) return false;
+                if(city.buildings.wall?.quantity>=city.getDefenseMax()) return false;
             }
 
             if(unit.data.action.build.includes(key)){

@@ -39,8 +39,10 @@ export class OrbitControls extends EventDispatcher {
         // "target" sets the location of focus, where the object orbits around
         this.target = new Vector3();
         // How far you can dolly in and out ( PerspectiveCamera only )
-        this.minDistance = 0;
-        this.maxDistance = Infinity;
+        this.minDistance = 300;
+        this.maxDistance = 3000;
+
+        this.boundary={top:-1000,bottom:1000,left:-1000,right:1000};
         // How far you can zoom in and out ( OrthographicCamera only )
         this.minZoom = 0;
         this.maxZoom = Infinity;
@@ -663,17 +665,39 @@ export class OrbitControls extends EventDispatcher {
                 this.spherical.radius *= this.scale;
                 // restrict radius to be between desired limits
                 this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius));
+
                 // move target to panned location
                 if (this.enableDamping === true) {
                     this.target.addScaledVector(this.panOffset, this.dampingFactor);
                 }
                 else {
-                    this.target.add(this.panOffset);
+                   if(this.target.x+this.panOffset.x<this.boundary.right && this.target.x+this.panOffset.x>this.boundary.left &&
+                    this.target.z+this.panOffset.z>this.boundary.top && this.target.z+this.panOffset.z<this.boundary.bottom) {
+                        this.target.add(this.panOffset);
+                    }
                 }
                 offset.setFromSpherical(this.spherical);
                 // rotate offset back to "camera-up-vector-is-up" space
                 offset.applyQuaternion(quatInverse);
-                position.copy(this.target).add(offset);
+
+//                 console.log(offset)
+ //                console.log(this.target)
+
+ //                console.log(position)
+
+
+
+                 position.copy(this.target).add(offset);
+
+
+
+//                if(position.x>this.boundary.right) position.x = this.boundary.right
+//                if(position.x<this.boundary.left) position.x = this.boundary.left
+ //               if(position.z<this.boundary.top) position.z = this.boundary.top
+  //              if(position.z>this.boundary.bottom) position.z = this.boundary.bottom
+
+
+
                 this.object.lookAt(this.target);
                 if (this.enableDamping === true) {
                     this.sphericalDelta.theta *= 1 - this.dampingFactor;

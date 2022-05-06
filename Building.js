@@ -57,23 +57,12 @@ export  const  Building =  (observer((props) => {
         </>
     }
 
-    const dismiss = (unit)=>{
-        building.removeUnit(unit)
-        if(building.type=='trade'){
-            if(building.units.length<city.trade.length){
-               city.trade.pop();
-               city.refreshTrade();
-            }
-        }
-    }
-
     const unassign = (unit)=>{
-        dismiss(unit)
-        city.units.push(unit);
+        building.unassignUnit(unit)
     }
 
     const disband = (unit)=>{
-        dismiss(unit)
+        building.dismissUnit(unit)
         city.manpower+=unit.data.manpower;
     }
 
@@ -100,13 +89,9 @@ export  const  Building =  (observer((props) => {
     }
 
     const getMaxAssigned = ()=>{
-        let ret =  building.quantity
 
-        if(building.data.build!=undefined && building.state=='deploy'){
-            ret += building.data.build?.worker
-        }
+        return building.getMaxAssigned()
 
-        return ret
     }
 
     return <ScrollView style={{padding:10,paddingBottom:30}}>
