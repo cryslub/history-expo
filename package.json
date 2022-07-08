@@ -35,7 +35,7 @@
     "jszip-utils": "^0.1.0",
     "mobx": "4.5.2",
     "mobx-react": "5.2.8",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
